@@ -12,11 +12,13 @@ output:
 
 ## Chosen Format
 
-For this project we would like to complete a brief, reproducible APA manuscript. The project will comprise the introduction section, method section, and the results section for an article investigating the relationship between the Dark Triad personality traits and social media use.
+For this project we would like to complete a brief, reproducible APA manuscript. The project will comprise the introduction section, method section, and the results section for an article investigating the relationship between the Dark Triad personality traits (narcissism, Machiavellianism, and psychopathy) and social media use.
 
 ## Purpose
 
 The project will be substantive insofar that we will be producing an APA manuscript. We hypothesize that narcissism will be positively associated with frequency of social media use and time spent on social media, irrespective of site. We also expect that Machiavellianism will be negatively associated with frequency of social media use and time spent on social media. It is unclear how psychopathy will influence frequency of social media use and time spent on social media. 
+
+A more exploratory aim of the project is to examine (1) whether one's reasons for using the internet and (2) perceptions of social media differ as a function of any of the Dark Triad traits. 
 
 ## Description of Data Source
 
@@ -28,7 +30,7 @@ data <- rio::import(here::here("data", "data_1.xlsx"), setclass = "tibble")
 head(data)
 ```
 
-We will be using a dataset collected Winter Term (2019) through the Human Subjects Pool's general survey. Participants (*N* = `r nrow(data)`) were University of Oregon undegraduate students. The dataset includes (1) a measure of the Dark Triad personality traits (i.e., Machiavellianism, narcissism, psychopathy), (2) questions assessing the participants' frequency of visiting eleven social media sites, (3) questions assessing the amount of time participants spend on those eleven social media sites, (4) a scale assessing the participants' addiction to social media, (5) a scale measuring the participants' reasons for using the intern, and (6) two questions asssessing the participants' overall view of social media sites. We will be focussing on the measure of teh Dark Triad, the questions assessing frequency of use and amoung of time spent on SMS.
+We will be using a dataset collected Winter Term (2019) through the Human Subjects Pool's general survey. Participants (*N* = `r nrow(data)`) were University of Oregon undegraduate students. The dataset includes (1) a measure of the Dark Triad personality traits (i.e., Machiavellianism, narcissism, psychopathy), (2) questions assessing  participants' frequency of visiting eleven social media sites, (3) questions assessing the amount of time participants spend on those eleven social media sites, (4) a scale assessing the participants' addiction to social media, (5) a scale measuring participants' reasons for using the internet, and (6) two questions asssessing participants' overall view of social media sites. We will be focussing on the measure of teh Dark Triad, the questions assessing frequency of use and amoung of time spent on SMS.
 
 ## Lingering Questions
 1. We are able to run multiple models using map, but is there a simple way to vary the variables entered as predictors using map? For example, if we want to run every model between a null model and a full model.
