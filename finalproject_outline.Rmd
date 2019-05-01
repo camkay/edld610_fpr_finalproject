@@ -16,7 +16,7 @@ For this project we would like to complete a brief, reproducible APA manuscript.
 
 ### Purpose
 
-The project will be substantive insofar that we will be producing an APA manuscript. We hypothesize that narcissism will be positively associated with frequency of social media use and time spent on social media, irrespective of site. We also expect that Machiavellianism will be negatively associated with frequency of social media use and time spent on social media. It is unclear how psychopathy will influence frequency of social media use and time spent on social media. 
+The project will be substantive insofar that we will be producing an APA manuscript. We hypothesize that narcissism will be positively associated with frequency of social media use and time spent on social media, irrespective of site. We also expect that Machiavellianism will be negatively associated with frequency of social media use and time spent on social media. It is unclear how psychopathy will influence frequency of social media use and time spent on social media.
 
 A more exploratory aim of the project is to examine (1) whether one's reasons for using the internet and (2) perceptions of social media differ as a function of any of the Dark Triad traits. 
 
@@ -30,21 +30,23 @@ data <- rio::import(here::here("data", "data_1.xlsx"), setclass = "tibble")
 head(data)
 ```
 
-We will be using a dataset collected Winter Term (2019) through the Human Subjects Pool's general survey. Participants (*N* = `r nrow(data)`) were University of Oregon undergraduate students. The dataset includes (1) a measure of the Dark Triad personality traits (i.e., Machiavellianism, narcissism, psychopathy), (2) questions assessing  participants' frequency of visiting eleven social media sites, (3) questions assessing the amount of time participants spend on those eleven social media sites, (4) a scale assessing the participants' addiction to social media, (5) a scale measuring participants' reasons for using the internet, and (6) two questions assessing participants' overall view of social media sites. We will be focusing on the measure of the Dark Triad, the questions assessing frequency of use and amount of time spent on SMS.
+We will be using a dataset collected Winter Term (2019) through the Human Subjects Pool's general survey. Participants (*N* = `r nrow(data)`) were University of Oregon undergraduate students. The dataset includes (1) a measure of the Dark Triad personality traits (i.e., Machiavellianism, narcissism, psychopathy), (2) questions assessing  participants' frequency of visiting eleven social media sites, (3) questions assessing the amount of time participants spend on those eleven social media sites, (4) a scale assessing the participants' addiction to social media, (5) a scale measuring participants' reasons for using the internet, and (6) two questions assessing participants' overall view of social media sites. We will be focusing on the measure of the Dark Triad and the questions assessing frequency of use and amount of time spent on SMS.
 
 ### Lingering Questions
 
 (1) We are able to run multiple models using map, but is there a simple way to vary the variables entered as predictors using map? For example, if we want to run every model between a null model and a full model?
 
+(2) We see how `pmap` can be used to tackle similar problems as the row-wise use of `apply`, but is there a variation of `map` that is more akin to `apply(X, MARGIN = 1)`? We've used `imap`, but it feels like a bit round-about.
+
 ### How we plan to address the main requirements for the final product:
 
-No code is used repetitively (no more than twice) [10 points] / More than one variant of purrr::map is used [10 points] / At least two custom functions [20 points; 10 points each]
+No code is used repetitively (no more than twice) [10 points] / More than one variant of `purrr::map` is used [10 points] / At least two custom functions [20 points; 10 points each]
 
-+ I imagine we will need to create a series of functions and such to ease the process of re-coding our variables and the data itself. We could probably find a way to use map when we need to exclude participants exhibiting low response deviations (i.e., an indicator of straight lining/clicking through the survey)?
++ We imagine that we will need to create a series of functions to ease the process of re-coding our variables and the data itself. We could find a way to use `map` when we need to exclude participants exhibiting low response deviations (an indicator of straight lining/clicking through the survey. It could also be used to streamline the fitting of your models. Since we would also expect there to be gender differences within the Dark Triad traits, we could create a function to streamline the t-test comparisons and the effect size calculations. 
 
 At least one instance of parallel iteration (e.g., map2_*, pmap_*) [10 points] / At least one use case of purrr::nest %>% mutate() [10 points]
 
-+ We could potentially do something similar to the plot iteration problem on the midterm.. maybe we could nest the data by Dark Triad trait and some other variable of interest, then create plots accordingly? 
++ We could potentially do something similar to the plot iteration problem on the midterm. We could nest the data by Dark Triad trait and some other variable of interest, then create plots accordingly. For example, we could produce a plot showing the relationship between the level of the dark triad traits and frequency of use for every participant. 
 
 Code is fully reproducible and housed on GitHub [10 points]
 
