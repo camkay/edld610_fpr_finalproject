@@ -61,27 +61,23 @@ data1 <- rio::import(here::here("data", "data_1.xlsx"), setclass = "tibble") %>%
 options(scipen = 999)
 ```
 
+```{r clean_data1, include = FALSE}
 
+```
 
-
+Sagacious intro text goes here.
 
 # Method
-We report how we determined our sample size, all data exclusions (if any), all manipulations, and all measures in the study. <!-- 21-word solution (Simmons, Nelson & Simonsohn, 2012; retrieved from http://ssrn.com/abstract=2160588) -->
 
 ## Participants
 
-## Material
-
-## Procedure
+## Material and procedure
 
 ## Data analysis
-We used `r cite_r("r-references.bib")` for all our analyses.
-
 
 # Results
 
 # Discussion
-
 
 \newpage
 
