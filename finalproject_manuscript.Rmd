@@ -1,0 +1,98 @@
+---
+title             : "Clickbait Title with SEO Keywords"
+shorttitle        : "Clickbait Title"
+
+author: 
+  - name          : "Cameron S. Kay"
+    affiliation   : "1"
+    corresponding : yes    # Define only one corresponding author
+    address       : "Department of Psychology, 1227 University of Oregon, Eugene, OR 97403"
+    email         : "ckay@uoregon.edu"
+  - name          : "Ashley L. Miller"
+    affiliation   : "1"
+
+affiliation:
+  - id            : "1"
+    institution   : "University of Oregon"
+
+authornote: |
+  Cameron Stuart Kay, Department of Psychology, University of Oregon; Ashley L. Miller, Department of Psychology, University of Oregon.
+
+abstract: |
+ Abstract goes herey
+  
+keywords          : "keywords"
+wordcount         : "X"
+
+bibliography      : ["r-references.bib"]
+
+floatsintext      : no
+figurelist        : no
+tablelist         : no
+footnotelist      : no
+linenumbers       : no
+mask              : no
+draft             : no
+
+header-includes:
+  - \raggedbottom
+  - \setlength{\parskip}{0pt}
+
+documentclass     : "apa6"
+classoption       : "man, fleqn, noextraspace"
+output            : papaja::apa6_pdf
+---
+
+```{r setup, include = FALSE}
+# load required packaages
+library("papaja") # for creating the apa journal article
+library(tidyverse) # for purrr, dplyr, and ggplot2 functions
+library(rio) # for easy imporrting of data
+library(here) # for reproducible paths
+library(magrittr) # for the compound assigiment pipe-operator
+library(lme4) # for conducting linear mixed-effects models
+library(lmerTest) # for calculating t-tests for linear mixed-effects models
+
+# import data as tibble and clean column names
+data1 <- rio::import(here::here("data", "data_1.xlsx"), setclass = "tibble") %>%
+  janitor::clean_names()
+
+# turn off scientific notation
+options(scipen = 999)
+```
+
+
+
+
+
+# Method
+We report how we determined our sample size, all data exclusions (if any), all manipulations, and all measures in the study. <!-- 21-word solution (Simmons, Nelson & Simonsohn, 2012; retrieved from http://ssrn.com/abstract=2160588) -->
+
+## Participants
+
+## Material
+
+## Procedure
+
+## Data analysis
+We used `r cite_r("r-references.bib")` for all our analyses.
+
+
+# Results
+
+# Discussion
+
+
+\newpage
+
+# References
+```{r create_r-references}
+r_refs(file = "r-references.bib")
+```
+
+\begingroup
+\setlength{\parindent}{-0.5in}
+\setlength{\leftskip}{0.5in}
+
+<div id = "refs"></div>
+\endgroup
