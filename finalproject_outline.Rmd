@@ -34,16 +34,21 @@ We will be using a dataset collected Winter Term (2019) through the Human Subjec
 
 ### Lingering Questions
 
-1. We are able to run multiple models using map, but is there a simple way to vary the variables entered as predictors using map? For example, if we want to run every model between a null model and a full model?
+(1) We are able to run multiple models using map, but is there a simple way to vary the variables entered as predictors using map? For example, if we want to run every model between a null model and a full model?
 
 ### How we plan to address the main requirements for the final product:
 
-+ No code is used repetitively (no more than twice) [10 points] / More than one variant of purrr::map is used [10 points] / At least two custom functions [20 points; 10 points each]
-  + I imagine we will need to create a series of functions and such to ease the process of re-coding our variables and the data itself. We could probably find a way to use map when we need to exclude participants exhibiting low response deviations (i.e., an indicator of straight lining/clicking through the survey)?
-+ At least one instance of parallel iteration (e.g., map2_*, pmap_*) [10 points] / At least one use case of purrr::nest %>% mutate() [10 points]
-  + We could potentially do something similar to the plot iteration problem on the midterm.. maybe we could nest the data by Dark Triad trait and some other variable of interest, then create plots accordingly? 
-+ Code is fully reproducible and housed on GitHub [10 points]
-  + Already hosted on Github :) We will make sure the code is reproducible!
+No code is used repetitively (no more than twice) [10 points] / More than one variant of purrr::map is used [10 points] / At least two custom functions [20 points; 10 points each]
+
++ I imagine we will need to create a series of functions and such to ease the process of re-coding our variables and the data itself. We could probably find a way to use map when we need to exclude participants exhibiting low response deviations (i.e., an indicator of straight lining/clicking through the survey)?
+
+At least one instance of parallel iteration (e.g., map2_*, pmap_*) [10 points] / At least one use case of purrr::nest %>% mutate() [10 points]
+
++ We could potentially do something similar to the plot iteration problem on the midterm.. maybe we could nest the data by Dark Triad trait and some other variable of interest, then create plots accordingly? 
+
+Code is fully reproducible and housed on GitHub [10 points]
+
++ Already hosted on Github :) We will make sure the code is reproducible!
 
 
 
