@@ -247,15 +247,41 @@ data1 %<>%
         # factorize social media site
         sns              = factor(sns),
         # factorize context
-        sns_perc_context = factor(sns_perc_context))
+        sns_perc_context = factor(sns_perc_context),
+        # numerize frequency
+        freq             = as.numeric(freq))
 
 
 # plot for fun
+data1 %>%
+  filter(gender == "Male" | gender == "Female") %>%
+  group_by(gender, sns) %>%
+  summarise(len_m = mean(len, na.rm = TRUE)) %>%
+  ggplot(aes(x = sns, y = len_m, fill = gender)) + 
+    geom_col(position = "dodge") +
+    scale_fill_manual(values = c("steelblue3", "darkorchid3")) +
+    theme_bw() +
+    coord_flip() +
+    labs(y = "Average length spent on Social Media Sites per Day (minutes)",
+         x = "Social Media Site")
 
-
-
+data1 %>%
+  filter(gender == "Male" | gender == "Female") %>%
+  group_by(gender, sns) %>%
+  summarise(freq_m = mean(freq, na.rm = TRUE)) %>%
+  ggplot(aes(x = sns, y = freq_m, fill = gender)) + 
+    geom_col(position = "dodge") +
+    scale_fill_manual(values = c("steelblue3", "darkorchid3")) +
+    theme_bw() +
+    coord_flip() +
+    labs(y = "Average frequency of using the social media sites",
+         x = "Social Media Site") +
+    scale_y_continuous(labels = c("Rarely", "Monthly", "Weekly", 
+                                  "Daily", "Multiple times of day"))
+  
 
 ```
+
 
 Sagacious intro text goes here.
 
