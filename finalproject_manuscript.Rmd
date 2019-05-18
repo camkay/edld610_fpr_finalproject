@@ -215,6 +215,28 @@ data1 %<>%
   mutate(sns_perc_context = gsub(".*_", "", sns_perc_context))
 
 
+# create a range function
+range_mean <- function(x) {
+  as.character(mean(as.numeric(strsplit(str_extract(x, "\\d*-\\d*"), "-")[[1]])))
+}
+
+data1[grepl("-", data1$len), "len"] <- apply(data1[grepl("-", data1$len), "len"], 
+                                             MARGIN = 1, 
+                                             range_mean)
+
+data1 %<>%
+  mutate(len_unit  = case_when(grepl("(hour|hr)", len) ~ 60,
+                               TRUE                    ~ 1),
+         len_clean = case_when(len == "ten"                  ~ 10,
+                               len == "3o"                   ~ 30,
+                               len == "sixty"                ~ 60,
+                               len == "eighty"               ~ 80,
+                               grepl("(zero|no|never)", len) ~ 0,
+                               TRUE                          ~ parse_number(len)),
+         len       = len_clean * len_unit) %>%
+  select(-len_unit, -len_clean)
+
+
 ```
 
 Sagacious intro text goes here.
