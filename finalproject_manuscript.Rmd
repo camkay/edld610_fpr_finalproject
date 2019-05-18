@@ -61,7 +61,7 @@ data1 <- rio::import(here::here("data", "data_1.xlsx"), setclass = "tibble") %>%
 options(scipen = 999)
 ```
 
-```{r clean_data1, include = FALSE}
+```{r renamecols_data1, include = FALSE}
 # drop the display order columns
 data1 %<>%
   select(-contains("do"))
@@ -75,9 +75,9 @@ data1 %<>%
          race_other   = q1_4_10_text)
 
 
-# create vectors of labels to use for renaming the columns
+# create vectors of subscale names for renaming the columns
 d3_traits    <- c("mach", "narc", "psyc")
-   
+
 sns          <- c("facebook", 
                   "pinterest", 
                   "instagram", 
@@ -104,14 +104,8 @@ sns_addict   <- c("salience",
 sns_contexts <- c("society",
                   "self")
 
-
-data_rename <- tibble(col_ids = c("q737",
-                                  "q738",
-                                  "q7(5|6[0-3])",
-                                  "q764",
-                                  "q765",
-                                  "q766"),
-                      scale_names = c("dd",
+# create a tibble containing all the necessary information for renaming the columns
+data_rename <- tibble(scale_names = c("dd",
                                       "freq",
                                       "len",
                                       "sns_perc",
@@ -125,11 +119,6 @@ data_rename <- tibble(col_ids = c("q737",
                                          sns_addict),
                       scale_lens  = c(12, 11, 11, 2, 20, 18),
                       sub_lens    = list(4, 1, 1, 1, c(8, 7, 5), 3))
-
-
-
-
-
 
 # create a function for detecting columns names from a string
 col_match <- function(pattern, data) {
@@ -145,7 +134,7 @@ col_match <- function(pattern, data) {
   grepl(pattern, names(data))
 }
 
-# create function for creating names
+# create a function for creating column names
 name_creator <- function(scale_name, sub_name, scale_len, sub_len) {
   
   # calculate the subscale length if no subscale length provided
@@ -177,33 +166,19 @@ name_creator <- function(scale_name, sub_name, scale_len, sub_len) {
   
 }
 
-
-
-
-# for (i in seq_len(nrow(data_rename))) {
-#   names(data1)[col_match(data_rename$col_ids[i], data1)] <- name_creator(data_rename$scale_names[i], 
-#                                                              data_rename$sub_names[[i]], 
-#                                                              data_rename$scale_lens[i], 
-#                                                              data_rename$sub_lens[[i]])
-# }
-
-
-col_names <- pmap(list(scale_names  = data_rename$scale_names,
-                       sub_names    = data_rename$sub_names,
-                       scale_lens   = data_rename$scale_lens,
-                       sub_lens     = data_rename$sub_lens),
-                  function(scale_names, sub_names, scale_lens, sub_lens) {
-                    name_creator(scale_names, sub_names, scale_lens, sub_lens)
-})
-
+# iterate through data_rename and create a list of column names
 col_names <- pmap(list(data_rename$scale_names,
                        data_rename$sub_names,
                        data_rename$scale_lens,
                        data_rename$sub_lens),
-                   ~name_creator(..1, ..2, ..3, ..4)
+                  ~name_creator(..1, ..2, ..3, ..4)
 )
 
+# assign created column names to data1
 names(data1)[col_match("q7", data1)] <- unlist(col_names)
+
+# remove uneeded variables
+rm(list = setdiff(ls(), "data1"))
 ```
 
 Sagacious intro text goes here.
