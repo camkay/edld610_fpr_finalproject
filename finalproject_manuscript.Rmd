@@ -66,7 +66,7 @@ options(scipen = 999)
 data1 %<>%
   select(-contains("do"))
 
-# manuaally rename demographic columns
+# manualy rename the demographic columns
 data1 %<>%
   rename(age          = q1_1,
          gender       = q1_2,
@@ -103,6 +103,33 @@ sns_addict   <- c("salience",
 
 sns_contexts <- c("society",
                   "self")
+
+
+data_rename <- tibble(col_ids = c("q737",
+                                  "q738",
+                                  "q7(5|6[0-3])",
+                                  "q764",
+                                  "q765",
+                                  "q766"),
+                      scale_names = c("dd",
+                                      "freq",
+                                      "len",
+                                      "sns_perc",
+                                      "int_mot",
+                                      "int_addict"),
+                      sub_names   = list(d3_traits,
+                                         sns,
+                                         sns,
+                                         sns_contexts,
+                                         int_motives,
+                                         sns_addict),
+                      scale_lens  = c(12, 11, 11, 2, 20, 18),
+                      sub_lens    = list(4, 1, 1, 1, c(8, 7, 5), 3))
+
+
+
+
+
 
 # create a function for detecting columns names from a string
 col_match <- function(pattern, data) {
@@ -150,38 +177,33 @@ name_creator <- function(scale_name, sub_name, scale_len, sub_len) {
   
 }
 
-flatten_dbl(map(c(8, 7, 5), seq_len))
-
-flatten_dbl(map(8, seq_len))
-
-name_creator("dd", d3_traits, 12)
-
-name_creator("freq", sns, 11)
-
-name_creator("len", sns, 11)
-
-name_creator("sns_perc", sns_contexts, 2)
-
-name_creator("int_mot", int_motives, 20, c(8, 7, 5))
-
-name_creator("int_addict", sns_addict, 18)
-
-
-names(data1)[col_match("q737", data1)] <- name_creator("dd", d3_traits, 12, 3)
-
-names(data1)[grepl("q738", names(data1))] <- paste("freq", sns, seq_along(sns), sep = "_")
-
-names(data1)[grepl("q7(5|6[0-3])", names(data1))] <- paste("len", sns, seq_along(sns), sep = "_")
-
-names(data1)[grepl("q764", names(data1))] <- paste("sns_perception", c("society", "self"), sep = "_")
-
-names(data1)[grepl("q765", names(data1))] <- paste("sns_perception", rep(int_motives, times = c(8, 7, 5)), flatten_dbl(map(c(8, 7, 5), seq_len)), sep = "_")
-
-names(data1)[grepl("q766", names(data1))] <- paste("int_addiction", rep(sns_addiction, each = 3), rep(1:3, length(sns_addiction)), sep = "_")
 
 
 
+# for (i in seq_len(nrow(data_rename))) {
+#   names(data1)[col_match(data_rename$col_ids[i], data1)] <- name_creator(data_rename$scale_names[i], 
+#                                                              data_rename$sub_names[[i]], 
+#                                                              data_rename$scale_lens[i], 
+#                                                              data_rename$sub_lens[[i]])
+# }
 
+
+col_names <- pmap(list(scale_names  = data_rename$scale_names,
+                       sub_names    = data_rename$sub_names,
+                       scale_lens   = data_rename$scale_lens,
+                       sub_lens     = data_rename$sub_lens),
+                  function(scale_names, sub_names, scale_lens, sub_lens) {
+                    name_creator(scale_names, sub_names, scale_lens, sub_lens)
+})
+
+col_names <- pmap(list(data_rename$scale_names,
+                       data_rename$sub_names,
+                       data_rename$scale_lens,
+                       data_rename$sub_lens),
+                   ~name_creator(..1, ..2, ..3, ..4)
+)
+
+names(data1)[col_match("q7", data1)] <- unlist(col_names)
 ```
 
 Sagacious intro text goes here.
