@@ -62,13 +62,11 @@ options(scipen = 999)
 ```
 
 ```{r clean_data1, include = FALSE}
-# create renamer function
-rep_each <- function()
-
-# rename columns
+# drop the display order columns
 data1 %<>%
   select(-contains("do"))
 
+# manuaally rename demographic columns
 data1 %<>%
   rename(age          = q1_1,
          gender       = q1_2,
@@ -76,23 +74,100 @@ data1 %<>%
          race         = q1_4,
          race_other   = q1_4_10_text)
 
-d3_traits <- c("mach", "narc", "psyc")
 
-sns       <- c("facebook", "pinterest", "instagram", "linkedin", "twitter", "snapchat", "youtube", "whatsapp", "reddit", "4chan", "tumblr")
+# create vectors of labels to use for renaming the columns
+d3_traits    <- c("mach", "narc", "psyc")
+   
+sns          <- c("facebook", 
+                  "pinterest", 
+                  "instagram", 
+                  "linkedin", 
+                  "twitter", 
+                  "snapchat", 
+                  "youtube", 
+                  "whatsapp", 
+                  "reddit", 
+                  "4chan", 
+                  "tumblr")
+ 
+int_motives  <- c("inform", 
+                  "interp", 
+                  "entert")
+ 
+sns_addict   <- c("salience",
+                  "tolerance",
+                  "mood",
+                  "relapse",
+                  "withdraw",
+                  "conflict")
 
-int_motives <- c("inform", 
-                 "interp", 
-                 "entert")
+sns_contexts <- c("society",
+                  "self")
 
-sns_addiction <- c("salience",
-                   "tolerance",
-                   "mood",
-                   "relapse",
-                   "withdraw",
-                   "conflict")
+# create a function for detecting columns names from a string
+col_match <- function(pattern, data) {
+  
+  # ensure pattern is a character and the data is a dataframe
+  if (!is.character(pattern)) {
+    stop("Pattern must be of type character.")
+  } else if (!is.data.frame(data)) {
+    stop("Data must of type dataframe/tibble.")
+  }
+  
+  # return colnumn names that contain the pattern
+  grepl(pattern, names(data))
+}
+
+# create function for creating names
+name_creator <- function(scale_name, sub_name, scale_len, sub_len) {
+  
+  # calculate the subscale length if no subscale length provided
+  if (missing(sub_len)) {
+    sub_len <- scale_len / length(sub_name)
+  }
+  
+  # create a vector of subscale names to match length of the scale
+  if (length(sub_len) == 1) {
+    sub_vector <- rep(sub_name, each = sub_len)
+    
+  } else {
+    sub_vector <- rep(sub_name, times = sub_len)
+  }
+
+  # paste the values together
+  scale_sub <- paste(scale_name, sub_vector, sep = "_")
+  
+  # if sub_len != 1, add item numbers
+  if (any(sub_len != 1)) {
+    # create a vector of item numbers
+    item_nums <- rep(flatten_dbl(map(sub_len, seq_len)), times = scale_len / sum(sub_len))
+    # combine scale_sub with the item_nums
+    scale_sub <- paste(scale_sub, item_nums, sep = "_")
+  }
+  
+  # return scale_sub
+  scale_sub
+  
+}
+
+flatten_dbl(map(c(8, 7, 5), seq_len))
+
+flatten_dbl(map(8, seq_len))
+
+name_creator("dd", d3_traits, 12)
+
+name_creator("freq", sns, 11)
+
+name_creator("len", sns, 11)
+
+name_creator("sns_perc", sns_contexts, 2)
+
+name_creator("int_mot", int_motives, 20, c(8, 7, 5))
+
+name_creator("int_addict", sns_addict, 18)
 
 
-names(data1)[grepl("q737", names(data1))] <- paste("dd", rep(d3_traits, each = 4), rep(1:4, times = 3), sep = "_")
+names(data1)[col_match("q737", data1)] <- name_creator("dd", d3_traits, 12, 3)
 
 names(data1)[grepl("q738", names(data1))] <- paste("freq", sns, seq_along(sns), sep = "_")
 
