@@ -181,23 +181,6 @@ rm(list = setdiff(ls(), "data1"))
 ```
 
 ```{r tidy_data1}
-# factorize and label factors
-data1 %<>%
-  mutate(gender = factor(gender, labels = c("Male",
-                                            "Female",
-                                            "Non-binary",
-                                            "Prefer not to say",
-                                            "Other")),
-         race   = factor(race, labels = c("American Indian or Alaska Native",
-                                          "Asian",
-                                          "Black or African American",
-                                          "Native Hawaiian or Other Pacific Islander",
-                                          "Caucasian",
-                                          "Hispanic, Latinx, or Spanish Origin",
-                                          "Middle Eastern or North African",
-                                          "I prefer not to answer",
-                                          "Some other ethnicity or origin")))
-
 # add an id column
 data1 %<>%
   mutate(id = 1:n()) %>%
@@ -215,26 +198,61 @@ data1 %<>%
   mutate(sns_perc_context = gsub(".*_", "", sns_perc_context))
 
 
-# create a range function
+# create a function for calculating the mean of time responses given as a range
 range_mean <- function(x) {
   as.character(mean(as.numeric(strsplit(str_extract(x, "\\d*-\\d*"), "-")[[1]])))
 }
 
+# replace all ranges with the mean of the ranges
 data1[grepl("-", data1$len), "len"] <- apply(data1[grepl("-", data1$len), "len"], 
                                              MARGIN = 1, 
                                              range_mean)
 
+# convert the length column to numeric
 data1 %<>%
-  mutate(len_unit  = case_when(grepl("(hour|hr)", len) ~ 60,
+  mutate(# create a new column for the unit the response was given in
+         len_unit  = case_when(grepl("(hour|hr)", len) ~ 60,
                                TRUE                    ~ 1),
+         # replace characgter numbers with numeric numbers
          len_clean = case_when(len == "ten"                  ~ 10,
                                len == "3o"                   ~ 30,
                                len == "sixty"                ~ 60,
                                len == "eighty"               ~ 80,
                                grepl("(zero|no|never)", len) ~ 0,
+                               # parse all remaining numbers
                                TRUE                          ~ parse_number(len)),
+         # multiple the length value by the length unit to give the total number in minutes
          len       = len_clean * len_unit) %>%
+  # drop the len_unit and len_clean columns
   select(-len_unit, -len_clean)
+
+# factorize and label factors
+data1 %<>%
+  mutate(# factorize gender
+        gender           = factor(gender, labels = c("Male",
+                                                     "Female",
+                                                     "Non-binary",
+                                                     "Prefer not to say",
+                                                     "Other")),
+        # factorize race 
+        race             = factor(race, labels   = c("American Indian or Alaska Native",
+                                                     "Asian",
+                                                     "Black or African American",
+                                                     "Native Hawaiian or Other Pacific Islander",
+                                                     "Caucasian",
+                                                     "Hispanic, Latinx, or Spanish Origin",
+                                                     "Middle Eastern or North African",
+                                                     "I prefer not to answer",
+                                                     "Some other ethnicity or origin")),
+        # factorize social media site
+        sns              = factor(sns),
+        # factorize context
+        sns_perc_context = factor(sns_perc_context))
+
+
+# plot for fun
+
+
 
 
 ```
