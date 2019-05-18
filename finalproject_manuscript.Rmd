@@ -62,17 +62,16 @@ options(scipen = 999)
 ```
 
 ```{r renamecols_data1, include = FALSE}
-# drop the display order columns
+# drop the display order columns and the other columns
 data1 %<>%
-  select(-contains("do"))
+  select(-contains("do"),
+         -contains("text"))
 
 # manualy rename the demographic columns
 data1 %<>%
   rename(age          = q1_1,
          gender       = q1_2,
-         gender_other = q1_2_5_text,
-         race         = q1_4,
-         race_other   = q1_4_10_text)
+         race         = q1_4)
 
 
 # create vectors of subscale names for renaming the columns
@@ -179,6 +178,36 @@ names(data1)[col_match("q7", data1)] <- unlist(col_names)
 
 # remove uneeded variables
 rm(list = setdiff(ls(), "data1"))
+```
+
+```{r tidy_data1}
+# factorize and label factors
+data1 %<>%
+  mutate(gender = factor(gender, labels = c("Male",
+                                            "Female",
+                                            "Non-binary",
+                                            "Prefer not to say",
+                                            "Other")),
+         race   = factor(race, labels = c("American Indian or Alaska Native",
+                                          "Asian",
+                                          "Black or African American",
+                                          "Native Hawaiian or Other Pacific Islander",
+                                          "Caucasian",
+                                          "Hispanic, Latinx, or Spanish Origin",
+                                          "Middle Eastern or North African",
+                                          "I prefer not to answer",
+                                          "Some other ethnicity or origin")))
+
+# add an id column
+data1 %<>%
+  mutate(id = 1:n()) %>%
+  select(id, everything())
+
+# tidy data
+data1 %<>%
+  gather("key", "value", freq_facebook:len_tumblr) %>%
+  separate(key, into = c("variable", "sns"), sep = "_") %>%
+  spread(variable, value)
 ```
 
 Sagacious intro text goes here.
