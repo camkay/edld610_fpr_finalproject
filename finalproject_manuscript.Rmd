@@ -303,10 +303,10 @@ comp_names %<>%
   map(str_replace, "_\\d", "") %>%
   map(unique)
 
-# create alphaizer function
-str_alpha <- function(col, data) {
+# create a function for calculating alpha given a string name
+str_alpha <- function(pattern, data) {
   # find names of columns that match the string
-  cols_found  <- col_find(col, data)
+  cols_found  <- col_find(pattern, data)
   # extract only those columns from the data 
   data <- data[, cols_found]
   # calculate and extract the alpha value
@@ -319,8 +319,47 @@ comp_alphas <- comp_names %>%
   flatten_dbl() 
 
 # name the alpha composites
-comp_alphas <- flatten_chr(comp_names)
+names(comp_alphas) <- flatten_chr(comp_names)
 
+# create a function for calculating rowmeans given a string name
+str_means <- function(pattern, data) {
+  # find names of columns that match the string
+  cols_found  <- col_find(pattern, data)
+  # extract only those columns from the data 
+  data <- data[, cols_found]
+  # message how the row means were created
+  names_len <- length(names(data))
+  
+  if (names_len <= 4) {
+    col_names <- paste(names(data), collapse = ", ")
+  } else {
+    col_names <- paste0(paste(names(data)[1:3], collapse = ", "), ", and ", names_len - 3, " more")
+  }
+  
+  
+  message(paste0("Row means were calculated using ", 
+                ncol(data), 
+                " columns: ",
+                col_names,
+                "."))
+  
+  # calculate row means
+  rowMeans(data)
+}
+
+# calculate composites
+data_comp <- comp_names %>%
+  map(map, str_means, data1) %>%
+  flatten_dfc()
+
+names(data_comp) <- paste0(flatten_chr(comp_names), "_comp")
+
+data1 <- data1 %>%
+  cbind(data_comp)
+
+# drop unneeded single item columns
+data1 %<>%
+  select(-matches("\\d$"))
 
 ```
 
