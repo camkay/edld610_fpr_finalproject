@@ -386,6 +386,15 @@ data1 %>%
     labs(y = "Average length spent on Social Media Sites per Day (minutes)",
          x = "Social Media Site")
 
+###########################################################
+################# Cooresponding analysis: ################# 
+###########################################################
+
+model1 <- lmer(len ~ gender*sns + (1 | id), data = ash_data)
+summary(model1)
+
+###########################################################
+
 data1 %>%
   filter(gender == "Male" | gender == "Female") %>%
   group_by(gender, sns) %>%
@@ -399,8 +408,130 @@ data1 %>%
          x = "Social Media Site") +
     scale_y_continuous(labels = c("Rarely", "Monthly", "Weekly", 
                                   "Daily", "Multiple times of day"))
-  
 
+```
+
+```{r mach_plots}
+
+ash_data <- data1 %>%
+  select(id, age, gender, race, sns:sns_perc_rating, contains("comp")) %>%
+  filter(gender == "Male" | gender == "Female") %>%
+  arrange(id)
+
+# Machiavellianism x gender x sns model
+#mach x insta X gender
+#mach x snapchat X gender
+mach_sns <- lmer(len ~ dd_mach_comp*sns*gender + (1 | id),
+             data = ash_data)
+summary(mach_sns)
+
+ash_data %<>%
+  mutate(mach_group = case_when(dd_mach_comp > quantile(dd_mach_comp, .75, na.rm = TRUE) ~ "High",
+                                dd_mach_comp < quantile(dd_mach_comp, .25, na.rm = TRUE) ~ "Low",
+                                TRUE ~ "Mid"),
+         mach_group = factor(mach_group, levels = c("Low", "Mid", "High")))
+
+ash_data %>%
+  filter(sns == "instagram" | sns == "snapchat") %>%
+  filter(mach_group != "Mid") %>%
+  group_by(sns, gender, mach_group) %>% 
+  summarize(len_m  = mean(len, na.rm = TRUE)) %>%
+  ggplot(aes(x = mach_group, y = len_m, fill = gender)) +
+    geom_col(position = "dodge", alpha = 0.9) +
+    scale_fill_manual(values = c("#4A235A", "#D2B4DE"),
+                         name  = "Gender",
+                         breaks = c("Male", "Female"),
+                         labels = c("Male", "Female")) +
+    facet_wrap(~sns) +
+    theme_bw(base_size = 14) +
+    theme(axis.title = element_text(face = "bold"),
+             strip.text = element_text(face = "bold", size = 14),
+             legend.title = element_text(face = "bold"),
+             panel.grid.major = element_line(colour = "white"), 
+             panel.grid.minor = element_line(colour = "white")) +
+    labs(y = "Average length spent on Social Media Sites per Day (minutes)",
+         x = "Machiavellianism",
+         colour = "Gender") 
+
+```
+
+```{r narc_plots}
+# Narcissism x gender x sns model
+# narc x insta x gender
+# narc x reddit x gender
+# narc x snapchat x gender
+narc_sns <- lmer(len ~ dd_narc_comp*sns*gender + (1 | id),
+             data = ash_data)
+summary(narc_sns)
+
+str(ash_data)
+
+ash_data %<>%
+  mutate(narc_group = case_when(dd_narc_comp > quantile(dd_narc_comp, .75, na.rm = TRUE) ~ "High",
+                                dd_narc_comp < quantile(dd_narc_comp, .25, na.rm = TRUE) ~ "Low",
+                                TRUE ~ "Mid"),
+         narc_group = factor(narc_group, levels = c("Low", "Mid", "High")))
+
+ash_data %>%
+  filter(sns == "instagram" | sns == "snapchat" | sns == "reddit") %>%
+  filter(narc_group != "Mid") %>%
+  group_by(sns, gender, narc_group) %>% 
+  summarize(len_m  = mean(len, na.rm = TRUE)) %>%
+    ggplot(aes(x = narc_group, y = len_m, fill = gender)) +
+    geom_col(position = "dodge", alpha = 0.9) +
+    scale_fill_manual(values = c("#17737B", "#5FCDD6"),
+                         name  = "Gender",
+                         breaks = c("Male", "Female"),
+                         labels = c("Male", "Female")) +
+    facet_wrap(~sns) +
+    theme_bw(base_size = 14) +
+    theme(axis.title = element_text(face = "bold"),
+             strip.text = element_text(face = "bold", size = 14),
+             legend.title = element_text(face = "bold"),
+             panel.grid.major = element_line(colour = "white"), 
+             panel.grid.minor = element_line(colour = "white")) +
+    labs(y = "Average length spent on Social Media Sites per Day (minutes)",
+         x = "Narcissism",
+         colour = "Gender") 
+  
+```
+
+```{r psyc_plots}
+# Psychopathy x gender x sns model
+# psychopathy/youtube
+# psychopathy/snapchat
+# psychopathy/instagram
+psyc_sns <- lmer(len ~ dd_psyc_comp*sns*gender + (1 | id),
+             data = ash_data)
+summary(psyc_sns)
+
+ash_data %<>%
+  mutate(psyc_group = case_when(dd_psyc_comp > quantile(dd_psyc_comp, .75, na.rm = TRUE) ~ "High",
+                                dd_psyc_comp < quantile(dd_psyc_comp, .25, na.rm = TRUE) ~ "Low",
+                                TRUE ~ "Mid"),
+         psyc_group = factor(psyc_group, levels = c("Low", "Mid", "High")))
+
+ash_data %>%
+  filter(sns == "instagram" | sns == "snapchat" | sns == "youtube") %>%
+  filter(psyc_group != "Mid") %>%
+  group_by(sns, gender, psyc_group) %>% 
+  summarize(len_m  = mean(len, na.rm = TRUE)) %>%
+  ggplot(aes(x = psyc_group, y = len_m, fill = gender)) +
+    geom_col(position = "dodge", alpha = 0.9) +
+    scale_fill_manual(values = c("#7B1740", "#D1769B"),
+                         name  = "Gender",
+                         breaks = c("Male", "Female"),
+                         labels = c("Male", "Female")) +
+    facet_wrap(~sns) +
+    theme_bw(base_size = 14) +
+    theme(axis.title = element_text(face = "bold"),
+             strip.text = element_text(face = "bold", size = 14),
+             legend.title = element_text(face = "bold"),
+             panel.grid.major = element_line(colour = "white"), 
+             panel.grid.minor = element_line(colour = "white")) +
+    labs(y = "Average length spent on Social Media Sites per Day (minutes)",
+         x = "Psychopathy",
+         colour = "Gender") 
 ```
 
 # Discussion
