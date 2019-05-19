@@ -191,61 +191,89 @@ names(data1)[col_find("q7", data1)] <- unlist(col_names)
 rm(list = setdiff(ls(), "data1"))
 ```
 
-```{r data1_tidy}
-# add an id column
+```{r data1_convert_to_long}
+# add an id column to the data
 data1 %<>%
   mutate(id = 1:n()) %>%
   select(id, everything())
 
-# create a column for sns, and tow others for the frequency and length
+# transform the data to long format with respect the the frequency of sns use 
+# and the length of sns use
 data1 %<>%
+  # over gather all frequency and length columns
   gather("key", "value", freq_facebook:len_tumblr) %>%
+  # separate the key columns into a column specifying freq/length and a column
+  # specifying the social media site
   separate(key, into = c("variable", "sns"), sep = "_") %>%
+  # spread the frequency and length column into two separate columns
   spread(variable, value)
 
-# turn the self and society perception into long format
+# transform the data to long format with respect to perception of sns
 data1 %<>%
+  # gather the two columns (i.e., benefit of sns to the self and benefit of sns
+  # to society)
   gather("sns_perc_context", "sns_perc_rating", starts_with("sns_perc")) %>%
+  # drop all text before "self" or "society
   mutate(sns_perc_context = gsub(".*_", "", sns_perc_context))
 
+```
 
-# create a function for calculating the mean of time responses given as a range
+```{r data1_parse_length}
+# identify the units responses were given in (even though I requested answers in 
+# minutes)
+data1 %<>%
+  mutate(len_unit  = case_when(grepl("(hour|hr)", len) ~ 60,
+                               TRUE                    ~ 1))
+
+# create a function for calculating the mean of time responses given as a 
+# character ranges. Example: "like 3-5 hours a day" would become "4"
 range_mean <- function(x) {
-  as.character(mean(as.numeric(strsplit(str_extract(x, "\\d*-\\d*"), "-")[[1]])))
+  # attempt to find a mean for only those with a hyphen in the response
+  if (grepl("-", x)) {
+    # extract the range from the response
+    x <- str_extract(x, "\\d*-\\d*")
+    # split the string around the dash
+    x <- strsplit(x, "-")[[1]]
+    # convert the string to numeric and calculate the mean
+    x <- mean(as.numeric(x))
+    # maintaining the original type, convert the result back to a character
+    as.character(x)
+  } else {
+    # if no hyphen, return x
+    x
+  }
 }
 
-# replace all ranges with the mean of the ranges
-data1[grepl("-", data1$len), "len"] <- apply(data1[grepl("-", data1$len), "len"], 
-                                             MARGIN = 1, 
-                                             range_mean)
+# replace all range responses with the means of those ranges
+data1$len <- map_chr(data1$len, range_mean)
 
-# convert the length column to numeric
+# parse the numbers
 data1 %<>%
-  mutate(# create a new column for the unit the response was given in
-         len_unit  = case_when(grepl("(hour|hr)", len) ~ 60,
-                               TRUE                    ~ 1),
-         # replace characgter numbers with numeric numbers
-         len_clean = case_when(len == "ten"                  ~ 10,
-                               len == "3o"                   ~ 30,
-                               len == "sixty"                ~ 60,
-                               len == "eighty"               ~ 80,
-                               grepl("(zero|no|never)", len) ~ 0,
-                               # parse all remaining numbers
-                               TRUE                          ~ parse_number(len)),
-         # multiple the length value by the length unit to give the total number in minutes
-         len       = len_clean * len_unit) %>%
-  # drop the len_unit and len_clean columns
-  select(-len_unit, -len_clean)
+  mutate(# replace written numbers with arabic numerals
+         len = case_when(len == "ten"                  ~ "10",
+                         len == "3o"                   ~ "30",
+                         len == "sixty"                ~ "60",
+                         len == "eighty"               ~ "80",
+                         grepl("(zero|no|never)", len) ~ "0",
+                         TRUE                          ~ len),
+         # parse the numbers
+         len = parse_number(len),
+         # calculate the length in minutes
+         len = len * len_unit) %>%
+         # drop the unit column
+         select(-len_unit)
+```
 
+```{r data1_format}
 # factorize and label factors
 data1 %<>%
-  mutate(# factorize gender
+  mutate(# factorize gender and apply labels
         gender           = factor(gender, labels = c("Male",
                                                      "Female",
                                                      "Non-binary",
                                                      "Prefer not to say",
                                                      "Other")),
-        # factorize race 
+        # factorize race and apply labels
         race             = factor(race, labels   = c("American Indian or Alaska Native",
                                                      "Asian",
                                                      "Black or African American",
