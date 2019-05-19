@@ -61,8 +61,8 @@ data1 <- rio::import(here::here("data", "data_1.xlsx"), setclass = "tibble") %>%
 options(scipen = 999)
 ```
 
-```{r renamecols_data1, include = FALSE}
-# drop the display order columns and the other columns
+```{r data1_rename, include = FALSE}
+# drop the display order columns and the custom demographic columns
 data1 %<>%
   select(-contains("do"),
          -contains("text"))
@@ -74,53 +74,60 @@ data1 %<>%
          race         = q1_4)
 
 
-# create vectors of subscale names for renaming the columns
-d3_traits    <- c("mach", "narc", "psyc")
+# create vectors of subscale names
+dd_subs  <- c("mach", "narc", "psyc") # subscales for the dirty dozen scale
 
-sns          <- c("facebook", 
-                  "pinterest", 
-                  "instagram", 
-                  "linkedin", 
-                  "twitter", 
-                  "snapchat", 
-                  "youtube", 
-                  "whatsapp", 
-                  "reddit", 
-                  "4chan", 
-                  "tumblr")
+sns_subs <- c("facebook", # subscales for the frequency and length of sns use 
+              "pinterest", 
+              "instagram", 
+              "linkedin", 
+              "twitter", 
+              "snapchat", 
+              "youtube", 
+              "whatsapp", 
+              "reddit", 
+              "4chan", 
+              "tumblr")
+
+con_subs <- c("society", # subscales for questions assessing benefit of sns
+              "self")
  
-int_motives  <- c("inform", 
-                  "interp", 
-                  "entert")
+mot_subs <- c("inform", # subscales for the motivations to use the internet 
+              "interp", # scale
+              "entert")
  
-sns_addict   <- c("salience",
-                  "tolerance",
-                  "mood",
-                  "relapse",
-                  "withdraw",
-                  "conflict")
+add_subs <- c("salience", # susbscales for the internet addiction scale
+              "tolerance",
+              "mood",
+              "relapse",
+              "withdraw",
+              "conflict")
 
-sns_contexts <- c("society",
-                  "self")
-
-# create a tibble containing all the necessary information for renaming the columns
-data_rename <- tibble(scale_names = c("dd",
+# create a tibble containing all the necessary information for renaming the 
+# columns
+data_rename <- tibble(
+                      # the scale names
+                      scale_names = c("dd", 
                                       "freq",
                                       "len",
                                       "sns_perc",
                                       "int_mot",
                                       "int_addict"),
-                      sub_names   = list(d3_traits,
-                                         sns,
-                                         sns,
-                                         sns_contexts,
-                                         int_motives,
-                                         sns_addict),
+                      # the scale subscales created above
+                      sub_names   = list(dd_subs,
+                                         sns_subs,
+                                         sns_subs,
+                                         con_subs,
+                                         mot_subs,
+                                         add_subs),
+                      # the total length of the scales
                       scale_lens  = c(12, 11, 11, 2, 20, 18),
+                      # the length of the subscales (only one value if all are 
+                      # the same length)
                       sub_lens    = list(4, 1, 1, 1, c(8, 7, 5), 3))
 
 # create a function for detecting columns names from a string
-col_match <- function(pattern, data) {
+col_find <- function(pattern, data) {
   
   # ensure pattern is a character and the data is a dataframe
   if (!is.character(pattern)) {
@@ -129,11 +136,11 @@ col_match <- function(pattern, data) {
     stop("Data must of type dataframe/tibble.")
   }
   
-  # return colnumn names that contain the pattern
+  # return column names that contain the pattern
   grepl(pattern, names(data))
 }
 
-# create a function for creating column names
+# create a function for creating column names using the data_rename tibble
 name_creator <- function(scale_name, sub_name, scale_len, sub_len) {
   
   # calculate the subscale length if no subscale length provided
@@ -141,31 +148,35 @@ name_creator <- function(scale_name, sub_name, scale_len, sub_len) {
     sub_len <- scale_len / length(sub_name)
   }
   
-  # create a vector of subscale names to match length of the scale
+  # create a vector of subscale names to match length of the scale. `times` has 
+  # to be used instead of `each` when subscales of different lengths are 
+  # specified
   if (length(sub_len) == 1) {
     sub_vector <- rep(sub_name, each = sub_len)
-    
   } else {
-    sub_vector <- rep(sub_name, times = sub_len)
+    sub_vector <- rep(sub_name, times = sub_len) 
   }
 
-  # paste the values together
-  scale_sub <- paste(scale_name, sub_vector, sep = "_")
+  # combine the scale names with the sub_scale names
+  var_names <- paste(scale_name, sub_vector, sep = "_")
   
-  # if sub_len != 1, add item numbers
+  # if length of the subscale is not equal to one, add an item identifier to the
+  # column names (this segment, in particular, should be refactored)
   if (any(sub_len != 1)) {
-    # create a vector of item numbers
-    item_nums <- rep(flatten_dbl(map(sub_len, seq_len)), times = scale_len / sum(sub_len))
-    # combine scale_sub with the item_nums
-    scale_sub <- paste(scale_sub, item_nums, sep = "_")
+    # get a sequence from 1 the length of a subscale for each subscale
+    item_nums <- flatten_dbl(map(sub_len, seq_len))
+    # repeat the sequence the number of subscales there are
+    item_nums <- rep(item_nums, times = scale_len / sum(sub_len))
+    # combine the variable names with the item numbers
+    var_names <- paste(var_names, item_nums, sep = "_")
   }
   
   # return scale_sub
-  scale_sub
+  var_names
   
 }
 
-# iterate through data_rename and create a list of column names
+# iterate through the data_rename tibble and create a list of column names
 col_names <- pmap(list(data_rename$scale_names,
                        data_rename$sub_names,
                        data_rename$scale_lens,
@@ -174,13 +185,13 @@ col_names <- pmap(list(data_rename$scale_names,
 )
 
 # assign created column names to data1
-names(data1)[col_match("q7", data1)] <- unlist(col_names)
+names(data1)[col_find("q7", data1)] <- unlist(col_names)
 
 # remove uneeded variables
 rm(list = setdiff(ls(), "data1"))
 ```
 
-```{r tidy_data1}
+```{r data1_tidy}
 # add an id column
 data1 %<>%
   mutate(id = 1:n()) %>%
@@ -251,7 +262,20 @@ data1 %<>%
         # numerize frequency
         freq             = as.numeric(freq))
 
+```
 
+
+Sagacious intro text goes here.
+
+# Method
+
+## Participants
+
+## Material and procedure
+
+# Results
+
+```{r trash_plots}
 # plot for fun
 data1 %>%
   filter(gender == "Male" | gender == "Female") %>%
@@ -281,19 +305,6 @@ data1 %>%
   
 
 ```
-
-
-Sagacious intro text goes here.
-
-# Method
-
-## Participants
-
-## Material and procedure
-
-## Data analysis
-
-# Results
 
 # Discussion
 
