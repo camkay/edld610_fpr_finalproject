@@ -52,6 +52,7 @@ library(here) # for reproducible paths
 library(magrittr) # for the compound assigiment pipe-operator
 library(lme4) # for conducting linear mixed-effects models
 library(lmerTest) # for calculating t-tests for linear mixed-effects models
+library(psych) # for caculating cronbach's alpha
 
 # import data as tibble and clean column names
 data1 <- rio::import(here::here("data", "data_1.xlsx"), setclass = "tibble") %>%
@@ -188,7 +189,7 @@ col_names <- pmap(list(data_rename$scale_names,
 names(data1)[col_find("q7", data1)] <- unlist(col_names)
 
 # remove uneeded variables
-rm(list = setdiff(ls(), "data1"))
+rm(list = setdiff(ls(), c("data1", "col_names", "col_find")))
 ```
 
 ```{r data1_convert_to_long}
@@ -292,6 +293,36 @@ data1 %<>%
 
 ```
 
+
+```{r data1_composites}
+# drop column names not to be made into composites
+comp_names <- col_names[-2:-4]
+
+# drop item identifiers to create the composite names and retain only unique names
+comp_names %<>%
+  map(str_replace, "_\\d", "") %>%
+  map(unique)
+
+# create alphaizer function
+str_alpha <- function(col, data) {
+  # find names of columns that match the string
+  cols_found  <- col_find(col, data)
+  # extract only those columns from the data 
+  data <- data[, cols_found]
+  # calculate and extract the alpha value
+  alpha(data)[["total"]][["raw_alpha"]]
+}
+
+# calculate alphas for the composite
+comp_alphas <- comp_names %>%
+  map(map_dbl, str_alpha, data1) %>%
+  flatten_dbl() 
+
+# name the alpha composites
+comp_alphas <- flatten_chr(comp_names)
+
+
+```
 
 Sagacious intro text goes here.
 
