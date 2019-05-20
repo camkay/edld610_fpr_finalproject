@@ -321,13 +321,8 @@ alphas <- comp_names %>%
 # name the alpha composites
 names(alphas) <- flatten_chr(comp_names)
 
-# create a function for calculating rowmeans given a string pattern
-str_means <- function(pattern, data) {
-  # find names of columns that match the string
-  cols_found  <- col_find(pattern, data)
-  # extract only those columns from the data 
-  data <- data[, cols_found]
-  # message user how the composites were created
+# create the str_message function for double-checking one's work
+str_message <- function(data) {
   names_len <- length(names(data))
   if (names_len <= 4) {
     col_names <- paste(names(data), collapse = ", ")
@@ -339,6 +334,16 @@ str_means <- function(pattern, data) {
                 " columns: ",
                 col_names,
                 "."))
+}
+
+# create a function for calculating rowmeans given a string pattern
+str_means <- function(pattern, data) {
+  # find names of columns that match the string
+  cols_found  <- col_find(pattern, data)
+  # extract only those columns from the data 
+  data <- data[, cols_found]
+  # message user how the composites were created
+  str_message(data)
   # calculate row means
   rowMeans(data)
 }
