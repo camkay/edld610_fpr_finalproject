@@ -419,7 +419,7 @@ data1 %>%
 
 ```
 
-```{r mach_plots}
+```{r tidy_data}
 
 test <- data1 %>%
   filter(gender == "Male" | gender == "Female") %>%
@@ -437,10 +437,20 @@ genderxsns_data <- data1 %>%
          sns != "whatsapp") %>%
   arrange(id)
 
+ash_data <- data1 %>%
+  select(id, age, gender, race, sns:sns_perc_rating, contains("comp")) %>%
+  filter(gender == "Male" | gender == "Female") %>%
+  arrange(id)
+
+```
+
+
+```{r mach_plots}
+
 # Machiavellianism x gender x sns model
-mach_sns <- lmer(len ~ dd_mach_comp*sns*gender + (1 | id),
-             data = genderxsns_data)
-summary(mach_sns)
+mach_sns_gender <- lmer(len ~ dd_mach_comp*sns*gender + (1 | id),
+                        data = genderxsns_data)
+summary(mach_sns_gender)
 
 genderxsns_data %<>%
   mutate(mach_group = case_when(dd_mach_comp > quantile(dd_mach_comp, .75, na.rm = TRUE) ~ "High",
@@ -494,9 +504,9 @@ genderxsns_data %>%
 
 ```{r narc_plots}
 # Narcissism x gender x sns model
-narc_sns <- lmer(len ~ dd_narc_comp*sns*gender + (1 | id),
-             data = genderxsns_data)
-summary(narc_sns)
+narc_sns_gender <- lmer(len ~ dd_narc_comp*sns*gender + (1 | id),
+                        data = genderxsns_data)
+summary(narc_sns_gender)
 
 genderxsns_data %<>%
   mutate(narc_group = case_when(dd_narc_comp > quantile(dd_narc_comp, .75, na.rm = TRUE) ~ "High",
@@ -535,9 +545,9 @@ genderxsns_data %>%
 
 ```{r psyc_plots}
 # Psychopathy x gender x sns model
-psyc_sns <- lmer(len ~ dd_psyc_comp*sns*gender + (1 | id),
-             data = genderxsns_data)
-summary(psyc_sns)
+psyc_sns_gender <- lmer(len ~ dd_psyc_comp*sns*gender + (1 | id),
+                        data = genderxsns_data)
+summary(psyc_sns_gender)
 
 genderxsns_data %<>%
   mutate(psyc_group = case_when(dd_psyc_comp > quantile(dd_psyc_comp, .75, na.rm = TRUE) ~ "High",
@@ -573,6 +583,135 @@ genderxsns_data %>%
          colour = "Gender") 
 ```
 
+```{r no_gender}
+
+mach_sns <- lmer(len ~ dd_mach_comp*sns + (1 | id),
+             data = ash_data)
+summary(mach_sns)
+
+narc_sns <- lmer(len ~ dd_narc_comp*sns + (1 | id),
+             data = ash_data)
+summary(narc_sns)
+
+psyc_sns <- lmer(len ~ dd_psyc_comp*sns + (1 | id),
+             data = ash_data)
+summary(psyc_sns)
+
+```
+
+```{r perception analyses}
+
+ash_data %<>%
+ filter(!is.na(sns),
+        !is.na(int_mot_inform_comp),
+        !is.na(int_mot_interp_comp),
+        !is.na(int_mot_entert_comp))
+
+
+model0            <- lmer(len ~ (1 | id), data = ash_data)
+model0_sns        <- lmer(len ~ sns + (1 | id), data = ash_data)
+
+
+#####################################################################################
+###### Examining potential influence of using social media use for information ###### 
+#####################################################################################
+
+model0_sns_inform <- lmer(len ~ sns + int_mot_inform_comp + 
+                         (1 | id), 
+                         data = ash_data)
+model0_snsxinfom <- lmer(len ~ sns*int_mot_inform_comp + 
+                         (1 | id), 
+                         data = ash_data)
+
+anova(model0, model0_sns, model0_sns_inform, model0_snsxinfom) #model0_sns is best; drop inform predictor
+
+######################################################################################
+###### Examining influence of using social media use for interpersonal relation ###### 
+######################################################################################
+
+model0_sns_interp <- lmer(len ~ sns + int_mot_interp_comp + 
+                         (1 | id), 
+                         data = ash_data)
+model0_snsxinterp <- lmer(len ~ sns*int_mot_interp_comp*gender + 
+                         (1 | id), 
+                         data = ash_data)
+
+anova(model0_sns, model0_sns_interp, model0_snsxinterp) 
+#both interp models are better than sns only model
+# best model contains interaction
+summary(model0_snsxinterp)
+
+ash_data %>%
+  filter(sns != "4chan") %>%
+  group_by(sns) %>%
+  summarize(len_m  = mean(len, na.rm = TRUE),
+            len_se = sundry::se(len),
+            interp_m = mean(int_mot_interp_comp, na.rm = TRUE),
+            interp_se = sundry::se(int_mot_interp_comp)) %>%
+  ggplot(aes(x = interp_m, y = len_m, fill = sns)) +
+    geom_col(position = "dodge", alpha = 0.9) +
+    scale_fill_viridis_d(name = "Social Media Site") +
+    theme_bw(base_size = 14) +
+    theme(axis.title = element_text(face = "bold"),
+          strip.text = element_text(face = "bold", size = 14),
+          legend.title = element_text(face = "bold"),
+          panel.grid.major = element_line(colour = "white"), 
+          panel.grid.minor = element_line(colour = "white")) +
+    labs(y = "Average time spent on Social \nMedia Sites per Day (minutes)",
+         x = "Interpersonal Motivation")
+
+#############################################################################
+###### Examining influence of using social media use for entertainment ###### 
+#############################################################################
+
+model0_sns_entert <- lmer(len ~ sns + int_mot_entert_comp + 
+                         (1 | id), 
+                         data = ash_data)
+model0_snsxentert <- lmer(len ~ sns*int_mot_entert_comp + 
+                         (1 | id), 
+                         data = ash_data)
+anova(model0_sns, model0_sns_entert, model0_snsxentert)
+#both entert models are better than sns only model
+# best model contains interaction
+summary(model0_snsxentert)
+
+model1 <- lmer(len ~ sns*int_mot_interp_comp + 
+                     sns*int_mot_entert_comp + 
+              (1 | id), 
+              data = ash_data)
+anova(model0_snsxentert, model1) #model 1 best
+anova(model0_snsxinterp, model1) #model 1 is marginally better (p = .07)
+
+summary(model1)
+
+#Basically, people who rely more on social media for interpesonal communication spend more time on snapchat each day
+#Similarly, people who rely more on social media for entertainment spend more time on youtube each day
+#People who rely more on social media for entertainment spend marginally more time on reddit each day
+
+```
+
+```{r genderxperception}
+
+genderxsns_data %<>%
+ filter(!is.na(sns),
+        !is.na(int_mot_inform_comp),
+        !is.na(int_mot_interp_comp),
+        !is.na(int_mot_entert_comp),
+        !is.na(gender))
+
+model1 <- lmer(len ~ sns*int_mot_interp_comp + 
+                     sns*int_mot_entert_comp + 
+              (1 | id), 
+              data = genderxsns_data)
+
+gender_interp_entert <- lmer(len ~ sns*int_mot_interp_comp*gender + 
+                                   sns*int_mot_entert_comp*gender +
+                     (1 | id), 
+                     data = genderxsns_data)
+anova(model1, gender_interp_entert)
+summary(gender_interp_entert) #fits data best
+
+```
 
 
 
