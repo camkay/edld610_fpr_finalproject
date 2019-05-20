@@ -245,6 +245,7 @@ range_mean <- function(x) {
   }
 }
 
+
 # replace all range responses with the means of those ranges
 data1$len <- map_chr(data1$len, range_mean)
 
@@ -373,6 +374,14 @@ Sagacious intro text goes here.
 # Results
 
 ```{r trash_plots}
+t <- data1 %>%
+  filter(gender == "Male" | gender == "Female") %>%
+  mutate(great_0 = if_else(freq > 1, 1, 0)) %>%
+  group_by(gender, sns) %>%
+  summarise(great_0_sum = sum(great_0, na.rm = TRUE))
+
+
+
 # plot for fun
 data1 %>%
   filter(gender == "Male" | gender == "Female") %>%
