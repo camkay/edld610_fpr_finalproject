@@ -448,6 +448,21 @@ genderxsns_data %<>%
                                 TRUE ~ "Mid"),
          mach_group = factor(mach_group, levels = c("Low", "Mid", "High")))
 
+################### create grouping variable function ################### 
+
+create_group <- function(data, group_var) {
+    group_var <- case_when(
+    data > quantile(data, .75, na.rm = TRUE) ~ "High",
+    data < quantile(data, .25, na.rm = TRUE) ~ "Low",
+    TRUE ~ "Mid")
+    group <- tibble(group_var)
+    data$group <- group
+}
+
+create_group(genderxsns_data$dd_mach_comp, test_mach_group) #not working... keeps ccohercing into list
+
+###########################################################################
+
 genderxsns_data %>%
   #filter(sns == "instagram" | sns == "snapchat") %>%
   filter(mach_group != "Mid") %>%
@@ -557,6 +572,10 @@ genderxsns_data %>%
          x = "Psychopathy",
          colour = "Gender") 
 ```
+
+
+
+
 
 # Discussion
 
