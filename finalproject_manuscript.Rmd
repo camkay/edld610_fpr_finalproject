@@ -431,7 +431,7 @@ test <- data1 %>%
 ################### create grouping variable function ###################
 #########################################################################
 
-to_cat <- function(column) {
+con_to_cat <- function(column) {
   cat_var <- case_when(column > quantile(column, .75, na.rm = TRUE) ~ "High",
                        column < quantile(column, .25, na.rm = TRUE) ~ "Low",
                        TRUE                                         ~ "Mid")
@@ -439,9 +439,9 @@ to_cat <- function(column) {
   cat_var
 }
 
-data1$mach_group <- to_cat(data1$dd_mach_comp)
-data1$narc_group <- to_cat(data1$dd_narc_comp)
-data1$psyc_group <- to_cat(data1$dd_psyc_comp)
+data1$mach_group <- con_to_cat(data1$dd_mach_comp)
+data1$narc_group <- con_to_cat(data1$dd_narc_comp)
+data1$psyc_group <- con_to_cat(data1$dd_psyc_comp)
 
 genderxsns_data <- data1 %>%
   select(id, age, gender, race, sns:sns_perc_rating, 
