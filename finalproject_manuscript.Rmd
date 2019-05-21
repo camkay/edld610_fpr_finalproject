@@ -427,8 +427,25 @@ test <- data1 %>%
   group_by(gender, sns) %>%
   summarise(great_0_sum = sum(great_0, na.rm = TRUE))
 
+#########################################################################
+################### create grouping variable function ###################
+#########################################################################
+
+to_cat <- function(column) {
+  cat_var <- case_when(column > quantile(column, .75, na.rm = TRUE) ~ "High",
+                       column < quantile(column, .25, na.rm = TRUE) ~ "Low",
+                       TRUE                                         ~ "Mid")
+  cat_var <- factor(cat_var, levels = c("Low", "Mid", "High"))
+  cat_var
+}
+
+data1$mach_group <- to_cat(data1$dd_mach_comp)
+data1$narc_group <- to_cat(data1$dd_narc_comp)
+data1$psyc_group <- to_cat(data1$dd_psyc_comp)
+
 genderxsns_data <- data1 %>%
-  select(id, age, gender, race, sns:sns_perc_rating, contains("comp")) %>%
+  select(id, age, gender, race, sns:sns_perc_rating, 
+         contains("comp"), contains("group")) %>%
   filter(gender == "Male" | gender == "Female") %>%
   filter(sns != "4chan" &
          sns != "linkedin" &
@@ -438,7 +455,8 @@ genderxsns_data <- data1 %>%
   arrange(id)
 
 ash_data <- data1 %>%
-  select(id, age, gender, race, sns:sns_perc_rating, contains("comp")) %>%
+  select(id, age, gender, race, sns:sns_perc_rating, contains("comp"),
+         contains("group")) %>%
   filter(gender == "Male" | gender == "Female") %>%
   arrange(id)
 
@@ -456,30 +474,6 @@ corr_data <- rio::import(here::here("data", "test.sav"),
 mach_sns_gender <- lmer(len ~ dd_mach_comp*sns*gender + (1 | id),
                         data = genderxsns_data)
 summary(mach_sns_gender)
-
-genderxsns_data %<>%
-  mutate(mach_group = case_when(dd_mach_comp > quantile(dd_mach_comp, .75, 
-                                                        na.rm = TRUE) ~ "High",
-                                dd_mach_comp < quantile(dd_mach_comp, .25, 
-                                                        na.rm = TRUE) ~ "Low",
-                                TRUE ~ "Mid"),
-         mach_group = factor(mach_group, levels = c("Low", "Mid", "High")))
-
-################### create grouping variable function ################### 
-
-create_group <- function(data, group_var) {
-    group_var <- case_when(
-    data > quantile(data, .75, na.rm = TRUE) ~ "High",
-    data < quantile(data, .25, na.rm = TRUE) ~ "Low",
-    TRUE ~ "Mid")
-    group <- tibble(group_var)
-    data$group <- group
-}
-
-create_group(genderxsns_data$dd_mach_comp, test_mach_group) 
-#not working... keeps ccohercing into list
-
-###########################################################################
 
 genderxsns_data %>%
   #filter(sns == "instagram" | sns == "snapchat") %>%
@@ -551,14 +545,6 @@ corr_data %>%
 narc_sns_gender <- lmer(len ~ dd_narc_comp*sns*gender + (1 | id),
                         data = genderxsns_data)
 summary(narc_sns_gender)
-
-genderxsns_data %<>%
-  mutate(narc_group = case_when(dd_narc_comp > quantile(dd_narc_comp, .75, 
-                                                        na.rm = TRUE) ~ "High",
-                                dd_narc_comp < quantile(dd_narc_comp, .25, 
-                                                        na.rm = TRUE) ~ "Low",
-                                TRUE ~ "Mid"),
-         narc_group = factor(narc_group, levels = c("Low", "Mid", "High")))
 
 genderxsns_data %>%
   #filter(sns == "instagram" | sns == "snapchat" | sns == "reddit") %>%
@@ -648,14 +634,6 @@ corr_data %>%
 psyc_sns_gender <- lmer(len ~ dd_psyc_comp*sns*gender + (1 | id),
                         data = genderxsns_data)
 summary(psyc_sns_gender)
-
-genderxsns_data %<>%
-  mutate(psyc_group = case_when(dd_psyc_comp > quantile(dd_psyc_comp, .75, 
-                                                        na.rm = TRUE) ~ "High",
-                                dd_psyc_comp < quantile(dd_psyc_comp, .25, 
-                                                        na.rm = TRUE) ~ "Low",
-                                TRUE ~ "Mid"),
-         psyc_group = factor(psyc_group, levels = c("Low", "Mid", "High")))
 
 genderxsns_data %>%
   #filter(sns == "instagram" | sns == "snapchat" | sns == "youtube") %>%
