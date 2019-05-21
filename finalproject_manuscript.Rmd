@@ -865,7 +865,7 @@ map(psyc_model_fits, ~anova(.x)) #not quite doing what I want.. I want model com
 ```
 
 
-```{r requirements}
+```{r parallel iteration}
 
 ########################################################
 ### instance of parallel iteration # 1 (1 required) ####
