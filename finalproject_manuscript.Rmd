@@ -369,6 +369,64 @@ data1 <- data1 %>%
 rm(list = setdiff(ls(), c("data1", "alphas", "col_find")))
 ```
 
+```{r tidy_data}
+
+# corr dataset is in wide format. I deleted data specific to each social media site and computed sum variables refelcting total time spend on social media 
+corr_data <- rio::import(here::here("data", "test.sav"), 
+                         setclass = "tibble") %>%
+  characterize() %>%
+  filter(outlier == 0.00)
+
+#########################################################################
+################### create grouping variable function ###################
+#########################################################################
+con_to_cat <- function(column) {
+  cat_var <- case_when(column > quantile(column, .75, na.rm = TRUE) ~ "High",
+                       column < quantile(column, .25, na.rm = TRUE) ~ "Low",
+                       TRUE                                         ~ "Mid")
+  cat_var <- factor(cat_var, levels = c("Low", "Mid", "High"))
+  cat_var
+}
+
+# create variable specifying if an individual is..
+# high, mid, or low in Machiavellianism
+data1$mach_group <- con_to_cat(data1$dd_mach_comp)
+# create variable specifying if an individual is..
+# high, mid, or low in Narcissism
+data1$narc_group <- con_to_cat(data1$dd_narc_comp)
+# create variable specifying if an individual is..
+# high, mid, or low in Psychopathy
+data1$psyc_group <- con_to_cat(data1$dd_psyc_comp)
+
+#selcting only variables I am interested in (dropping single items)
+ash_data <- data1 %>%
+  select(id, age, gender, race, sns:sns_perc_rating, contains("comp"),
+         contains("group")) %>%
+  filter(gender == "Male" | gender == "Female") %>%
+  arrange(id)
+
+# if we are interested in gender comparisons, we should probably exclude sns sites that don't have adaquate sample sizes (i.e., there are more than 25 females and 25 males)
+# this data frame counts how many males and females use a given social media site
+test <- data1 %>%
+  filter(gender == "Male" | gender == "Female") %>%
+  mutate(great_0 = if_else(freq > 1, 1, 0)) %>%
+  group_by(gender, sns) %>%
+  summarise(great_0_sum = sum(great_0, na.rm = TRUE))
+
+# dataset for gender specific analyses:
+genderxsns_data <- data1 %>%
+  select(id, age, gender, race, sns:sns_perc_rating, 
+         contains("comp"), contains("group")) %>%
+  filter(gender == "Male" | gender == "Female") %>%
+  filter(sns != "4chan" & # only 6 men and 6 women use 4chan
+         sns != "linkedin" & # only 14 men use linkedin
+         sns != "pinterest" & # only 4 men use pinterest
+         sns != "tumblr" & # only 4 men use tumblr
+         sns != "whatsapp") %>% # only 2 men use whatsapp
+  arrange(id)
+
+```
+
 Sagacious intro text goes here.
 
 # Method
@@ -416,54 +474,6 @@ data1 %>%
          x = "Social Media Site") +
     scale_y_continuous(labels = c("Rarely", "Monthly", "Weekly", 
                                   "Daily", "Multiple times of day"))
-
-```
-
-```{r tidy_data}
-
-test <- data1 %>%
-  filter(gender == "Male" | gender == "Female") %>%
-  mutate(great_0 = if_else(freq > 1, 1, 0)) %>%
-  group_by(gender, sns) %>%
-  summarise(great_0_sum = sum(great_0, na.rm = TRUE))
-
-#########################################################################
-################### create grouping variable function ###################
-#########################################################################
-
-con_to_cat <- function(column) {
-  cat_var <- case_when(column > quantile(column, .75, na.rm = TRUE) ~ "High",
-                       column < quantile(column, .25, na.rm = TRUE) ~ "Low",
-                       TRUE                                         ~ "Mid")
-  cat_var <- factor(cat_var, levels = c("Low", "Mid", "High"))
-  cat_var
-}
-
-data1$mach_group <- con_to_cat(data1$dd_mach_comp)
-data1$narc_group <- con_to_cat(data1$dd_narc_comp)
-data1$psyc_group <- con_to_cat(data1$dd_psyc_comp)
-
-genderxsns_data <- data1 %>%
-  select(id, age, gender, race, sns:sns_perc_rating, 
-         contains("comp"), contains("group")) %>%
-  filter(gender == "Male" | gender == "Female") %>%
-  filter(sns != "4chan" &
-         sns != "linkedin" &
-         sns != "pinterest" &
-         sns != "tumblr" &
-         sns != "whatsapp") %>%
-  arrange(id)
-
-ash_data <- data1 %>%
-  select(id, age, gender, race, sns:sns_perc_rating, contains("comp"),
-         contains("group")) %>%
-  filter(gender == "Male" | gender == "Female") %>%
-  arrange(id)
-
-corr_data <- rio::import(here::here("data", "test.sav"), 
-                         setclass = "tibble") %>%
-  characterize() %>%
-  filter(outlier == 0.00)
 
 ```
 
