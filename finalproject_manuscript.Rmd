@@ -128,6 +128,11 @@ data_rename <- tibble(
                       # the same length)
                       sub_lens    = list(4, 1, 1, 1, c(8, 7, 5), 3))
 
+
+#################################################
+#### Custom function 1 (at least 2 required) ####
+#################################################
+
 # create a function for detecting columns names from a string
 col_find <- function(pattern, data) {
   
@@ -141,6 +146,10 @@ col_find <- function(pattern, data) {
   # return column names that contain the pattern
   grepl(pattern, names(data))
 }
+
+#################################################
+#### Custom function 2 (at least 2 required) ####
+#################################################
 
 # create a function for creating column names using the data_rename tibble
 name_creator <- function(scale_name, sub_name, scale_len, sub_len) {
@@ -227,6 +236,10 @@ data1 %<>%
   mutate(len_unit  = case_when(grepl("(hour|hr)", len) ~ 60,
                                TRUE                    ~ 1))
 
+#################################################
+#### Custom function 3 (at least 2 required) ####
+#################################################
+
 # create a function for calculating the mean of time responses given as a 
 # character ranges. Example: "like 3-5 hours a day" would become "4"
 range_mean <- function(x) {
@@ -246,6 +259,10 @@ range_mean <- function(x) {
   }
 }
 
+
+#######################################################
+#### Variant of purr::map #1 (at least 2 required) ####
+#######################################################
 
 # replace all range responses with the means of those ranges
 data1$len <- map_chr(data1$len, range_mean)
@@ -299,10 +316,19 @@ data1 %<>%
 # drop column names not to be made into composites
 comp_names <- col_names[-2:-4]
 
+
+#######################################################
+#### Variant of purr::map #2 (at least 2 required) ####
+#######################################################
+
 # drop item identifiers to create the composite names; retain only unique names
 comp_names %<>%
   map(str_replace, "_\\d", "") %>%
   map(unique)
+
+#################################################
+#### Custom function 4 (at least 2 required) ####
+#################################################
 
 # create a function for calculating alpha given a string pattern
 str_alpha <- function(pattern, data) {
@@ -314,6 +340,10 @@ str_alpha <- function(pattern, data) {
   alpha(data)[["total"]][["raw_alpha"]]
 }
 
+#######################################################
+#### Variant of purr::map #3 (at least 2 required) ####
+#######################################################
+
 # calculate alphas for the composites
 alphas <- comp_names %>%
   map(map_dbl, str_alpha, data1) %>%
@@ -321,6 +351,10 @@ alphas <- comp_names %>%
 
 # name the alpha composites
 names(alphas) <- flatten_chr(comp_names)
+
+#################################################
+#### Custom function 5 (at least 2 required) ####
+#################################################
 
 # create the str_message function for double-checking one's work
 str_message <- function(data) {
@@ -337,6 +371,10 @@ str_message <- function(data) {
                 "."))
 }
 
+#################################################
+#### Custom function 6 (at least 2 required) ####
+#################################################
+
 # create a function for calculating rowmeans given a string pattern
 str_means <- function(pattern, data) {
   # find names of columns that match the string
@@ -348,6 +386,10 @@ str_means <- function(pattern, data) {
   # calculate row means
   rowMeans(data)
 }
+
+#######################################################
+#### Variant of purr::map #4 (at least 2 required) ####
+#######################################################
 
 # create composites
 data_comp <- comp_names %>%
@@ -371,9 +413,12 @@ rm(list = setdiff(ls(), c("data1", "alphas", "col_find")))
 
 ```{r tidy_data}
 
-#########################################################################
-################### create grouping variable function ###################
-#########################################################################
+
+#################################################
+#### Custom function 7 (at least 2 required) ####
+#################################################
+
+# create grouping variable function 
 con_to_cat <- function(column) {
   cat_var <- case_when(column > quantile(column, .75, na.rm = TRUE) ~ "High",
                        column < quantile(column, .25, na.rm = TRUE) ~ "Low",
@@ -817,6 +862,12 @@ map(psyc_model_fits, ~summary(.x))
 
 map(psyc_model_fits, ~anova(.x)) #not quite doing what I want.. I want model comparisons????
 
+```
+
+
+```{r requirements}
+# Still need at least one instance of parallel iteration (map2, pmap)
+# Still need at least one case of purr::nest%>%mutate()
 ```
 
 
