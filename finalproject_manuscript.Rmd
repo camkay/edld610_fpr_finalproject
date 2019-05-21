@@ -442,6 +442,11 @@ ash_data <- data1 %>%
   filter(gender == "Male" | gender == "Female") %>%
   arrange(id)
 
+corr_data <- rio::import(here::here("data", "test.sav"), 
+                         setclass = "tibble") %>%
+  characterize() %>%
+  filter(outlier == 0.00)
+
 ```
 
 
@@ -453,8 +458,10 @@ mach_sns_gender <- lmer(len ~ dd_mach_comp*sns*gender + (1 | id),
 summary(mach_sns_gender)
 
 genderxsns_data %<>%
-  mutate(mach_group = case_when(dd_mach_comp > quantile(dd_mach_comp, .75, na.rm = TRUE) ~ "High",
-                                dd_mach_comp < quantile(dd_mach_comp, .25, na.rm = TRUE) ~ "Low",
+  mutate(mach_group = case_when(dd_mach_comp > quantile(dd_mach_comp, .75, 
+                                                        na.rm = TRUE) ~ "High",
+                                dd_mach_comp < quantile(dd_mach_comp, .25, 
+                                                        na.rm = TRUE) ~ "Low",
                                 TRUE ~ "Mid"),
          mach_group = factor(mach_group, levels = c("Low", "Mid", "High")))
 
@@ -469,7 +476,8 @@ create_group <- function(data, group_var) {
     data$group <- group
 }
 
-create_group(genderxsns_data$dd_mach_comp, test_mach_group) #not working... keeps ccohercing into list
+create_group(genderxsns_data$dd_mach_comp, test_mach_group) 
+#not working... keeps ccohercing into list
 
 ###########################################################################
 
@@ -500,6 +508,42 @@ genderxsns_data %>%
          x = "Machiavellianism",
          colour = "Gender") 
 
+corr_data %>%
+  mutate(mach_group = as.factor(mach_group)) %>%
+  filter(mach_group != "Mid") %>%
+  ggplot(aes(x = int_addict_mood_comp, y = sum_len, group = mach_group, colour = mach_group)) +
+      geom_smooth(method = "lm", 
+                  se = FALSE,
+                  size = 2) +
+      theme_bw(base_size = 14) +
+      scale_color_manual(values = c("#4A235A", "#D2B4DE")) +
+      theme(axis.title = element_text(face = "bold"),
+            strip.text = element_text(face = "bold", size = 14),
+            legend.title = element_text(face = "bold"),
+            panel.grid.major = element_line(colour = "white"), 
+            panel.grid.minor = element_line(colour = "white")) +
+        labs(y = "Total Time Spent on Social \nMedia Sites per Day (minutes)",
+             x = "Social Media Addiction Mood Modification",
+             colour = "Machiavellianism")
+
+corr_data %>%
+  mutate(mach_group = as.factor(mach_group)) %>%
+  filter(mach_group != "Mid") %>%
+  ggplot(aes(x = int_addict_salience_comp, y = sum_len, group = mach_group, colour = mach_group)) +
+      geom_smooth(method = "lm", 
+                  se = FALSE,
+                  size = 2) +
+      theme_bw(base_size = 14) +
+      scale_color_manual(values = c("#4A235A", "#D2B4DE")) +
+      theme(axis.title = element_text(face = "bold"),
+            strip.text = element_text(face = "bold", size = 14),
+            legend.title = element_text(face = "bold"),
+            panel.grid.major = element_line(colour = "white"), 
+            panel.grid.minor = element_line(colour = "white")) +
+        labs(y = "Total Time Spent on Social \nMedia Sites per Day (minutes)",
+             x = "Social Media Addiction Salience",
+             colour = "Machiavellianism")
+
 ```
 
 ```{r narc_plots}
@@ -509,8 +553,10 @@ narc_sns_gender <- lmer(len ~ dd_narc_comp*sns*gender + (1 | id),
 summary(narc_sns_gender)
 
 genderxsns_data %<>%
-  mutate(narc_group = case_when(dd_narc_comp > quantile(dd_narc_comp, .75, na.rm = TRUE) ~ "High",
-                                dd_narc_comp < quantile(dd_narc_comp, .25, na.rm = TRUE) ~ "Low",
+  mutate(narc_group = case_when(dd_narc_comp > quantile(dd_narc_comp, .75, 
+                                                        na.rm = TRUE) ~ "High",
+                                dd_narc_comp < quantile(dd_narc_comp, .25, 
+                                                        na.rm = TRUE) ~ "Low",
                                 TRUE ~ "Mid"),
          narc_group = factor(narc_group, levels = c("Low", "Mid", "High")))
 
@@ -540,7 +586,61 @@ genderxsns_data %>%
     labs(y = "Average length spent on Social \nMedia Sites per Day (minutes)",
          x = "Narcissism",
          colour = "Gender") 
-  
+
+corr_data %>%
+  mutate(narc_group = as.factor(narc_group)) %>%
+  filter(narc_group != "Mid") %>%
+  ggplot(aes(x = int_addict_mood_comp, y = sum_len, group = narc_group, colour = narc_group)) +
+      geom_smooth(method = "lm", 
+                  se = FALSE,
+                  size = 2) +
+      theme_bw(base_size = 14) +
+      scale_color_manual(values = c("#17737B", "#5FCDD6")) +
+      theme(axis.title = element_text(face = "bold"),
+            strip.text = element_text(face = "bold", size = 14),
+            legend.title = element_text(face = "bold"),
+            panel.grid.major = element_line(colour = "white"), 
+            panel.grid.minor = element_line(colour = "white")) +
+        labs(y = "Total Time Spent on Social \nMedia Sites per Day (minutes)",
+             x = "Social Media Addiction Mood Modification",
+             colour = "Narcissism")
+
+corr_data %>%
+  mutate(narc_group = as.factor(narc_group)) %>%
+  filter(narc_group != "Mid") %>%
+  ggplot(aes(x = int_addict_salience_comp, y = sum_len, group = narc_group, colour = narc_group)) +
+      geom_smooth(method = "lm", 
+                  se = FALSE,
+                  size = 2) +
+      theme_bw(base_size = 14) +
+      scale_color_manual(values = c("#17737B", "#5FCDD6")) +
+      theme(axis.title = element_text(face = "bold"),
+            strip.text = element_text(face = "bold", size = 14),
+            legend.title = element_text(face = "bold"),
+            panel.grid.major = element_line(colour = "white"), 
+            panel.grid.minor = element_line(colour = "white")) +
+        labs(y = "Total Time Spent on Social \nMedia Sites per Day (minutes)",
+             x = "Social Media Addiction Salience",
+             colour = "Narcissism")
+
+corr_data %>%
+  mutate(narc_group = as.factor(narc_group)) %>%
+  filter(narc_group != "Mid") %>%
+  ggplot(aes(x = int_addict_tolerance_comp, y = sum_len, group = narc_group, colour = narc_group)) +
+      geom_smooth(method = "lm", 
+                  se = FALSE,
+                  size = 2) +
+      theme_bw(base_size = 14) +
+      scale_color_manual(values = c("#17737B", "#5FCDD6")) +
+      theme(axis.title = element_text(face = "bold"),
+            strip.text = element_text(face = "bold", size = 14),
+            legend.title = element_text(face = "bold"),
+            panel.grid.major = element_line(colour = "white"), 
+            panel.grid.minor = element_line(colour = "white")) +
+        labs(y = "Total Time Spent on Social \nMedia Sites per Day (minutes)",
+             x = "Social Media Addiction Tolerance",
+             colour = "Narcissism")
+ 
 ```
 
 ```{r psyc_plots}
@@ -550,8 +650,10 @@ psyc_sns_gender <- lmer(len ~ dd_psyc_comp*sns*gender + (1 | id),
 summary(psyc_sns_gender)
 
 genderxsns_data %<>%
-  mutate(psyc_group = case_when(dd_psyc_comp > quantile(dd_psyc_comp, .75, na.rm = TRUE) ~ "High",
-                                dd_psyc_comp < quantile(dd_psyc_comp, .25, na.rm = TRUE) ~ "Low",
+  mutate(psyc_group = case_when(dd_psyc_comp > quantile(dd_psyc_comp, .75, 
+                                                        na.rm = TRUE) ~ "High",
+                                dd_psyc_comp < quantile(dd_psyc_comp, .25, 
+                                                        na.rm = TRUE) ~ "Low",
                                 TRUE ~ "Mid"),
          psyc_group = factor(psyc_group, levels = c("Low", "Mid", "High")))
 
@@ -599,119 +701,7 @@ summary(psyc_sns)
 
 ```
 
-```{r perception analyses}
 
-ash_data %<>%
- filter(!is.na(sns),
-        !is.na(int_mot_inform_comp),
-        !is.na(int_mot_interp_comp),
-        !is.na(int_mot_entert_comp))
-
-
-model0            <- lmer(len ~ (1 | id), data = ash_data)
-model0_sns        <- lmer(len ~ sns + (1 | id), data = ash_data)
-
-
-#####################################################################################
-###### Examining potential influence of using social media use for information ###### 
-#####################################################################################
-
-model0_sns_inform <- lmer(len ~ sns + int_mot_inform_comp + 
-                         (1 | id), 
-                         data = ash_data)
-model0_snsxinfom <- lmer(len ~ sns*int_mot_inform_comp + 
-                         (1 | id), 
-                         data = ash_data)
-
-anova(model0, model0_sns, model0_sns_inform, model0_snsxinfom) #model0_sns is best; drop inform predictor
-
-######################################################################################
-###### Examining influence of using social media use for interpersonal relation ###### 
-######################################################################################
-
-model0_sns_interp <- lmer(len ~ sns + int_mot_interp_comp + 
-                         (1 | id), 
-                         data = ash_data)
-model0_snsxinterp <- lmer(len ~ sns*int_mot_interp_comp*gender + 
-                         (1 | id), 
-                         data = ash_data)
-
-anova(model0_sns, model0_sns_interp, model0_snsxinterp) 
-#both interp models are better than sns only model
-# best model contains interaction
-summary(model0_snsxinterp)
-
-ash_data %>%
-  filter(sns != "4chan") %>%
-  group_by(sns) %>%
-  summarize(len_m  = mean(len, na.rm = TRUE),
-            len_se = sundry::se(len),
-            interp_m = mean(int_mot_interp_comp, na.rm = TRUE),
-            interp_se = sundry::se(int_mot_interp_comp)) %>%
-  ggplot(aes(x = interp_m, y = len_m, fill = sns)) +
-    geom_col(position = "dodge", alpha = 0.9) +
-    scale_fill_viridis_d(name = "Social Media Site") +
-    theme_bw(base_size = 14) +
-    theme(axis.title = element_text(face = "bold"),
-          strip.text = element_text(face = "bold", size = 14),
-          legend.title = element_text(face = "bold"),
-          panel.grid.major = element_line(colour = "white"), 
-          panel.grid.minor = element_line(colour = "white")) +
-    labs(y = "Average time spent on Social \nMedia Sites per Day (minutes)",
-         x = "Interpersonal Motivation")
-
-#############################################################################
-###### Examining influence of using social media use for entertainment ###### 
-#############################################################################
-
-model0_sns_entert <- lmer(len ~ sns + int_mot_entert_comp + 
-                         (1 | id), 
-                         data = ash_data)
-model0_snsxentert <- lmer(len ~ sns*int_mot_entert_comp + 
-                         (1 | id), 
-                         data = ash_data)
-anova(model0_sns, model0_sns_entert, model0_snsxentert)
-#both entert models are better than sns only model
-# best model contains interaction
-summary(model0_snsxentert)
-
-model1 <- lmer(len ~ sns*int_mot_interp_comp + 
-                     sns*int_mot_entert_comp + 
-              (1 | id), 
-              data = ash_data)
-anova(model0_snsxentert, model1) #model 1 best
-anova(model0_snsxinterp, model1) #model 1 is marginally better (p = .07)
-
-summary(model1)
-
-#Basically, people who rely more on social media for interpesonal communication spend more time on snapchat each day
-#Similarly, people who rely more on social media for entertainment spend more time on youtube each day
-#People who rely more on social media for entertainment spend marginally more time on reddit each day
-
-```
-
-```{r genderxperception}
-
-genderxsns_data %<>%
- filter(!is.na(sns),
-        !is.na(int_mot_inform_comp),
-        !is.na(int_mot_interp_comp),
-        !is.na(int_mot_entert_comp),
-        !is.na(gender))
-
-model1 <- lmer(len ~ sns*int_mot_interp_comp + 
-                     sns*int_mot_entert_comp + 
-              (1 | id), 
-              data = genderxsns_data)
-
-gender_interp_entert <- lmer(len ~ sns*int_mot_interp_comp*gender + 
-                                   sns*int_mot_entert_comp*gender +
-                     (1 | id), 
-                     data = genderxsns_data)
-anova(model1, gender_interp_entert)
-summary(gender_interp_entert) #fits data best
-
-```
 
 
 
