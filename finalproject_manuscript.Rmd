@@ -418,17 +418,17 @@ test <- data1 %>%
   group_by(gender, sns) %>%
   summarise(great_0_sum = sum(great_0, na.rm = TRUE))
 
-# dataset for gender specific analyses:
-genderxsns_data <- data1 %>%
-  select(id, age, gender, race, sns:sns_perc_rating, 
-         contains("comp"), contains("group")) %>%
-  filter(gender == "Male" | gender == "Female") %>%
-  filter(sns != "4chan" & # only 6 men and 6 women use 4chan
-         sns != "linkedin" & # only 14 men use linkedin
-         sns != "pinterest" & # only 4 men use pinterest
-         sns != "tumblr" & # only 4 men use tumblr
-         sns != "whatsapp") %>% # only 2 men use whatsapp
-  arrange(id)
+# # dataset for gender specific analyses:
+# genderxsns_data <- data1 %>%
+#   select(id, age, gender, race, sns:sns_perc_rating, 
+#          contains("comp"), contains("group")) %>%
+#   filter(gender == "Male" | gender == "Female") %>%
+#   filter(sns != "4chan" & # only 6 men and 6 women use 4chan
+#          sns != "linkedin" & # only 14 men use linkedin
+#          sns != "pinterest" & # only 4 men use pinterest
+#          sns != "tumblr" & # only 4 men use tumblr
+#          sns != "whatsapp") %>% # only 2 men use whatsapp
+#   arrange(id)
 
 ```
 
@@ -445,7 +445,7 @@ Sagacious intro text goes here.
 ```{r gender_plots}
 # examining gender differences in minutes spent on social media each day
 #faceted by social media site
-genderxsns_data %>%
+ash_data %>%
   group_by(gender, sns) %>%
   summarise(len_m = mean(len, na.rm = TRUE),
             len_se = se(len, na.rm = TRUE)) %>%
@@ -461,19 +461,10 @@ genderxsns_data %>%
     labs(y = "Average Length Spent on Social Media Sites per Day (minutes)",
          x = "Social Media Site")
 
-###########################################################
-################# Cooresponding analysis: ################# 
-###########################################################
-
-model1 <- lmer(len ~ gender*sns + (1 | id), data = genderxsns_data)
-summary(model1)
-
-###########################################################
-
 #same plot as above...
 #But, instead of minutese on social media, the DV here was a likert scale
 #Personally, I prefer the minutes variable (len) above
-genderxsns_data %>%
+ash_data %>%
   group_by(gender, sns) %>%
   summarise(freq_m = mean(freq, na.rm = TRUE),
             len_se = se(len, na.rm = TRUE)) %>%
@@ -508,8 +499,13 @@ corrs <- round(corrs, 2)
 ```{r machxgender_plots}
 
 #Examining whether gender effects differ as a funciton of Machiavellianism
-genderxsns_data %>%
+ash_data %>%
   filter(mach_group != "Mid") %>%
+  filter(sns != "4chan" & # only 6 men and 6 women use 4chan
+         sns != "linkedin" & # only 14 men use linkedin
+         sns != "pinterest" & # only 4 men use pinterest
+         sns != "tumblr" & # only 4 men use tumblr
+         sns != "whatsapp") %>% # only 2 men use whatsapp
   group_by(sns, gender, mach_group) %>% 
   summarize(len_m  = mean(len, na.rm = TRUE),
             len_se = sundry::se(len)) %>%
@@ -532,26 +528,14 @@ genderxsns_data %>%
          x = "Machiavellianism",
          colour = "Gender") 
 
-#####################
-#### Mach Models ####
-#####################
-
-mach_models <- list(len ~ dd_mach_comp + (1 | id),
-                    len ~ dd_mach_comp*gender + (1 | id),
-                    len ~ dd_mach_comp*sns + (1 | id),
-                    len ~ dd_mach_comp*sns*gender + (1 | id))
-
-mach_model_fits <- map(mach_models, ~lmer(.x, data = ash_data)) 
-
-map(mach_model_fits, ~summary(.x))
-
-map(mach_model_fits, ~anova(.x)) #not quite doing what I want.. I want model comparisons????
-
 #Examining whether social media use differ as a funciton of Machiavellianism
 ash_data %>%
   filter(mach_group != "Mid",
-         sns == "instagram" |
-         sns == "snapchat") %>%
+         sns != "4chan" & 
+         sns != "linkedin" & 
+         sns != "pinterest" & 
+         sns != "tumblr" & 
+         sns != "whatsapp") %>% 
   group_by(sns, mach_group) %>%
   summarize(len_m  = mean(len, na.rm = TRUE),
             len_se = sundry::se(len)) %>%
@@ -570,6 +554,21 @@ ash_data %>%
           legend.title = element_text(face = "bold")) +
     labs(y = "Average length spent on Social \nMedia Sites per Day (minutes)",
          x = "Machiavellianism")
+
+#####################
+#### Mach Models ####
+#####################
+
+mach_models <- list(len ~ dd_mach_comp + (1 | id),
+                    len ~ dd_mach_comp*gender + (1 | id),
+                    len ~ dd_mach_comp*sns + (1 | id),
+                    len ~ dd_mach_comp*sns*gender + (1 | id))
+
+mach_model_fits <- map(mach_models, ~lmer(.x, data = ash_data)) 
+
+map(mach_model_fits, ~summary(.x))
+
+map(mach_model_fits, ~anova(.x)) #not quite doing what I want.. I want model comparisons????
 
 ```
 
@@ -614,8 +613,13 @@ corr_data %>%
 
 ```{r narcxgender_plots}
 #Examining whether gender effects on social media use differ as a funciton of Narcissism
-genderxsns_data %>%
-  filter(narc_group != "Mid") %>%
+ash_data %>%
+  filter(narc_group != "Mid",
+         sns != "4chan" & 
+         sns != "linkedin" & 
+         sns != "pinterest" & 
+         sns != "tumblr" & 
+         sns != "whatsapp") %>%
   group_by(sns, gender, narc_group) %>% 
   summarize(len_m  = mean(len, na.rm = TRUE),
             len_se = sundry::se(len)) %>%
@@ -638,25 +642,14 @@ genderxsns_data %>%
          x = "Narcissism",
          colour = "Gender") 
 
-###########################
-#### Narcissism Models ####
-###########################
-
-narc_models <- list(len ~ dd_narc_comp + (1 | id),
-                    len ~ dd_narc_comp*gender + (1 | id),
-                    len ~ dd_narc_comp*sns + (1 | id),
-                    len ~ dd_narc_comp*sns*gender + (1 | id))
-
-narc_model_fits <- map(narc_models, ~lmer(.x, data = ash_data)) 
-
-map(narc_model_fits, ~summary(.x))
-
-map(narc_model_fits, ~anova(.x)) #not quite doing what I want.. I want model comparisons????
-
 #Examining whether social media use differ as a funciton of Narcissism (no gender)
 ash_data %>%
   filter(narc_group != "Mid",
-         sns == "snapchat") %>%
+         sns != "4chan" & 
+         sns != "linkedin" & 
+         sns != "pinterest" & 
+         sns != "tumblr" & 
+         sns != "whatsapp") %>%
   group_by(sns, narc_group) %>% 
   summarize(len_m  = mean(len, na.rm = TRUE),
             len_se = sundry::se(len)) %>%
@@ -675,6 +668,22 @@ ash_data %>%
              legend.title = element_text(face = "bold")) +
     labs(y = "Average length spent on Social \nMedia Sites per Day (minutes)",
          x = "Narcissism")
+
+###########################
+#### Narcissism Models ####
+###########################
+
+narc_models <- list(len ~ dd_narc_comp + (1 | id),
+                    len ~ dd_narc_comp*gender + (1 | id),
+                    len ~ dd_narc_comp*sns + (1 | id),
+                    len ~ dd_narc_comp*sns*gender + (1 | id))
+
+narc_model_fits <- map(narc_models, ~lmer(.x, data = ash_data)) 
+
+map(narc_model_fits, ~summary(.x))
+
+map(narc_model_fits, ~anova(.x)) #not quite doing what I want.. I want model comparisons????
+
 ```
 
 ```{r narc_addiction}
@@ -737,8 +746,13 @@ corr_data %>%
 
 ```{r psycxgender_plots}
 #Examining whether gender effects on social media use differ as a funciton of Psychopathy
-genderxsns_data %>%
-  filter(psyc_group != "Mid") %>%
+ash_data %>%
+  filter(psyc_group != "Mid",
+         sns != "4chan" & 
+         sns != "linkedin" & 
+         sns != "pinterest" & 
+         sns != "tumblr" & 
+         sns != "whatsapp") %>%
   group_by(sns, gender, psyc_group) %>% 
   summarize(len_m  = mean(len, na.rm = TRUE),
             len_se = sundry::se(len)) %>%
@@ -761,26 +775,14 @@ genderxsns_data %>%
          x = "Psychopathy",
          colour = "Gender") 
 
-############################
-#### Psychopathy Models ####
-############################
-
-psyc_models <- list(len ~ dd_psyc_comp + (1 | id),
-                    len ~ dd_psyc_comp*gender + (1 | id),
-                    len ~ dd_psyc_comp*sns + (1 | id),
-                    len ~ dd_psyc_comp*sns*gender + (1 | id))
-
-psyc_model_fits <- map(psyc_models, ~lmer(.x, data = ash_data)) 
-
-map(psyc_model_fits, ~summary(.x))
-
-map(psyc_model_fits, ~anova(.x)) #not quite doing what I want.. I want model comparisons????
-
 #Examining whether social media use differ as a funciton of Psychopathy (no gender)
 ash_data %>%
   filter(psyc_group != "Mid",
-         sns == "youtube" |
-         sns == "snapchat") %>%
+         sns != "4chan" & 
+         sns != "linkedin" & 
+         sns != "pinterest" & 
+         sns != "tumblr" & 
+         sns != "whatsapp") %>%
   group_by(sns, psyc_group) %>% 
   summarize(len_m  = mean(len, na.rm = TRUE),
             len_se = sundry::se(len)) %>%
@@ -800,7 +802,20 @@ ash_data %>%
     labs(y = "Average length spent on Social \nMedia Sites per Day (minutes)",
          x = "Psychopathy") 
 
-### hmm... doesn't really look like much is there
+############################
+#### Psychopathy Models ####
+############################
+
+psyc_models <- list(len ~ dd_psyc_comp + (1 | id),
+                    len ~ dd_psyc_comp*gender + (1 | id),
+                    len ~ dd_psyc_comp*sns + (1 | id),
+                    len ~ dd_psyc_comp*sns*gender + (1 | id))
+
+psyc_model_fits <- map(psyc_models, ~lmer(.x, data = ash_data)) 
+
+map(psyc_model_fits, ~summary(.x))
+
+map(psyc_model_fits, ~anova(.x)) #not quite doing what I want.. I want model comparisons????
 
 ```
 
