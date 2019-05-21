@@ -536,26 +536,17 @@ genderxsns_data %>%
 #### Mach Models ####
 #####################
 
-mach <- lmer(len ~ dd_mach_comp + (1 | id), data = ash_data)
+mach_models <- list(len ~ dd_mach_comp + (1 | id),
+                    len ~ dd_mach_comp*gender + (1 | id),
+                    len ~ dd_mach_comp*sns + (1 | id),
+                    len ~ dd_mach_comp*sns*gender + (1 | id))
 
-mach_gender <- lmer(len ~ dd_mach_comp*gender + (1 | id),
-                       data = ash_data)
+mach_model_fits <- map(mach_models, ~lmer(.x, data = ash_data)) 
 
-anova(mach, mach_gender) #adding gender doesn't do anything
+map(mach_model_fits, ~summary(.x))
 
-mach_sns <- lmer(len ~ dd_mach_comp*sns + (1 | id),
-                       data = ash_data)
-anova(mach, mach_sns) #mach_sns model is best thus far
-summary(mach_sns) 
-#people high in mach spend more time each day on insta and snapchat
+map(mach_model_fits, ~anova(.x)) #not quite doing what I want.. I want model comparisons????
 
-# Machiavellianism x gender x sns model
-mach_sns_gender <- lmer(len ~ dd_mach_comp*sns*gender + (1 | id),
-                        data = genderxsns_data)
-
-summary(mach_sns_gender) #nothing shakes out with 3 way interaction!!
-
-# BEST MACH MODEL IS MACH_SNS (no gender)
 #Examining whether social media use differ as a funciton of Machiavellianism
 ash_data %>%
   filter(mach_group != "Mid",
@@ -651,21 +642,18 @@ genderxsns_data %>%
 #### Narcissism Models ####
 ###########################
 
-narc <- lmer(len ~ dd_narc_comp + (1 | id), data = ash_data)
+narc_models <- list(len ~ dd_narc_comp + (1 | id),
+                    len ~ dd_narc_comp*gender + (1 | id),
+                    len ~ dd_narc_comp*sns + (1 | id),
+                    len ~ dd_narc_comp*sns*gender + (1 | id))
 
-narc_gender <- lmer(len ~ dd_narc_comp*gender + (1 | id),
-                       data = ash_data)
+narc_model_fits <- map(narc_models, ~lmer(.x, data = ash_data)) 
 
-anova(narc, narc_gender) #adding gender interaction doesn't do anything
+map(narc_model_fits, ~summary(.x))
 
-narc_sns <- lmer(len ~ dd_narc_comp*sns + (1 | id),
-                       data = ash_data)
-anova(narc, narc_sns) #narc_sns model is best thus far
-summary(narc_sns) 
+map(narc_model_fits, ~anova(.x)) #not quite doing what I want.. I want model comparisons????
 
-#people high in Narcissism spend more time each day on snapchat
 #Examining whether social media use differ as a funciton of Narcissism (no gender)
-genderxsns_data %>%
 ash_data %>%
   filter(narc_group != "Mid",
          sns == "snapchat") %>%
@@ -687,24 +675,6 @@ ash_data %>%
              legend.title = element_text(face = "bold")) +
     labs(y = "Average length spent on Social \nMedia Sites per Day (minutes)",
          x = "Narcissism")
-
-# Narcissism x gender x sns model
-narc_sns_gender <- lmer(len ~ dd_narc_comp*sns*gender + (1 | id),
-                        data = genderxsns_data)
-
-narc_sns <- lmer(len ~ dd_narc_comp*sns + (1 | id),
-                       data = genderxsns_data) #need to re-run model with same data
-
-anova(narc_sns, narc_sns_gender) #model with 3 way interaction fits the best!!
-
-# BEST MACH MODEL IS MACH_SNS_GENDER 
-summary(narc_sns_gender)
-
-# Narcissism x gender x sns model
-narc_sns_gender <- lmer(len ~ dd_narc_comp*sns*gender + (1 | id),
-                        data = genderxsns_data)
-summary(narc_sns_gender)
-
 ```
 
 ```{r narc_addiction}
@@ -795,17 +765,16 @@ genderxsns_data %>%
 #### Psychopathy Models ####
 ############################
 
-psyc <- lmer(len ~ dd_psyc_comp + (1 | id), data = ash_data)
+psyc_models <- list(len ~ dd_psyc_comp + (1 | id),
+                    len ~ dd_psyc_comp*gender + (1 | id),
+                    len ~ dd_psyc_comp*sns + (1 | id),
+                    len ~ dd_psyc_comp*sns*gender + (1 | id))
 
-psyc_gender <- lmer(len ~ dd_psyc_comp*gender + (1 | id),
-                       data = ash_data)
+psyc_model_fits <- map(psyc_models, ~lmer(.x, data = ash_data)) 
 
-anova(psyc, psyc_gender) #adding gender interaction doesn't do anything
+map(psyc_model_fits, ~summary(.x))
 
-psyc_sns1 <- lmer(len ~ dd_psyc_comp*sns + (1 | id),
-                       data = ash_data)
-anova(psyc, psyc_sns1) #psyc_sns model is best thus far
-summary(psyc_sns1) #people high in psychopathy spend more time each day on youtube and snapchat
+map(psyc_model_fits, ~anova(.x)) #not quite doing what I want.. I want model comparisons????
 
 #Examining whether social media use differ as a funciton of Psychopathy (no gender)
 ash_data %>%
@@ -832,11 +801,6 @@ ash_data %>%
          x = "Psychopathy") 
 
 ### hmm... doesn't really look like much is there
-
-# Psychopathy x gender x sns model
-psyc_sns_gender <- lmer(len ~ dd_psyc_comp*sns*gender + (1 | id),
-                        data = genderxsns_data)
-summary(psyc_sns_gender) #according to this model, differences only arise with reddit
 
 ```
 
