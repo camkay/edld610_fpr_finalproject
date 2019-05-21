@@ -406,7 +406,7 @@ corr_data <- ash_data %>%
   mutate(mean_freq = mean(freq, na.rm = TRUE),
          sum_freq = sum(freq, na.rm = TRUE),
          sum_len = sum(len, na.rm = TRUE)) %>%
-  select(id, gender, mean_freq, sum_freq, sum_len, self, society, 
+  select(id, gender, sum_freq, sum_len, self, society, 
          contains("comp"), contains("addict"), contains("group")) %>%
   unique()
 
@@ -451,7 +451,7 @@ ash_data %>%
             len_se = se(len, na.rm = TRUE)) %>%
   ggplot(aes(x = sns, y = len_m, fill = gender)) + 
     geom_col(position = "dodge", alpha = 0.7) +
-    scale_fill_manual(values = c("steelblue3", "darkorchid3"),
+    scale_fill_manual(values = c("#633974", "#2A99A2"),
                       name = "Gender") +
     theme_bw(base_size = 14) +
     theme(axis.title = element_text(face = "bold"),
@@ -470,7 +470,7 @@ ash_data %>%
             len_se = se(len, na.rm = TRUE)) %>%
   ggplot(aes(x = sns, y = freq_m, fill = gender)) + 
     geom_col(position = "dodge", alpha = 0.7) +
-    scale_fill_manual(values = c("steelblue3", "darkorchid3"),
+    scale_fill_manual(values = c("#633974", "#2A99A2"),
                       name = "Gender") +
     theme_bw(base_size = 14) +
     theme(axis.title = element_text(face = "bold"),
