@@ -617,45 +617,6 @@ map(mach_model_fits, ~anova(.x)) #not quite doing what I want.. I want model com
 
 ```
 
-```{r mach_addiction}
-#Examining whether mood mofication/time on social media relation varies as a funciton of Machiavellianism
-corr_data %>%
-  mutate(mach_group = as.factor(mach_group)) %>%
-  filter(mach_group != "Mid") %>%
-  ggplot(aes(x = int_addict_mood_comp, y = sum_len, 
-             group = mach_group, colour = mach_group)) +
-      geom_smooth(method = "lm", 
-                  se = FALSE,
-                  size = 2) +
-      theme_bw(base_size = 14) +
-      scale_color_manual(values = c("#4A235A", "#D2B4DE")) +
-      theme(axis.title = element_text(face = "bold"),
-            strip.text = element_text(face = "bold", size = 14),
-            legend.title = element_text(face = "bold")) +
-        labs(y = "Total Time Spent on Social \nMedia Sites per Day (minutes)",
-             x = "Social Media Addiction Mood Modification",
-             colour = "Machiavellianism")
-
-#Examining whether addicition salience/time on social media relation varies as a funciton of Machiavellianism
-corr_data %>%
-  mutate(mach_group = as.factor(mach_group)) %>%
-  filter(mach_group != "Mid") %>%
-  ggplot(aes(x = int_addict_salience_comp, y = sum_len, 
-             group = mach_group, colour = mach_group)) +
-      geom_smooth(method = "lm", 
-                  se = FALSE,
-                  size = 2) +
-      theme_bw(base_size = 14) +
-      scale_color_manual(values = c("#4A235A", "#D2B4DE")) +
-      theme(axis.title = element_text(face = "bold"),
-            strip.text = element_text(face = "bold", size = 14),
-            legend.title = element_text(face = "bold")) +
-        labs(y = "Total Time Spent on Social \nMedia Sites per Day (minutes)",
-             x = "Social Media Addiction Salience",
-             colour = "Machiavellianism")
-
-```
-
 ```{r narcxgender_plots}
 #Examining whether gender effects on social media use differ as a funciton of Narcissism
 ash_data %>%
@@ -729,64 +690,6 @@ map(narc_model_fits, ~summary(.x))
 
 map(narc_model_fits, ~anova(.x)) #not quite doing what I want.. I want model comparisons????
 
-```
-
-```{r narc_addiction}
-
-#Examining whether mood modification/time on social media relation varies as a funciton of Narcissism
-corr_data %>%
-  mutate(narc_group = as.factor(narc_group)) %>%
-  filter(narc_group != "Mid") %>%
-  ggplot(aes(x = int_addict_mood_comp, y = sum_len, 
-             group = narc_group, colour = narc_group)) +
-      geom_smooth(method = "lm", 
-                  se = FALSE,
-                  size = 2) +
-      theme_bw(base_size = 14) +
-      scale_color_manual(values = c("#17737B", "#5FCDD6")) +
-      theme(axis.title = element_text(face = "bold"),
-            strip.text = element_text(face = "bold", size = 14),
-            legend.title = element_text(face = "bold")) +
-      labs(y = "Total Time Spent on Social \nMedia Sites per Day (minutes)",
-             x = "Social Media Addiction Mood Modification",
-             colour = "Narcissism")
-
-#Examining whether addicition salience/time on social media relation varies as a funciton of Narcissism
-corr_data %>%
-  mutate(narc_group = as.factor(narc_group)) %>%
-  filter(narc_group != "Mid") %>%
-  ggplot(aes(x = int_addict_salience_comp, y = sum_len, group = narc_group, colour = narc_group)) +
-      geom_smooth(method = "lm", 
-                  se = FALSE,
-                  size = 2) +
-      theme_bw(base_size = 14) +
-      scale_color_manual(values = c("#17737B", "#5FCDD6")) +
-      theme(axis.title = element_text(face = "bold"),
-            strip.text = element_text(face = "bold", size = 14),
-            legend.title = element_text(face = "bold"),
-            panel.grid.major = element_line(colour = "white"), 
-            panel.grid.minor = element_line(colour = "white")) +
-        labs(y = "Total Time Spent on Social \nMedia Sites per Day (minutes)",
-             x = "Social Media Addiction Salience",
-             colour = "Narcissism")
-
-#Examining whether addicition tolerance/time on social media relation varies as a funciton of Narcissism
-corr_data %>%
-  mutate(narc_group = as.factor(narc_group)) %>%
-  filter(narc_group != "Mid") %>%
-  ggplot(aes(x = int_addict_tolerance_comp, y = sum_len, 
-             group = narc_group, colour = narc_group)) +
-      geom_smooth(method = "lm", 
-                  se = FALSE,
-                  size = 2) +
-      theme_bw(base_size = 14) +
-      scale_color_manual(values = c("#17737B", "#5FCDD6")) +
-      theme(axis.title = element_text(face = "bold"),
-            strip.text = element_text(face = "bold", size = 14),
-            legend.title = element_text(face = "bold")) +
-        labs(y = "Total Time Spent on Social \nMedia Sites per Day (minutes)",
-             x = "Social Media Addiction Tolerance",
-             colour = "Narcissism")
 ```
 
 ```{r psycxgender_plots}
@@ -863,7 +766,6 @@ map(psyc_model_fits, ~summary(.x))
 map(psyc_model_fits, ~anova(.x)) #not quite doing what I want.. I want model comparisons????
 
 ```
-
 
 ```{r parallel iteration}
 
