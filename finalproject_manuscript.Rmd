@@ -505,28 +505,6 @@ ash_data %>%
     coord_flip() +
     labs(y = "Average Length Spent on Social Media Sites per Day (minutes)",
          x = "Social Media Site")
-
-#same plot as above...
-#But, instead of minutese on social media, the DV here was a likert scale
-#Personally, I prefer the minutes variable (len) above
-ash_data %>%
-  group_by(gender, sns) %>%
-  summarise(freq_m = mean(freq, na.rm = TRUE),
-            len_se = se(len, na.rm = TRUE)) %>%
-  ggplot(aes(x = sns, y = freq_m, fill = gender)) + 
-    geom_col(position = "dodge", alpha = 0.7) +
-    scale_fill_manual(values = c("#633974", "#2A99A2"),
-                      name = "Gender") +
-    theme_bw(base_size = 14) +
-    theme(axis.title = element_text(face = "bold"),
-          strip.text = element_text(face = "bold", size = 14),
-          legend.title = element_text(face = "bold")) +
-    coord_flip() +
-    labs(y = "Average frequency of using the social media sites",
-         x = "Social Media Site") +
-    scale_y_continuous(labels = c("Rarely", "Monthly", "Weekly", 
-                                  "Daily", "Multiple times of day"))
-
 ```
 
 ```{r correlations}
