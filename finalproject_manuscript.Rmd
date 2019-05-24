@@ -475,15 +475,32 @@ test <- data1 %>%
 #          sns != "whatsapp") %>% # only 2 men use whatsapp
 #   arrange(id)
 
+# corr_data %>%
+#   filter(gender == "Female") %>%
+#   nrow() #102/149 females
+
+# data1 %>%
+#   select(id, age) %>%
+#   unique() %>%
+#   mutate(age = as.numeric(age)) %>%
+#   summarize(m_age = mean(age, na.rm = TRUE),
+#             sd_age = sd(age, na.rm = TRUE),
+#             max_age = max(age, na.rm = TRUE),
+#             min_age = min(age, na.rm = TRUE))
+
 ```
+
+# Intro
 
 Sagacious intro text goes here.
 
 # Method
 
-## Participants
+## Participants and Procedure
 
-## Material and procedure
+A total of `r nrow(corr_data)` participants (68% female; age range: 18 to 34 years; *M* age = 19.61, *SD* age = 2.02) were recruited from the human subject pool at the University of Oregon. Data was collected over one academic quarter, and all participants were compensated with course credit necessary for meeting a course research requirement. Participants completed an online survey that included (1) a measure of the Dark Triad personality traits (i.e., Machiavellianism, narcissism, psychopathy), (2) questions assessing  participants' frequency of visiting eleven social media sites, (3) questions assessing the amount of time participants spend on those eleven social media sites, (4) a scale assessing the participants' addiction to social media, (5) a scale measuring participants' reasons for using the internet, and (6) two questions assessing participants' overall view of social media sites. The following analyses will only be focusing on the measure of the Dark Triad and the questions assessing frequency of use and amount of time spent on social media sites.
+
+## Materials
 
 # Results
 
