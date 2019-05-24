@@ -44,8 +44,19 @@ output            : papaja::apa6_pdf
 ---
 
 ```{r setup, include = FALSE}
-# load required packaages
-library(sundry)
+
+#devtools::install_github("datalorax/sundry")
+# install.packages("papaja")
+# install.packages("tidyverse")
+# install.packages("rio")
+# install.packages("here")
+# install.packages("magrittr")
+# install.packages("lme4")
+# install.packages("lmerTest")
+# install.packages("psych")
+# install.packages("glue")
+
+library(sundry) # for calculating standard errors
 library("papaja") # for creating the apa journal article
 library(tidyverse) # for purrr, dplyr, and ggplot2 functions
 library(rio) # for easy imporrting of data
@@ -54,6 +65,7 @@ library(magrittr) # for the compound assigiment pipe-operator
 library(lme4) # for conducting linear mixed-effects models
 library(lmerTest) # for calculating t-tests for linear mixed-effects models
 library(psych) # for caculating cronbach's alpha
+library(glue) # for parallel iteration 
 
 # import data as tibble and clean column names
 data1 <- rio::import(here::here("data", "data_1.xlsx"), setclass = "tibble") %>%
@@ -778,8 +790,6 @@ plot_data <- ash_data %>%
   spread(sns_perc_context, sns_perc_rating) %>%
   group_by(sns) %>%
   nest()
-
-library(glue)
 
 plot_data <- test %>%
   mutate(plots = pmap(
