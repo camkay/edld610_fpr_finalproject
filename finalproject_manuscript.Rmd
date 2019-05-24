@@ -774,63 +774,68 @@ map(psyc_model_fits, ~anova(.x)) #not quite doing what I want.. I want model com
 
 ```
 
-```{r parallel iteration}
+```{r parallel_iteration}
 
 ########################################################
 ### instance of parallel iteration # 1 (1 required) ####
 ## instance of purr::nest%>%mutate() # 1 (1 required) ##
 ########################################################
 
+# What if we wanted to visualize all three groups (low, mid, high)?
+
 plot_data <- ash_data %>%
-  # filter(sns != "4chan" & 
-  #        sns != "linkedin" & 
-  #        sns != "pinterest" & 
-  #        sns != "tumblr" & 
-  #        sns != "whatsapp") %>%
+  filter(sns != "4chan" & 
+         sns != "linkedin" & 
+         sns != "pinterest" & 
+         sns != "tumblr" & 
+         sns != "whatsapp") %>%
+  gather(key = dd_trait, value = standing, mach_group:psyc_group) %>%
+  mutate(dd_trait = recode(dd_trait,
+                        "mach_group" = "Machiavellianism",
+                        "narc_group" = "Narcissism",
+                        "psyc_group" = "Psychopathy"))
+  
+plot_data$standing <- factor(plot_data$standing, levels = c("Low", "Mid", "High"))
+
+plot_data %<>%
+  #filter(standing != "Mid") %>%
   spread(sns_perc_context, sns_perc_rating) %>%
-  group_by(sns) %>%
+  group_by(dd_trait) %>%
   nest()
 
-plot_data <- test %>%
+#Specify colors for my own color palette
+outrun <- c("violetred4", "pink", "turquoise4")
+
+plot_data <- plot_data %>%
   mutate(plots = pmap(
     # create list of plot resources
     list(data_for_plot = plot_data$data,
-         sns = plot_data$sns),
+         dd_trait = plot_data$dd_trait),
     # create plots
-    function(data_for_plot, sns) {
-      ggplot(data_for_plot, aes(x = int_addict_salience_comp, y = len,
-                                group = gender, colour = gender)) +
-        geom_smooth(method = "lm", 
-                    se = FALSE,
-                    size = 2) +
-        scale_colour_manual(values = c("#633974", "#2A99A2"),
-                            name = "Gender") +
+    function(data_for_plot, dd_trait) {
+      ggplot(data_for_plot, aes(x = standing, y = len, fill = standing)) +
+        geom_col(position = "dodge") +
+        scale_fill_manual(values = outrun) +
         # apply theme minimal
         theme_bw(base_size = 12) +
+        guides(fill=FALSE) +
+        facet_wrap(~sns) +
         #scale_color_manual(values = c("#17737B", "#5FCDD6")) +
         theme(axis.title = element_text(face = "bold"),
-              strip.text = element_text(face = "bold", size = 14),
-              legend.title = element_text(face = "bold")) +
+              legend.title = element_text(face = "bold"),
+              title = element_text(face = "bold"),
+              strip.text = element_text(face = "bold")) +
         # set labels
-        labs(title    = glue("Relation between time on social media \nand addictive salience: {sns}"),
-             y        = "Total Time Spent on Social \nMedia Sites per Day (minutes)",
-             x        = "Social Media Addiction Salience")
+        labs(title    = glue("Relation Between Time on Social Media and {dd_trait}"),
+             y        = "Total Time Spent on Social Media \nSites per Day (Minutes)",
+             x        = dd_trait)
 }))
 
 plot_data$plots[[1]]
 plot_data$plots[[2]]
 plot_data$plots[[3]]
-plot_data$plots[[4]]
-plot_data$plots[[5]]
-plot_data$plots[[6]]
-plot_data$plots[[7]]
-plot_data$plots[[8]]
-plot_data$plots[[9]]
-plot_data$plots[[10]]
-plot_data$plots[[11]]
 
 ```
-
 
 # Discussion
 

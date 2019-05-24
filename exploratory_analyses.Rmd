@@ -665,4 +665,72 @@ corr_data %>%
              colour = "Narcissism")
 ```
 
+```{r parallel_iteration}
 
+########################################################
+### instance of parallel iteration # 1 (1 required) ####
+## instance of purr::nest%>%mutate() # 1 (1 required) ##
+########################################################
+
+plot_data <- ash_data %>%
+  gather(key = dd_trait, value = standing, mach_group:psyc_group) %>%
+  mutate(dd_trait = recode(dd_trait,
+                        "mach_group" = "Machiavellianism",
+                        "narc_group" = "Narcissism",
+                        "psyc_group" = "Psychopathy"))
+  
+plot_data$standing <- factor(plot_data$standing, levels = c("Low", "Mid", "High"))
+
+plot_data %<>%
+  spread(sns_perc_context, sns_perc_rating) %>%
+  group_by(sns, dd_trait) %>%
+  nest()
+
+# plot_data <- ash_data %>%
+#   # filter(sns != "4chan" & 
+#   #        sns != "linkedin" & 
+#   #        sns != "pinterest" & 
+#   #        sns != "tumblr" & 
+#   #        sns != "whatsapp") %>%
+#   spread(sns_perc_context, sns_perc_rating) %>%
+#   group_by(sns) %>%
+#   nest()
+
+#Specify colors for my own color palette
+outrun <- c("violetred4", "pink", "turquoise4")
+
+plot_data <- plot_data %>%
+  mutate(plots = pmap(
+    # create list of plot resources
+    list(data_for_plot = plot_data$data,
+         sns = plot_data$sns,
+         dd_trait = plot_data$dd_trait),
+    # create plots
+    function(data_for_plot, sns, dd_trait) {
+      ggplot(data_for_plot, aes(x = standing, y = len, fill = standing)) +
+        geom_col(position = "dodge") +
+        scale_fill_manual(values = outrun) +
+        # apply theme minimal
+        theme_bw(base_size = 12) +
+        guides(fill=FALSE) +
+        #scale_color_manual(values = c("#17737B", "#5FCDD6")) +
+        theme(axis.title = element_text(face = "bold"),
+              legend.title = element_text(face = "bold")) +
+        # set labels
+        labs(title    = glue("Relation Between Time on Social Media and {dd_trait}: {sns}"),
+             y        = "Total Time Spent on Social Media Sites per Day (minutes)",
+             x        = dd_trait)
+}))
+
+plot_data$plots[[1]]
+plot_data$plots[[3]]
+plot_data$plots[[5]]
+plot_data$plots[[6]]
+plot_data$plots[[7]]
+plot_data$plots[[14]]
+plot_data$plots[[16]]
+plot_data$plots[[17]]
+plot_data$plots[[29]]
+plot_data$plots[[31]]
+
+```
