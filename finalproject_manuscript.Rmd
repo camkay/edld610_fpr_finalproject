@@ -516,26 +516,6 @@ A total of `r nrow(corr_data)` participants (68% female; age range: 18 to 34 yea
 
 # Results
 
-```{r gender_plots}
-# examining gender differences in minutes spent on social media each day
-#faceted by social media site
-ash_data %>%
-  group_by(gender, sns) %>%
-  summarise(len_m = mean(len, na.rm = TRUE),
-            len_se = se(len, na.rm = TRUE)) %>%
-  ggplot(aes(x = sns, y = len_m, fill = gender)) + 
-    geom_col(position = "dodge", alpha = 0.7) +
-    scale_fill_manual(values = c("#633974", "#2A99A2"),
-                      name = "Gender") +
-    theme_bw(base_size = 14) +
-    theme(axis.title = element_text(face = "bold"),
-          strip.text = element_text(face = "bold", size = 14),
-          legend.title = element_text(face = "bold")) +
-    coord_flip() +
-    labs(y = "Average Length Spent on Social Media Sites per Day (minutes)",
-         x = "Social Media Site")
-```
-
 ```{r correlations}
 
 corrs <- corr_data %>%
@@ -549,36 +529,6 @@ corrs <- round(corrs, 2)
 ```
 
 ```{r machxgender_plots}
-
-#Examining whether gender effects differ as a funciton of Machiavellianism
-ash_data %>%
-  filter(mach_group != "Mid") %>%
-  filter(sns != "4chan" & # only 6 men and 6 women use 4chan
-         sns != "linkedin" & # only 14 men use linkedin
-         sns != "pinterest" & # only 4 men use pinterest
-         sns != "tumblr" & # only 4 men use tumblr
-         sns != "whatsapp") %>% # only 2 men use whatsapp
-  group_by(sns, gender, mach_group) %>% 
-  summarize(len_m  = mean(len, na.rm = TRUE),
-            len_se = sundry::se(len)) %>%
-  ggplot(aes(x = mach_group, y = len_m, fill = gender)) +
-    geom_col(position = "dodge", alpha = 0.8) +
-    geom_errorbar(aes(ymin = len_m - len_se, 
-                      ymax = len_m + len_se),
-                  position = "dodge",
-                  colour = "grey30") +
-    scale_fill_manual(values = c("#4A235A", "#D2B4DE"),
-                         name  = "Gender",
-                         breaks = c("Male", "Female"),
-                         labels = c("Male", "Female")) +
-    facet_wrap(~sns) +
-    theme_bw(base_size = 14) +
-    theme(axis.title = element_text(face = "bold"),
-             strip.text = element_text(face = "bold", size = 14),
-             legend.title = element_text(face = "bold")) +
-    labs(y = "Average length spent on Social \nMedia Sites per Day (minutes)",
-         x = "Machiavellianism",
-         colour = "Gender") 
 
 #Examining whether social media use differ as a funciton of Machiavellianism
 ash_data %>%
@@ -625,36 +575,6 @@ map(mach_model_fits, ~anova(.x)) #not quite doing what I want.. I want model com
 ```
 
 ```{r narcxgender_plots}
-#Examining whether gender effects on social media use differ as a funciton of Narcissism
-ash_data %>%
-  filter(narc_group != "Mid",
-         sns != "4chan" & 
-         sns != "linkedin" & 
-         sns != "pinterest" & 
-         sns != "tumblr" & 
-         sns != "whatsapp") %>%
-  group_by(sns, gender, narc_group) %>% 
-  summarize(len_m  = mean(len, na.rm = TRUE),
-            len_se = sundry::se(len)) %>%
-    ggplot(aes(x = narc_group, y = len_m, fill = gender)) +
-    geom_col(position = "dodge", alpha = 0.8) +
-    geom_errorbar(aes(ymin = len_m - len_se, 
-                      ymax = len_m + len_se),
-                  position = "dodge",
-                  colour = "grey30") +
-    scale_fill_manual(values = c("#17737B", "#5FCDD6"),
-                         name  = "Gender",
-                         breaks = c("Male", "Female"),
-                         labels = c("Male", "Female")) +
-    facet_wrap(~sns) +
-    theme_bw(base_size = 14) +
-    theme(axis.title = element_text(face = "bold"),
-             strip.text = element_text(face = "bold", size = 14),
-             legend.title = element_text(face = "bold")) +
-    labs(y = "Average length spent on Social \nMedia Sites per Day (minutes)",
-         x = "Narcissism",
-         colour = "Gender") 
-
 #Examining whether social media use differ as a funciton of Narcissism (no gender)
 ash_data %>%
   filter(narc_group != "Mid",
@@ -700,36 +620,6 @@ map(narc_model_fits, ~anova(.x)) #not quite doing what I want.. I want model com
 ```
 
 ```{r psycxgender_plots}
-#Examining whether gender effects on social media use differ as a funciton of Psychopathy
-ash_data %>%
-  filter(psyc_group != "Mid",
-         sns != "4chan" & 
-         sns != "linkedin" & 
-         sns != "pinterest" & 
-         sns != "tumblr" & 
-         sns != "whatsapp") %>%
-  group_by(sns, gender, psyc_group) %>% 
-  summarize(len_m  = mean(len, na.rm = TRUE),
-            len_se = sundry::se(len)) %>%
-  ggplot(aes(x = psyc_group, y = len_m, fill = gender)) +
-    geom_col(position = "dodge", alpha = 0.8) +
-    geom_errorbar(aes(ymin = len_m - len_se, 
-                      ymax = len_m + len_se),
-                  position = "dodge",
-                  colour = "grey30") +
-    scale_fill_manual(values = c("#7B1740", "#D1769B"),
-                      name  = "Gender",
-                      breaks = c("Male", "Female"),
-                      labels = c("Male", "Female")) +
-    facet_wrap(~sns) +
-    theme_bw(base_size = 14) +
-    theme(axis.title = element_text(face = "bold"),
-             strip.text = element_text(face = "bold", size = 14),
-             legend.title = element_text(face = "bold")) +
-    labs(y = "Average length spent on Social \nMedia Sites per Day (minutes)",
-         x = "Psychopathy",
-         colour = "Gender") 
-
 #Examining whether social media use differ as a funciton of Psychopathy (no gender)
 ash_data %>%
   filter(psyc_group != "Mid",
@@ -774,12 +664,34 @@ map(psyc_model_fits, ~anova(.x)) #not quite doing what I want.. I want model com
 
 ```
 
-```{r parallel_iteration}
+
+```{r gender_parallel_iteration}
+
+# examining gender differences in minutes spent on social media each day
+# by social media site
+ash_data %>%
+  group_by(gender, sns) %>%
+  summarise(len_m = mean(len, na.rm = TRUE),
+            len_se = se(len, na.rm = TRUE)) %>%
+  ggplot(aes(x = sns, y = len_m, fill = gender)) + 
+    geom_col(position = "dodge", alpha = 0.9) +
+    scale_fill_manual(values = c("#633974", "#2A99A2"),
+                      name = "Gender") +
+    theme_bw(base_size = 14) +
+    theme(axis.title = element_text(face = "bold"),
+          strip.text = element_text(face = "bold", size = 14),
+          legend.title = element_text(face = "bold")) +
+    coord_flip() +
+    labs(y = "Average Length Spent on Social Media Sites per Day (minutes)",
+         x = "Social Media Site")
 
 ########################################################
 ### instance of parallel iteration # 1 (1 required) ####
 ## instance of purr::nest%>%mutate() # 1 (1 required) ##
 ########################################################
+
+# lets examine potential gender effects on social media use..
+# ...as a function of the dark triad traits
 
 plot_data <- ash_data %>%
   filter(sns != "4chan" & 
