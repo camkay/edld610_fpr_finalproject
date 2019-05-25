@@ -781,8 +781,6 @@ map(psyc_model_fits, ~anova(.x)) #not quite doing what I want.. I want model com
 ## instance of purr::nest%>%mutate() # 1 (1 required) ##
 ########################################################
 
-# What if we wanted to visualize all three groups (low, mid, high)?
-
 plot_data <- ash_data %>%
   filter(sns != "4chan" & 
          sns != "linkedin" & 
@@ -800,22 +798,20 @@ plot_data$standing <- factor(plot_data$standing, levels = c("Low", "Mid", "High"
 plot_data %<>%
   #filter(standing != "Mid") %>%
   spread(sns_perc_context, sns_perc_rating) %>%
-  group_by(dd_trait) %>%
+  group_by(dd_trait, standing) %>%
   nest()
-
-#Specify colors for my own color palette
-outrun <- c("violetred4", "pink", "turquoise4")
 
 plot_data <- plot_data %>%
   mutate(plots = pmap(
     # create list of plot resources
     list(data_for_plot = plot_data$data,
-         dd_trait = plot_data$dd_trait),
+         dd_trait = plot_data$dd_trait, 
+         standing = plot_data$standing),
     # create plots
-    function(data_for_plot, dd_trait) {
-      ggplot(data_for_plot, aes(x = standing, y = len, fill = standing)) +
+    function(data_for_plot, dd_trait, standing) {
+      ggplot(data_for_plot, aes(x = gender, y = len, fill = gender)) +
         geom_col(position = "dodge") +
-        scale_fill_manual(values = outrun) +
+        scale_fill_manual(values = c("#633974", "#2A99A2")) +
         # apply theme minimal
         theme_bw(base_size = 12) +
         guides(fill=FALSE) +
@@ -824,17 +820,23 @@ plot_data <- plot_data %>%
         theme(axis.title = element_text(face = "bold"),
               legend.title = element_text(face = "bold"),
               title = element_text(face = "bold"),
-              strip.text = element_text(face = "bold")) +
+              strip.text = element_text(face = "bold"),
+              legend.position = "bottom") +
         # set labels
-        labs(title    = glue("Relation Between Time on Social Media and {dd_trait}"),
+        labs(title    = glue("Relation Between Time on Social Media and Gender for those {standing} in {dd_trait}"),
              y        = "Total Time Spent on Social Media \nSites per Day (Minutes)",
-             x        = dd_trait)
+             x        = "Gender")
 }))
 
 plot_data$plots[[1]]
 plot_data$plots[[2]]
 plot_data$plots[[3]]
-
+plot_data$plots[[4]]
+plot_data$plots[[5]]
+plot_data$plots[[6]]
+plot_data$plots[[7]]
+plot_data$plots[[8]]
+plot_data$plots[[9]]
 ```
 
 # Discussion
