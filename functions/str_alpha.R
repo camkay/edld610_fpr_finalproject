@@ -6,10 +6,10 @@ str_alpha <- function(pattern, data, full = TRUE, na.rm = TRUE) {
   
   # ensure the pattern is a character
   if (!is.character(pattern)) {
-    stop("pattern must of type numeric.")
+    stop("pattern must be of type numeric.")
   # and data is a data frame
   } else if (!is.data.frame(data)) {
-    stop("data must of type data frame or tibble.")
+    stop("data must be of type data frame or tibble.")
   }
   
   # drop columns not including the pattern
