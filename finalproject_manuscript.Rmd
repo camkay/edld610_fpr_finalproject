@@ -314,7 +314,7 @@ data1 <- data1 %>%
   cbind(data_comp)
 
 # clean up the environment
-rm(list = setdiff(ls(), c("data1", "alphas", "costum_functions", custom_functions)))
+rm(list = setdiff(ls(), c("data1", "alphas", "custom_functions", custom_functions)))
 ```
 
 # Intro
@@ -371,37 +371,123 @@ data1 %<>%
 exclusions_gender <- sample_start - exclusions_duration - exclusions_sd - lenique(data1$id)
 
 # get a dataframe of only unique ids for calculating demographic information
-data1_demo <- data1 %>%
+data1_distinct <- data1 %>%
   distinct(id, .keep_all = TRUE)
 
 # calculate demographic information for gender
-demo_gender <- data1_demo %>%
+demo_gender <- data1_distinct %>%
   select(gender) %>%
   perble()
 
 # calculate demographic information for culture
-demo_culture <- data1_demo %>%
+demo_culture <- data1_distinct %>%
   select(race) %>%
   perble()
 
 # calculate descriptives for age
-demo_age <- data1_demo$age %>%
+demo_age <- data1_distinct$age %>%
   as.numeric() %>%
   describe() %>%
   unlist()
-
-100 - sum(sort(demo_culture["Percent", ], TRUE)[1:4])
 ```
 
 A total of `r sample_start` participants were recruited from the human subject pool at the University of Oregon as part of a general survey. Data was collected over one academic quarter, and all participants were compensated with course credit necessary for meeting a course research requirement. The length of the survey was 10 minutes.  Participants completing the survey in under 90 seconds would have been excluded, but no participants failed to meet this treshold. We did, however, exclude a single participant for having a response standard deviation of zero, an indicator of straightlining. Since we were interested in the effects of gender on social media use and considering that the subsamples for the non-conventional genders were too small to be properly analyzed, we also excluded participants who reported being neither female nor male (*n* = `r exclusions_gender`). Our resulting sample comprised `r lenique(data1$id)` participants (`r spround(demo_gender["Percent", "Female"], 2)`% female; age range: `r demo_age["min"]` to `r demo_age["max"]` years; *M* age = `r demo_age["mean"]`, *SD* age = `r demo_age["sd"]`). With respect to cultural identity, `r spround(demo_culture["Percent", "Caucasian"], 2)`% reported being Caucasian, `r spround(demo_culture["Percent", "Asian"], 2)`% reported being Asian, `r spround(demo_culture["Percent", "Hispanic, Latinx, or Spanish Origin"], 2)`% reported being Hispanic, Latinx, or Spanish, `r spround(demo_culture["Percent", "Black or African American"], 2)`% reported being black or African American, and `r spround(100 - sum(sort(demo_culture["Percent", ], TRUE)[1:4]), 2)`% identified as being from some other culture or prefered not to answer. 
+
+## Procedures and Materials
+```{r data1_measures_comps}
+# drop unneeded variables from previous section
+rm(list = setdiff(ls(), c("data1", "alphas", "data1_distinct", "custom_functions", custom_functions)))
+
+# drop individual item columns
+data1 %<>%
+  select(-matches("\\d"))
+
+# calculate descriptives for composite columns
+descript_comps <- data1_distinct %>%
+  select(ends_with("_comp")) %>%
+  describe() %>%
+  select(vars, n, mean, sd)
+
+descript_comps <- data1_distinct %>%
+  filter(gender == "Female") %>%
+  select(ends_with("_comp")) %>%
+  describe() %>%
+  select(vars, n_fem = n, mean_fem = mean, sd_fem = sd) %>%
+  right_join(descript_comps, by = "vars")
+
+descript_comps <- data1_distinct %>%
+  filter(gender == "Male") %>%
+  select(ends_with("_comp")) %>%
+  describe() %>%
+  select(vars, n_mal = n, mean_mal = mean, sd_mal = sd) %>%
+  right_join(descript_comps, by = "vars")
+
+descript_comps$vars <- str_cols_find("_comp", data1, return = "names")
+
+# calculate t, p, and d
+descript_comps %<>%
+  mutate(t   = (mean_fem - mean_mal) / sqrt(((sd_fem^2) / n_fem) + ((sd_mal^2) / n_mal)),
+         d   = spround(abs(t2d(t, n = n, n1 = n_fem, n2 = n_mal))),
+         p   = pt(t, (n_fem + n_mal - 2)),
+         ast = case_when(p < .001 ~ "***",
+                         p < .01  ~  "**",
+                         p < .05  ~   "*",
+                         TRUE     ~   ""),
+         t   = paste0(spround(t), ast))
+  
+# format composite descriptives for output
+descript_comps %<>%
+  mutate(Total  = paste0(spround(mean), "(", spround(sd), ")"),
+         Female = paste0(spround(mean_fem), "(", spround(sd_fem), ")"),
+         Male   = paste0(spround(mean_mal), "(", spround(sd_mal), ")")) %>%
+  select(Trait = vars, Total, Female, Male, t, d)
+
+# create meaningful trait names
+descript_comps$Trait <- c("Machiavellianism",
+                          "Narcissism",
+                          "Psychopathy",
+                          "Information",
+                          "Interpersonal",
+                          "Entertaining",
+                          "Salience",
+                          "Tolerance",
+                          "Mood",
+                          "Relapse",
+                          "Withdrawal",
+                          "Conflict")
+
+# insert stub headers
+descript_comps <- rbind(c("\\textit{Dark Triad}", rep("", ncol(descript_comps) - 1)),
+                        descript_comps[1:3, ],
+                        c("\\textit{Motivation}", rep("", ncol(descript_comps) - 1)),
+                        descript_comps[4:6, ],
+                        c("\\textit{Addiction}", rep("", ncol(descript_comps) - 1)),
+                        descript_comps[7:12, ])
+```
+
+```{r data1_table1, echo = FALSE, results = 'asis'}
+descript_comps %>%
+  apa_table(caption      = "Descriptive statistics and sex differences for scales",
+            col_spanners = list("Mean (SD)" = c(str_cols_find("l", descript_comps, return = "numbers"))),
+            stub_indents = list(which(descript_comps$Total != "")),
+            note         = "* \\textit{p} < .05, ** \\textit{p} < .01, *** \\textit{p} < .001.", 
+            align        = c("l", "r", "r", "r", "r", "r"),
+            escape       = FALSE)
+```
+
+```{r data1_measures_sns}
+
+```
+
+  
+
+
 
 
 
 Participants completed an online survey that included (1) a measure of the Dark Triad personality traits (i.e., Machiavellianism, narcissism, psychopathy), (2) questions assessing  participants' frequency of visiting eleven social media sites, (3) questions assessing the amount of time participants spend on those eleven social media sites, (4) a scale assessing the participants' addiction to social media, (5) a scale measuring participants' reasons for using the internet, and (6) two questions assessing participants' overall view of social media sites. The following analyses will only be focusing on the measure of the Dark Triad and the questions assessing frequency of use and amount of time spent on social media sites.
 
 ```{r tidy_data}
-
-
 #################################################
 #### Custom function 7 (at least 2 required) ####
 #################################################
@@ -477,8 +563,6 @@ test <- data1 %>%
 #             min_age = min(age, na.rm = TRUE))
 
 ```
-
-## Materials
 
 # Results
 
