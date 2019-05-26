@@ -68,6 +68,9 @@ library(lmerTest) # for calculating t-tests for linear mixed-effects models
 library(psych) # for caculating cronbach's alpha
 library(glue) # for parallel iteration 
 
+# set a table incrementer
+table_count <- 0
+
 # source custom functions (the rmarkdown document is unwieldy otherwise)
 source(here("functions", "str_cols_find.R")) # CUSTOM FUNCTION 1: for extracting
                                              # columns from a dataframe using a 
@@ -465,7 +468,7 @@ descript_comps <- rbind(c("\\textit{Dark Triad}", rep("", ncol(descript_comps) -
                         descript_comps[7:12, ])
 ```
 
-```{r data1_table1, echo = FALSE, results = 'asis'}
+```{r data1_measures_comps_tab, echo = FALSE, results = 'asis'}
 descript_comps %>%
   apa_table(caption      = "Descriptive statistics and sex differences for scales",
             col_spanners = list("Mean (SD)" = c(str_cols_find("l", descript_comps, return = "numbers"))),
@@ -562,13 +565,13 @@ descript_sns %<>%
          `d ` = d_len) %>%
   mutate(Site = stringi::stri_trans_totitle(Site))
 
-# split in 2
+# split data into two
 descript_sns_freq <- descript_sns[1:6]
 
 descript_sns_len <- descript_sns[c(1, 7:11)]
 ```
 
-```{r data1_measure_sns_freq, echo = FALSE, results = 'asis'}
+```{r data1_measure_sns_freq_tab, echo = FALSE, results = 'asis'}
 descript_sns_freq %>%
   apa_table(caption      = "Descriptive statistics and sex differences for frequency of SNS use",
             col_spanners = list("Mean (SD)" = c(str_cols_find("l", descript_comps, return = "numbers"))),
@@ -577,7 +580,7 @@ descript_sns_freq %>%
             escape       = FALSE)
 ```
 
-```{r data1_measure_sns_len, echo = FALSE, results = 'asis'}
+```{r data1_measure_sns_len_tab, echo = FALSE, results = 'asis'}
 descript_sns_len %>%
   apa_table(caption      = "Descriptive statistics and sex differences for average length of SNS use in minutes",
             col_spanners = list("Mean (SD)" = c(str_cols_find("l", descript_comps, return = "numbers"))),
@@ -586,7 +589,15 @@ descript_sns_len %>%
             escape       = FALSE)
 ```
 
-Participants completed an online survey that included (1) a measure of the Dark Triad personality traits (i.e., Machiavellianism, narcissism, psychopathy), (2) questions assessing  participants' frequency of visiting eleven social media sites, (3) questions assessing the amount of time participants spend on those eleven social media sites, (4) a scale assessing the participants' addiction to social media, (5) a scale measuring participants' reasons for using the internet, and (6) two questions assessing participants' overall view of social media sites. The following analyses will only be focusing on the measure of the Dark Triad and the questions assessing frequency of use and amount of time spent on social media sites.
+Participants completed an online survey that included (1) a measure of the Dark Triad personality traits (i.e., Machiavellianism, narcissism, psychopathy), (2) questions assessing  participants' frequency of visiting eleven social media sites, (3) questions assessing the amount of time participants spend on those eleven social media sites, (4) a scale assessing the participants' addiction to social media, (5) a scale measuring participants' reasons for using the internet, and (6) two questions assessing participants' overall view of social media sites. The following analyses will focus on the measure of the Dark Triad and the questions assessing frequency of use and amount of time spent on social media sites.
+
+The Dark Triad was assessed using the Dirty Dozen [@Jonason2010d], comprising four items each for Machiavellianism ($\alpha$ = `r alphas["dd_mach"]`), narcissism ($\alpha$ = `r alphas["dd_narc"]`), and psychopathy ($\alpha$ = `r alphas["dd_psyc"]`). Participants responded using a 5-pt Likert scale (1 = "Strongly disagree"; 5 = "Strongly agree"). Descriptive statistics and gender comparisons for the Dark Triad traits, as well as the other scale measures, can be seen in Table `r (table_count <- table_count + 1)`.
+
+Participants were also asked how frequently they visited 11 social media sites on a 5-pt scale (1 = "less often than every few weeks"; 5 = "several times a day"). The list of sites included Facebook, Instagram, LinkedIn, Twitter, Snapchat, YouTube, WhatsApp, Reddit, 4chan, and Tumblr. However, certain sites were only used be women (i.e., Pinterest) or men (i.e., 4chan). Additional sites included did include users from both genders, but in an amount that would lead to misinterpretatiosn. We dropped sites with fewer than 20 participants reporting visiting the site at least every few weeks from the analysis from either gender. In the end, we retained frequency of use ratings for Facebook, Instagram, Reddit, Snapchat, Twitter, and YouTube. The descriptive statistics and gender comparisons for those sites can be seen in Table `r (table_count <- table_count + 1)`.
+
+We also asked participants the average number of minutes they spend on each site on an average day. Again, we only retained those sites that had more than 20 at-least-rare users of both genders. For the descriptive statistics and gender comparisons for the average length of time in minutes spent on those sites per day, see Table `r (table_count <- table_count + 1)`. 
+
+# Results
 
 ```{r tidy_data}
 #################################################
@@ -664,8 +675,6 @@ test <- data1 %>%
 #             min_age = min(age, na.rm = TRUE))
 
 ```
-
-# Results
 
 ```{r correlations}
 
