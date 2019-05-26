@@ -85,6 +85,9 @@ source(here("functions", "str_alpha.R"))     # CUSTOM FUNCTION 4: for
 source(here("functions", "str_composite.R")) # CUSTOM FUNCTION 5: for 
                                              # calculating rowmeans for
                                              # columns that match a string
+source(here("functions", "str_composite.R")) # CUSTOM FUNCTION 6: for rounding 
+                                             # and formatting for printing in 
+                                             # one step
 
 # create a vector of the custom functions
 custom_functions <- objects()
