@@ -319,7 +319,44 @@ Sagacious intro text goes here.
 
 # Method
 
-## Participants and Procedure
+## Participants
+
+```{r data1_participants, include = FALSE}
+# calculate sample size at the start
+sample_start <- length(unique(data1$id))
+
+# remove participants with low response durations
+data1 %<>%
+  filter(duration_in_seconds > 90)
+
+# calculate number of participants dropped for low response durations
+duration_exclusions <- sample_start - length(unique(data1$id))
+
+# calculate the standard deviations of responses for every participant
+data1_sd <- data1 %>%
+  # select only the item columns
+  select(id, matches("\\d")) %>%
+  # retain only rows that have a distinct id row
+  distinct(id, .keep_all = TRUE) %>%
+  # create groups by id
+  nest(-id)
+
+  # calculate a separate sd for each group (subject)
+data1_sd$resp_sd <- map_dbl(data1_sd$data, ~sd(unlist(.x), na.rm = TRUE))
+
+  # add the sds back to data1
+data1 <- data1_sd %>%
+  # drop the data column
+  select(-data) %>%
+  # join the two data frames by id
+  right_join(data1, by = "id") %>%
+  # filter out response sds that are equal to 0
+  filter(resp_sd != 0)
+
+# calculate number of participants droped for low standard deviations
+
+
+```
 
 A total of `r nrow(corr_data)` participants (68% female; age range: 18 to 34 years; *M* age = 19.61, *SD* age = 2.02) were recruited from the human subject pool at the University of Oregon. Data was collected over one academic quarter, and all participants were compensated with course credit necessary for meeting a course research requirement. Participants completed an online survey that included (1) a measure of the Dark Triad personality traits (i.e., Machiavellianism, narcissism, psychopathy), (2) questions assessing  participants' frequency of visiting eleven social media sites, (3) questions assessing the amount of time participants spend on those eleven social media sites, (4) a scale assessing the participants' addiction to social media, (5) a scale measuring participants' reasons for using the internet, and (6) two questions assessing participants' overall view of social media sites. The following analyses will only be focusing on the measure of the Dark Triad and the questions assessing frequency of use and amount of time spent on social media sites.
 
