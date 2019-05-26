@@ -55,6 +55,7 @@ output            : papaja::apa6_pdf
 # install.packages("lmerTest")
 # install.packages("psych")
 # install.packages("glue")
+# install.packages("sjstats")
 
 # load packages
 library(sundry) # for calculating standard errors
@@ -67,6 +68,7 @@ library(lme4) # for conducting linear mixed-effects models
 library(lmerTest) # for calculating t-tests for linear mixed-effects models
 library(psych) # for caculating cronbach's alpha
 library(glue) # for parallel iteration 
+library(sjstats) # for caalculating betas
 
 # set a table incrementer
 table_count <- 0
@@ -710,6 +712,47 @@ zo %>%
             escape = FALSE)
 ```
 
+See Table `r (table_count <- table_count + 1)` for zero-order correlations. 
+
+```{r data1_model_comps_freq, include = FALSE}
+# model 0 unconditional
+model_freq_0 <- lmer(freq ~ (1 | id) + (1 | sns), data = data1)
+
+# model 1 gender
+model_freq_1 <- lmer(freq ~ gender + 
+                            (1 | id) + (1 | sns), data = data1)
+
+# model 2 dark triad
+model_freq_2 <- lmer(freq ~ gender + 
+                            dd_mach_comp + 
+                            dd_narc_comp + 
+                            dd_psyc_comp + 
+                            (1 | id) + (1 | sns), data = data1)
+
+# model 3 dark triad
+model_freq3 <- lmer(freq ~ dd_mach_comp + 
+                          dd_narc_comp + 
+                          dd_psyc_comp + 
+                          sns +
+                          dd_mach_comp * sns + 
+                          dd_narc_comp * sns + 
+                          dd_psyc_comp * sns +
+                            (1 | id), data = data1)
+
+summary(model_freq_3)
+
+model_len_3 <- lmer(len ~ dd_mach_comp + 
+                          dd_narc_comp + 
+                          dd_psyc_comp + 
+                          sns +
+                          dd_mach_comp * sns + 
+                          dd_narc_comp * sns + 
+                          dd_psyc_comp * sns +
+                          (1 | id), data = data1)
+
+summary(model_len_3)
+std_beta(model_len_3)
+```
 
 
 ```{r tidy_data}
