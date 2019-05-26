@@ -621,6 +621,96 @@ Participants were also asked how frequently they visited 11 social media sites o
 We also asked participants the average number of minutes they spend on each site on an average day. Again, we only retained those sites that had more than 20 at-least-rare users of both genders. For the descriptive statistics and gender comparisons for the average length of time in minutes spent on those sites per day, see Table `r (table_count <- table_count + 1)`. 
 
 # Results
+```{r data1_zeroorder, include = FALSE}
+# set the data up for the correlation matrix
+data1_corr <- data1 %>%
+  spread(sns_perc_context, sns_perc_rating) %>%
+  select(id, freq, len, sns) %>%
+  gather(unit, value, c(freq, len)) %>%
+  unite(temp, unit, sns) %>%
+  spread(temp, value)
+
+# calculate average frequency and total minutes spent on sns accross all sites
+data1_corr$sns_freq_avg <- str_composite("freq_", data1_corr)
+data1_corr$sns_len_sum  <- str_composite("len_", data1_corr, sum = TRUE)
+
+# tidy data for zero order analsis
+data1_corr %<>%
+  select(id, sns_freq_avg, sns_len_sum) %>%
+  left_join(data1, by = "id") %>%
+  distinct(id, .keep_all = TRUE) %>%
+  select(sns_freq_avg,
+         sns_len_sum,
+         gender,
+         starts_with("dd")) 
+
+# corr. test
+zo_fem <- data1_corr %>%
+  filter(gender == "Female") %>%
+  select(-gender) %>%
+  corr.test()
+
+zo_mal <- data1_corr %>%
+  filter(gender == "Male") %>%
+  select(-gender) %>%
+  corr.test()
+  
+zo <- zo_fem$r
+
+for (i in 1:nrow(zo)) {
+  for (j in 1:ncol(zo)) {
+    if (i / j > 1) {
+      r <- spround(zo_mal$r[i, j])
+      p <- zo_mal$p[j, i] # switched in order to get the "holm"-adjusted values
+      if (p < .01) {
+        p <- "**"
+      } else if (p < .05) {
+        p <- "*"
+      } else {
+        p <- ""
+      }
+      zo[i, j] <- paste(r, p, sep = "")
+    } else {
+      r <- spround(zo_fem$r[i, j])
+      p <- zo_fem$p[i, j]
+      if (p < .01) {
+        p <- "**"
+      } else if (p < .05) {
+        p <- "*"
+      } else {
+        p <- ""
+      }
+      zo[i, j] <- paste(r, p, sep = "")
+    }
+  }
+}
+
+# rename columns and headers
+colnames(zo) <- 1:ncol(zo)
+rownames(zo) <- c("1. SNS Frequency",
+                  "2. SNS Length",
+                  "3. Machiavellianism",
+                  "4. Narcissism",
+                  "5. Psychopathy")
+
+zo[zo == "1.00**"] <- "-"
+
+```
+
+```{r data1_zeroorder_tab, echo = FALSE, results = 'asis'}
+# print table
+zo %>%
+  apa_table(caption = "Zero-order correlations for frequency and length of social media use and the Dark Triad traits.",
+            note = paste0("* \\textit{p} < .05, ** \\textit{p} < .01. Values above the diagononal are for women (\\textit{n} = ",
+                         median(zo_fem$n),
+                         "); values below the diagonal are for men (\\textit{n} = ",
+                         median(zo_mal$n),
+                         "). P-values were adjusted using the Holm-Bonferonni method (Holm, 1978) and were adjusted seperately for the male and female subsamples."),
+            align = "l",
+            escape = FALSE)
+```
+
+
 
 ```{r tidy_data}
 #################################################
@@ -646,75 +736,15 @@ data1$narc_group <- con_to_cat(data1$dd_narc_comp)
 # high, mid, or low in Psychopathy
 data1$psyc_group <- con_to_cat(data1$dd_psyc_comp)
 
-#selcting only variables I am interested in (dropping single items)
-ash_data <- data1 %>%
-  select(id, age, gender, race, sns:sns_perc_rating, contains("comp"),
-         contains("group")) %>%
-  filter(gender == "Male" | gender == "Female") %>%
-  arrange(id)
 
-# corr dataset is in wide format. I deleted data specific to each social media site and computed sum variables refelcting total time spend on social media 
-corr_data <- ash_data %>% 
-  spread(sns_perc_context, sns_perc_rating) %>%
-  group_by(id) %>%
-  mutate(mean_freq = mean(freq, na.rm = TRUE),
-         sum_freq = sum(freq, na.rm = TRUE),
-         sum_len = sum(len, na.rm = TRUE)) %>%
-  select(id, gender, sum_freq, sum_len, self, society, 
-         contains("comp"), contains("addict"), contains("group")) %>%
-  unique()
-
-# if we are interested in gender comparisons, we should probably exclude sns sites that don't have adaquate sample sizes (i.e., there are more than 25 females and 25 males)
-# this data frame counts how many males and females use a given social media site
-test <- data1 %>%
-  filter(gender == "Male" | gender == "Female") %>%
-  mutate(great_0 = if_else(freq > 1, 1, 0)) %>%
-  group_by(gender, sns) %>%
-  summarise(great_0_sum = sum(great_0, na.rm = TRUE))
-
-# # dataset for gender specific analyses:
-# genderxsns_data <- data1 %>%
-#   select(id, age, gender, race, sns:sns_perc_rating, 
-#          contains("comp"), contains("group")) %>%
-#   filter(gender == "Male" | gender == "Female") %>%
-#   filter(sns != "4chan" & # only 6 men and 6 women use 4chan
-#          sns != "linkedin" & # only 14 men use linkedin
-#          sns != "pinterest" & # only 4 men use pinterest
-#          sns != "tumblr" & # only 4 men use tumblr
-#          sns != "whatsapp") %>% # only 2 men use whatsapp
-#   arrange(id)
-
-# corr_data %>%
-#   filter(gender == "Female") %>%
-#   nrow() #102/149 females
-
-# data1 %>%
-#   select(id, age) %>%
-#   unique() %>%
-#   mutate(age = as.numeric(age)) %>%
-#   summarize(m_age = mean(age, na.rm = TRUE),
-#             sd_age = sd(age, na.rm = TRUE),
-#             max_age = max(age, na.rm = TRUE),
-#             min_age = min(age, na.rm = TRUE))
 
 ```
 
-```{r correlations}
-
-corrs <- corr_data %>%
-  select(id, sum_freq:int_addict_conflict_comp)
-
-corrs <- cor(corrs, method = "pearson", use = "complete.obs")
-corrs <- round(corrs, 2)
-
-#insert heatmat????
-
-```
 
 ```{r machxgender_plots}
 
 #Examining whether social media use differ as a funciton of Machiavellianism
-ash_data %>%
+data1 %>%
   filter(mach_group != "Mid",
          sns != "4chan" & 
          sns != "linkedin" & 
@@ -749,7 +779,7 @@ mach_models <- list(len ~ dd_mach_comp + (1 | id),
                     len ~ dd_mach_comp*sns + (1 | id),
                     len ~ dd_mach_comp*sns*gender + (1 | id))
 
-mach_model_fits <- map(mach_models, ~lmer(.x, data = ash_data)) 
+mach_model_fits <- map(mach_models, ~lmer(.x, data = data1)) 
 
 map(mach_model_fits, ~summary(.x))
 
@@ -759,7 +789,7 @@ map(mach_model_fits, ~anova(.x)) #not quite doing what I want.. I want model com
 
 ```{r narcxgender_plots}
 #Examining whether social media use differ as a funciton of Narcissism (no gender)
-ash_data %>%
+data1 %>%
   filter(narc_group != "Mid",
          sns != "4chan" & 
          sns != "linkedin" & 
@@ -794,7 +824,7 @@ narc_models <- list(len ~ dd_narc_comp + (1 | id),
                     len ~ dd_narc_comp*sns + (1 | id),
                     len ~ dd_narc_comp*sns*gender + (1 | id))
 
-narc_model_fits <- map(narc_models, ~lmer(.x, data = ash_data)) 
+narc_model_fits <- map(narc_models, ~lmer(.x, data = data1)) 
 
 map(narc_model_fits, ~summary(.x))
 
@@ -804,7 +834,7 @@ map(narc_model_fits, ~anova(.x)) #not quite doing what I want.. I want model com
 
 ```{r psycxgender_plots}
 #Examining whether social media use differ as a funciton of Psychopathy (no gender)
-ash_data %>%
+data1 %>%
   filter(psyc_group != "Mid",
          sns != "4chan" & 
          sns != "linkedin" & 
@@ -839,7 +869,7 @@ psyc_models <- list(len ~ dd_psyc_comp + (1 | id),
                     len ~ dd_psyc_comp*sns + (1 | id),
                     len ~ dd_psyc_comp*sns*gender + (1 | id))
 
-psyc_model_fits <- map(psyc_models, ~lmer(.x, data = ash_data)) 
+psyc_model_fits <- map(psyc_models, ~lmer(.x, data = data1)) 
 
 map(psyc_model_fits, ~summary(.x))
 
@@ -852,7 +882,7 @@ map(psyc_model_fits, ~anova(.x)) #not quite doing what I want.. I want model com
 
 # examining gender differences in minutes spent on social media each day
 # by social media site
-ash_data %>%
+data1 %>%
   group_by(gender, sns) %>%
   summarise(len_m = mean(len, na.rm = TRUE),
             len_se = se(len, na.rm = TRUE)) %>%
@@ -876,7 +906,7 @@ ash_data %>%
 # lets examine potential gender effects on social media use..
 # ...as a function of the dark triad traits
 
-plot_data <- ash_data %>%
+plot_data <- data1 %>%
   filter(sns != "4chan" & 
          sns != "linkedin" & 
          sns != "pinterest" & 
