@@ -476,14 +476,115 @@ descript_comps %>%
 ```
 
 ```{r data1_measures_sns}
+# calculate the number of users by gender and sns
+n_gen_sns <- data1 %>%
+  mutate(great_0 = if_else(freq > 1, 1, 0)) %>%
+  group_by(gender, sns) %>%
+  summarise(great_0_sum = sum(great_0, na.rm = TRUE))
 
+# drop sites with users < 20
+low_use_sites <- n_gen_sns %>%
+  ungroup() %>%
+  filter(great_0_sum < 20) %>%
+  select(sns) %>%
+  mutate(sns = as.character(sns)) %>%
+  flatten_chr() %>%
+  unique()
+
+data1 %<>%
+  filter(!(sns %in% low_use_sites))
+
+# calculate descriptives
+descript_sns <- data1 %>%
+  group_by(sns) %>%
+  summarise(freq_mean = mean(freq, na.rm = TRUE),
+            freq_sd   =   sd(freq, na.rm = TRUE),
+            len_mean  = mean( len, na.rm = TRUE),
+            len_sd    =   sd( len, na.rm = TRUE))
+
+descript_sns <- data1 %>%
+  filter(gender == "Female") %>%
+  group_by(sns) %>%
+  summarise(freq_mean_fem = mean(freq, na.rm = TRUE),
+            freq_sd_fem   =   sd(freq, na.rm = TRUE),
+            len_mean_fem  = mean( len, na.rm = TRUE),
+            len_sd_fem    =   sd( len, na.rm = TRUE),
+            n_fem         =    n()) %>%
+  right_join(descript_sns, by = "sns")
+
+descript_sns <- data1 %>%
+  filter(gender == "Male") %>%
+  group_by(sns) %>%
+  summarise(freq_mean_mal = mean(freq, na.rm = TRUE),
+            freq_sd_mal   =   sd(freq, na.rm = TRUE),
+            len_mean_mal  = mean( len, na.rm = TRUE),
+            len_sd_mal    =   sd( len, na.rm = TRUE),
+            n_mal         =    n()) %>%
+  right_join(descript_sns, by = "sns")
+
+# calculate t, p, and d
+descript_sns %<>%
+  mutate(t_freq   = (freq_mean_fem - freq_mean_mal) / sqrt(((freq_sd_fem^2) / n_fem) + ((freq_sd_mal^2) / n_mal)),
+         t_len    = (len_mean_fem - len_mean_mal) / sqrt(((len_sd_fem^2) / n_fem) + ((len_sd_mal^2) / n_mal)),
+         d_freq   = spround(abs(t2d(t_freq, n = n, n1 = n_fem, n2 = n_mal))),
+         d_len    = spround(abs(t2d(t_len, n = n, n1 = n_fem, n2 = n_mal))),
+         p_freq   = pt(t_freq, (n_fem + n_mal - 2)),
+         p_len    = pt(t_len, (n_fem + n_mal - 2)),
+         ast_freq = case_when(p_freq < .001 ~ "***",
+                              p_freq < .01  ~  "**",
+                              p_freq < .05  ~   "*",
+                              TRUE          ~   ""),
+         ast_len  = case_when(p_len  < .001 ~ "***",
+                              p_len  < .01  ~  "**",
+                              p_len  < .05  ~   "*",
+                              TRUE          ~   ""),
+         t_freq   = paste0(spround(t_freq), ast_freq),
+         t_len    = paste0(spround(t_len), ast_len))
+  
+# format composite descriptives for output
+descript_sns %<>%
+  mutate(`Total`      = paste0(spround(freq_mean), "(", spround(freq_sd), ")"),
+         `Female`     = paste0(spround(freq_mean_fem), "(", spround(freq_sd_fem), ")"),
+         `Male`       = paste0(spround(freq_mean_mal), "(", spround(freq_sd_mal), ")"),
+         `Total `     = paste0(spround(len_mean), "(", spround(len_sd), ")"),
+         `Female `    = paste0(spround(len_mean_fem), "(", spround(len_sd_fem), ")"),
+         `Male `      = paste0(spround(len_mean_mal), "(", spround(len_sd_mal), ")")) %>%
+  select(Site = sns, 
+         Total,
+         Female,
+         Male,
+         t = t_freq,
+         d = d_freq,
+         `Total `,
+         `Female `,
+         `Male `,
+         `t ` = t_len,
+         `d ` = d_len) %>%
+  mutate(Site = stringi::stri_trans_totitle(Site))
+
+# split in 2
+descript_sns_freq <- descript_sns[1:6]
+
+descript_sns_len <- descript_sns[c(1, 7:11)]
 ```
 
-  
+```{r data1_measure_sns_freq, echo = FALSE, results = 'asis'}
+descript_sns_freq %>%
+  apa_table(caption      = "Descriptive statistics and sex differences for frequency of SNS use",
+            col_spanners = list("Mean (SD)" = c(str_cols_find("l", descript_comps, return = "numbers"))),
+            note         = "* \\textit{p} < .05, ** \\textit{p} < .01, *** \\textit{p} < .001.", 
+            align        = c("l", "r", "r", "r", "r", "r"),
+            escape       = FALSE)
+```
 
-
-
-
+```{r data1_measure_sns_len, echo = FALSE, results = 'asis'}
+descript_sns_len %>%
+  apa_table(caption      = "Descriptive statistics and sex differences for average length of SNS use in minutes",
+            col_spanners = list("Mean (SD)" = c(str_cols_find("l", descript_comps, return = "numbers"))),
+            note         = "* \\textit{p} < .05, ** \\textit{p} < .01, *** \\textit{p} < .001.", 
+            align        = c("l", "r", "r", "r", "r", "r"),
+            escape       = FALSE)
+```
 
 Participants completed an online survey that included (1) a measure of the Dark Triad personality traits (i.e., Machiavellianism, narcissism, psychopathy), (2) questions assessing  participants' frequency of visiting eleven social media sites, (3) questions assessing the amount of time participants spend on those eleven social media sites, (4) a scale assessing the participants' addiction to social media, (5) a scale measuring participants' reasons for using the internet, and (6) two questions assessing participants' overall view of social media sites. The following analyses will only be focusing on the measure of the Dark Triad and the questions assessing frequency of use and amount of time spent on social media sites.
 
