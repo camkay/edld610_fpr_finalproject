@@ -327,14 +327,14 @@ Sagacious intro text goes here.
 
 ```{r data1_participants, include = FALSE}
 # calculate sample size at the start
-sample_start <- length(unique(data1$id))
+sample_start <- lenique(data1$id)
 
 # remove participants with low response durations
 data1 %<>%
   filter(duration_in_seconds > 90)
 
 # calculate number of participants dropped for low response durations
-exclusions_duration <- sample_start - length(unique(data1$id))
+exclusions_duration <- sample_start - lenique(data1$id)
 
 # calculate the standard deviations of responses for every participant
 data1_sd <- data1 %>%
@@ -361,29 +361,41 @@ data1 <- data1_sd %>%
 rm(data1_sd)
 
 # calculate number of participants dropped for low standard deviations
-exclusions_sd <- sample_start - exclusions_duration - length(unique(data1$id))
+exclusions_sd <- sample_start - exclusions_duration - lenique(data1$id)
 
 # since we are interested in gender as a predictor, drop non-conventional genders
 data1 %<>%
   filter(gender == "Female" | gender == "Male")
 
 # calculate number of participants dropped for not being female/male
-exclusions_gender <- sample_start - exclusions_duration - exclusions_sd - length(unique(data1$id))
+exclusions_gender <- sample_start - exclusions_duration - exclusions_sd - lenique(data1$id)
 
-# calculate demographic information
-demo_gender <- data1 %>%
-  distinct(id, .keep_all = TRUE) %>%
+# get a dataframe of only unique ids for calculating demographic information
+data1_demo <- data1 %>%
+  distinct(id, .keep_all = TRUE)
+
+# calculate demographic information for gender
+demo_gender <- data1_demo %>%
   select(gender) %>%
   perble()
 
-demo_culture <- data1 %>%
-  distinct(id, .keep_all = TRUE) %>%
+# calculate demographic information for culture
+demo_culture <- data1_demo %>%
   select(race) %>%
   perble()
+
+# calculate descriptives for age
+demo_age <- data1_demo$age %>%
+  as.numeric() %>%
+  describe() %>%
+  unlist()
+
+100 - sum(sort(demo_culture["Percent", ], TRUE)[1:4])
 ```
 
-A total of `r sample_start` participants were recruited from the human subject pool at the University of Oregon as part of a general survey. Data was collected over one academic quarter, and all participants were compensated with course credit necessary for meeting a course research requirement. The length of the survey was 10 minutes.  Participants completing the survey in under 90 seconds would have been excluded, but no participants failed to meet this treshold. We did, however, exclude a participant who had a response standard deviation of zero, an indicator of straightlining. Since we were interested in the effects of gender on social media use and considering that the subsamples for the non-conventional genders were too small to be properly analyzed, we excluded participants who reported being neither female nor male (*n* = `r exclusions_gender`). Our resulting sample comprised `r nrow(data1)`
-(68% female; age range: 18 to 34 years; *M* age = 19.61, *SD* age = 2.02)
+A total of `r sample_start` participants were recruited from the human subject pool at the University of Oregon as part of a general survey. Data was collected over one academic quarter, and all participants were compensated with course credit necessary for meeting a course research requirement. The length of the survey was 10 minutes.  Participants completing the survey in under 90 seconds would have been excluded, but no participants failed to meet this treshold. We did, however, exclude a single participant for having a response standard deviation of zero, an indicator of straightlining. Since we were interested in the effects of gender on social media use and considering that the subsamples for the non-conventional genders were too small to be properly analyzed, we also excluded participants who reported being neither female nor male (*n* = `r exclusions_gender`). Our resulting sample comprised `r lenique(data1$id)` participants (`r spround(demo_gender["Percent", "Female"], 2)`% female; age range: `r demo_age["min"]` to `r demo_age["max"]` years; *M* age = `r demo_age["mean"]`, *SD* age = `r demo_age["sd"]`). With respect to cultural identity, `r spround(demo_culture["Percent", "Caucasian"], 2)`% reported being Caucasian, `r spround(demo_culture["Percent", "Asian"], 2)`% reported being Asian, `r spround(demo_culture["Percent", "Hispanic, Latinx, or Spanish Origin"], 2)`% reported being Hispanic, Latinx, or Spanish, `r spround(demo_culture["Percent", "Black or African American"], 2)`% reported being black or African American, and `r spround(100 - sum(sort(demo_culture["Percent", ], TRUE)[1:4]), 2)`% identified as being from some other culture or prefered not to answer. 
+
+
 
 Participants completed an online survey that included (1) a measure of the Dark Triad personality traits (i.e., Machiavellianism, narcissism, psychopathy), (2) questions assessing  participants' frequency of visiting eleven social media sites, (3) questions assessing the amount of time participants spend on those eleven social media sites, (4) a scale assessing the participants' addiction to social media, (5) a scale measuring participants' reasons for using the internet, and (6) two questions assessing participants' overall view of social media sites. The following analyses will only be focusing on the measure of the Dark Triad and the questions assessing frequency of use and amount of time spent on social media sites.
 
