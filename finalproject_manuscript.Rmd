@@ -44,8 +44,8 @@ output            : papaja::apa6_pdf
 ---
 
 ```{r setup, include = FALSE}
-
-#devtools::install_github("datalorax/sundry")
+# install packages if you do not have them installed already
+# devtools::install_github("datalorax/sundry")
 # install.packages("papaja")
 # install.packages("tidyverse")
 # install.packages("rio")
@@ -56,6 +56,7 @@ output            : papaja::apa6_pdf
 # install.packages("psych")
 # install.packages("glue")
 
+# load packages
 library(sundry) # for calculating standard errors
 library("papaja") # for creating the apa journal article
 library(tidyverse) # for purrr, dplyr, and ggplot2 functions
@@ -66,6 +67,27 @@ library(lme4) # for conducting linear mixed-effects models
 library(lmerTest) # for calculating t-tests for linear mixed-effects models
 library(psych) # for caculating cronbach's alpha
 library(glue) # for parallel iteration 
+
+# source custom functions (the rmarkdown document is unwieldy otherwise)
+source(here("functions", "str_cols_find.R")) # CUSTOM FUNCTION 1: for extracting
+                                             # columns from a dataframe using a 
+                                             # string
+source(here("functions", "name_creator.R"))  # CUSTOM FUNCTION 2: for creating
+                                             # variable names given strings
+source(here("functions", "range_mean.R"))    # CUSTOM FUNCTION 3: create a 
+                                             # function for calculating the mean 
+                                             # of a time response given as a 
+                                             # character range. Example: "like 
+                                             # 3-5 hours a day" would become "4"
+source(here("functions", "str_alpha.R"))     # CUSTOM FUNCTION 4: for 
+                                             # calculating cronbach's alpha for
+                                             # columns that match a string
+source(here("functions", "str_composite.R")) # CUSTOM FUNCTION 5: for 
+                                             # calculating rowmeans for
+                                             # columns that match a string
+
+# create a vector of the custom functions
+custom_functions <- objects()
 
 # import data as tibble and clean column names
 data1 <- rio::import(here::here("data", "data_1.xlsx"), setclass = "tibble") %>%
@@ -140,65 +162,6 @@ data_rename <- tibble(
                       # the same length)
                       sub_lens    = list(4, 1, 1, 1, c(8, 7, 5), 3))
 
-
-#################################################
-#### Custom function 1 (at least 2 required) ####
-#################################################
-
-# create a function for detecting columns names from a string
-col_find <- function(pattern, data) {
-  
-  # ensure pattern is a character and the data is a dataframe
-  if (!is.character(pattern)) {
-    stop("Pattern must be of type character.")
-  } else if (!is.data.frame(data)) {
-    stop("Data must of type dataframe/tibble.")
-  }
-  
-  # return column names that contain the pattern
-  grepl(pattern, names(data))
-}
-
-#################################################
-#### Custom function 2 (at least 2 required) ####
-#################################################
-
-# create a function for creating column names using the data_rename tibble
-name_creator <- function(scale_name, sub_name, scale_len, sub_len) {
-  
-  # calculate the subscale length if no subscale length provided
-  if (missing(sub_len)) {
-    sub_len <- scale_len / length(sub_name)
-  }
-  
-  # create a vector of subscale names to match length of the scale. `times` has 
-  # to be used instead of `each` when subscales of different lengths are 
-  # specified
-  if (length(sub_len) == 1) {
-    sub_vector <- rep(sub_name, each = sub_len)
-  } else {
-    sub_vector <- rep(sub_name, times = sub_len) 
-  }
-
-  # combine the scale names with the sub_scale names
-  var_names <- paste(scale_name, sub_vector, sep = "_")
-  
-  # if length of the subscale is not equal to one, add an item identifier to the
-  # column names (this segment, in particular, should be refactored)
-  if (any(sub_len != 1)) {
-    # get a sequence from 1 the length of a subscale for each subscale
-    item_nums <- flatten_dbl(map(sub_len, seq_len))
-    # repeat the sequence the number of subscales there are
-    item_nums <- rep(item_nums, times = scale_len / sum(sub_len))
-    # combine the variable names with the item numbers
-    var_names <- paste(var_names, item_nums, sep = "_")
-  }
-  
-  # return scale_sub
-  var_names
-  
-}
-
 # iterate through the data_rename tibble and create a list of column names
 col_names <- pmap(list(data_rename$scale_names,
                        data_rename$sub_names,
@@ -208,10 +171,10 @@ col_names <- pmap(list(data_rename$scale_names,
 )
 
 # assign created column names to data1
-names(data1)[col_find("q7", data1)] <- unlist(col_names)
+names(data1)[str_cols_find("q7", data1)] <- unlist(col_names)
 
 # remove uneeded variables
-rm(list = setdiff(ls(), c("data1", "col_names", "col_find")))
+rm(list = setdiff(ls(), c("data1", "col_names", "custom_functions", custom_functions)))
 ```
 
 ```{r data1_convert_to_long, include = FALSE}
@@ -242,35 +205,11 @@ data1 %<>%
 ```
 
 ```{r data1_parse_length, include = FALSE}
-# identify the units responses were given in (even though I requested answers in 
-# minutes)
+# identify the units responses were given in (even though I specifically 
+# requested that the responses be provided in  minutes)
 data1 %<>%
   mutate(len_unit  = case_when(grepl("(hour|hr)", len) ~ 60,
                                TRUE                    ~ 1))
-
-#################################################
-#### Custom function 3 (at least 2 required) ####
-#################################################
-
-# create a function for calculating the mean of time responses given as a 
-# character ranges. Example: "like 3-5 hours a day" would become "4"
-range_mean <- function(x) {
-  # attempt to find a mean for only those with a hyphen in the response
-  if (grepl("-", x)) {
-    # extract the range from the response
-    x <- str_extract(x, "\\d*-\\d*")
-    # split the string around the dash
-    x <- strsplit(x, "-")[[1]]
-    # convert the string to numeric and calculate the mean
-    x <- mean(as.numeric(x))
-    # maintaining the original type, convert the result back to a character
-    as.character(x)
-  } else {
-    # if no hyphen, return x
-    x
-  }
-}
-
 
 #######################################################
 #### Variant of purr::map #1 (at least 2 required) ####
@@ -290,7 +229,7 @@ data1 %<>%
                          TRUE                          ~ len),
          # parse the numbers
          len = parse_number(len),
-         # calculate the length in minutes
+         # calculate the length in minutes by multipling the unit by the length
          len = len * len_unit) %>%
          # drop the unit column
          select(-len_unit)
@@ -328,76 +267,28 @@ data1 %<>%
 # drop column names not to be made into composites
 comp_names <- col_names[-2:-4]
 
-
 #######################################################
 #### Variant of purr::map #2 (at least 2 required) ####
 #######################################################
 
-# drop item identifiers to create the composite names; retain only unique names
+# drop item identifiers (e.g., "dd_7") to create the composite names; retain 
+# only unique names (e.g., "dd")
 comp_names %<>%
   map(str_replace, "_\\d", "") %>%
   map(unique)
 
-#################################################
-#### Custom function 4 (at least 2 required) ####
-#################################################
-
-# create a function for calculating alpha given a string pattern
-str_alpha <- function(pattern, data) {
-  # find names of columns that match the string
-  cols_found  <- col_find(pattern, data)
-  # extract only those columns from the data 
-  data <- data[, cols_found]
-  # calculate and extract the alpha value
-  alpha(data)[["total"]][["raw_alpha"]]
-}
 
 #######################################################
 #### Variant of purr::map #3 (at least 2 required) ####
 #######################################################
 
-# calculate alphas for the composites
+# calculate alphas for the composites 
 alphas <- comp_names %>%
-  map(map_dbl, str_alpha, data1) %>%
+  map(map_dbl, str_alpha, data = data1, full = FALSE) %>%
   flatten_dbl() 
 
 # name the alpha composites
 names(alphas) <- flatten_chr(comp_names)
-
-#################################################
-#### Custom function 5 (at least 2 required) ####
-#################################################
-
-# create the str_message function for double-checking one's work
-str_message <- function(data) {
-  names_len <- length(names(data))
-  if (names_len <= 4) {
-    col_names <- paste(names(data), collapse = ", ")
-  } else {
-    col_names <- paste0(paste(names(data)[1:3], collapse = ", "), ", and ", names_len - 3, " more")
-  }
-  message(paste0("Row means were calculated using ", 
-                ncol(data), 
-                " columns: ",
-                col_names,
-                "."))
-}
-
-#################################################
-#### Custom function 6 (at least 2 required) ####
-#################################################
-
-# create a function for calculating rowmeans given a string pattern
-str_means <- function(pattern, data) {
-  # find names of columns that match the string
-  cols_found  <- col_find(pattern, data)
-  # extract only those columns from the data 
-  data <- data[, cols_found]
-  # message user how the composites were created
-  str_message(data)
-  # calculate row means
-  rowMeans(data)
-}
 
 #######################################################
 #### Variant of purr::map #4 (at least 2 required) ####
@@ -405,7 +296,7 @@ str_means <- function(pattern, data) {
 
 # create composites
 data_comp <- comp_names %>%
-  map(map, str_means, data1) %>%
+  map(map, str_composite, data1) %>%
   flatten_dfc()
 
 # assign names to the created composites
@@ -415,13 +306,19 @@ names(data_comp) <- paste0(flatten_chr(comp_names), "_comp")
 data1 <- data1 %>%
   cbind(data_comp)
 
-# drop unneeded, single item columns (ACTUALLY, we'll need these for checking SDs)
-#data1 %<>%
-#  select(-matches("\\d$"))
-
 # clean up the environment
-rm(list = setdiff(ls(), c("data1", "alphas", "col_find")))
+rm(list = setdiff(ls(), c("data1", "alphas", "costum_functions", custom_functions)))
 ```
+
+# Intro
+
+Sagacious intro text goes here.
+
+# Method
+
+## Participants and Procedure
+
+A total of `r nrow(corr_data)` participants (68% female; age range: 18 to 34 years; *M* age = 19.61, *SD* age = 2.02) were recruited from the human subject pool at the University of Oregon. Data was collected over one academic quarter, and all participants were compensated with course credit necessary for meeting a course research requirement. Participants completed an online survey that included (1) a measure of the Dark Triad personality traits (i.e., Machiavellianism, narcissism, psychopathy), (2) questions assessing  participants' frequency of visiting eleven social media sites, (3) questions assessing the amount of time participants spend on those eleven social media sites, (4) a scale assessing the participants' addiction to social media, (5) a scale measuring participants' reasons for using the internet, and (6) two questions assessing participants' overall view of social media sites. The following analyses will only be focusing on the measure of the Dark Triad and the questions assessing frequency of use and amount of time spent on social media sites.
 
 ```{r tidy_data}
 
@@ -501,16 +398,6 @@ test <- data1 %>%
 #             min_age = min(age, na.rm = TRUE))
 
 ```
-
-# Intro
-
-Sagacious intro text goes here.
-
-# Method
-
-## Participants and Procedure
-
-A total of `r nrow(corr_data)` participants (68% female; age range: 18 to 34 years; *M* age = 19.61, *SD* age = 2.02) were recruited from the human subject pool at the University of Oregon. Data was collected over one academic quarter, and all participants were compensated with course credit necessary for meeting a course research requirement. Participants completed an online survey that included (1) a measure of the Dark Triad personality traits (i.e., Machiavellianism, narcissism, psychopathy), (2) questions assessing  participants' frequency of visiting eleven social media sites, (3) questions assessing the amount of time participants spend on those eleven social media sites, (4) a scale assessing the participants' addiction to social media, (5) a scale measuring participants' reasons for using the internet, and (6) two questions assessing participants' overall view of social media sites. The following analyses will only be focusing on the measure of the Dark Triad and the questions assessing frequency of use and amount of time spent on social media sites.
 
 ## Materials
 
