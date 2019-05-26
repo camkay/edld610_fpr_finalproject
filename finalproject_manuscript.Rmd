@@ -85,9 +85,11 @@ source(here("functions", "str_alpha.R"))     # CUSTOM FUNCTION 4: for
 source(here("functions", "str_composite.R")) # CUSTOM FUNCTION 5: for 
                                              # calculating rowmeans for
                                              # columns that match a string
-source(here("functions", "str_composite.R")) # CUSTOM FUNCTION 6: for rounding 
+source(here("functions", "spround.R"))       # CUSTOM FUNCTION 6: for rounding 
                                              # and formatting for printing in 
                                              # one step
+source(here("functions", "perble.R"))        # CUSTOM FUNCTION 7: for creating a
+                                             # a table with the percentages
 
 # create a vector of the custom functions
 custom_functions <- objects()
@@ -330,7 +332,7 @@ data1 %<>%
   filter(duration_in_seconds > 90)
 
 # calculate number of participants dropped for low response durations
-duration_exclusions <- sample_start - length(unique(data1$id))
+exclusions_duration <- sample_start - length(unique(data1$id))
 
 # calculate the standard deviations of responses for every participant
 data1_sd <- data1 %>%
@@ -353,9 +355,29 @@ data1 <- data1_sd %>%
   # filter out response sds that are equal to 0
   filter(resp_sd != 0)
 
-# calculate number of participants droped for low standard deviations
+  # drop unneeded dataframe 
+rm(data1_sd)
 
+# calculate number of participants dropped for low standard deviations
+exclusions_sd <- sample_start - exclusions_duration - length(unique(data1$id))
 
+# since we are interested in gender as a predictor, drop non-conventional genders
+data1 %<>%
+  filter(gender == "Female" | gender == "Male")
+
+# calculate number of participants dropped for not being female/male
+exclusions_gender <- sample_start - exclusions_duration - exclusions_sd - length(unique(data1$id))
+
+# calculate demographic information
+demo_gender <- data1 %>%
+  distinct(id, .keep_all = TRUE) %>%
+  select(gender) %>%
+  perble()
+
+demo_culture <- data1 %>%
+  distinct(id, .keep_all = TRUE) %>%
+  select(race) %>%
+  perble()
 ```
 
 A total of `r nrow(corr_data)` participants (68% female; age range: 18 to 34 years; *M* age = 19.61, *SD* age = 2.02) were recruited from the human subject pool at the University of Oregon. Data was collected over one academic quarter, and all participants were compensated with course credit necessary for meeting a course research requirement. Participants completed an online survey that included (1) a measure of the Dark Triad personality traits (i.e., Machiavellianism, narcissism, psychopathy), (2) questions assessing  participants' frequency of visiting eleven social media sites, (3) questions assessing the amount of time participants spend on those eleven social media sites, (4) a scale assessing the participants' addiction to social media, (5) a scale measuring participants' reasons for using the internet, and (6) two questions assessing participants' overall view of social media sites. The following analyses will only be focusing on the measure of the Dark Triad and the questions assessing frequency of use and amount of time spent on social media sites.
