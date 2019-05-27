@@ -712,47 +712,257 @@ zo %>%
             escape = FALSE)
 ```
 
-See Table `r (table_count <- table_count + 1)` for zero-order correlations. 
+Table `r (table_count <- table_count + 1)` for zero-order correlations, which seems to suggest that at conventional significant levels there is no relationship between the Dark Triad and either the freuqency of social media use or the average length of social media use per day. However, the frequency and length measures inclduded in the matrix are collapsing accross social media sites. 
 
-```{r data1_model_comps_freq, include = FALSE}
-# model 0 unconditional
-model_freq_0 <- lmer(freq ~ (1 | id) + (1 | sns), data = data1)
+In order to leverage the multiple observations gathered for every participant, we opted to run two series of linear mixed-effects model. In terms of predictors, both models were identical. They differed by outcome variable:  The first model had frequency of social media use as an outcome variable. The second model had length of social media use per day as the outcome variable.
 
-# model 1 gender
+```{r data1_lmer_freq, include = FALSE}
+# filter data1 for nas
+data1 %<>%
+  filter(!is.na(dd_mach_comp),
+         !is.na(dd_narc_comp),
+         !is.na(dd_psyc_comp),
+         !is.na(freq))
+
+# grand-mean center dark triad traits
+data1 %<>%
+  mutate_at(vars(starts_with("dd")), scale, scale = FALSE)
+
+# fit unconditional model
+model_freq_0 <- lmer(freq ~ (1 | id), data = data1, REML = FALSE)
+
+# calculate ICCs
+freq_icc <- icc(model_freq_0)
+
+# fit gender model
 model_freq_1 <- lmer(freq ~ gender + 
-                            (1 | id) + (1 | sns), data = data1)
+                            (1 | id), data = data1, REML = FALSE)
 
-# model 2 dark triad
+# fit model with the dark triad traits
 model_freq_2 <- lmer(freq ~ gender + 
                             dd_mach_comp + 
-                            dd_narc_comp + 
+                            dd_narc_comp +
                             dd_psyc_comp + 
-                            (1 | id) + (1 | sns), data = data1)
+                            (1 | id), data = data1, REML = FALSE)
 
-# model 3 dark triad
-model_freq3 <- lmer(freq ~ dd_mach_comp + 
-                          dd_narc_comp + 
-                          dd_psyc_comp + 
-                          sns +
-                          dd_mach_comp * sns + 
-                          dd_narc_comp * sns + 
-                          dd_psyc_comp * sns +
-                            (1 | id), data = data1)
+# fit model with sns
+model_freq_3 <- lmer(freq ~ gender + 
+                            dd_mach_comp + 
+                            dd_narc_comp +
+                            dd_psyc_comp + 
+                            sns +
+                            (1 | id), data = data1, REML = FALSE)
 
-summary(model_freq_3)
+# fit model with gender X d3 interaciton
+model_freq_4 <- lmer(freq ~ gender + 
+                            dd_mach_comp + 
+                            dd_narc_comp +
+                            dd_psyc_comp + 
+                            sns +
+                            gender * dd_mach_comp + 
+                            gender * dd_narc_comp + 
+                            gender * dd_psyc_comp + 
+                            (1 | id), data = data1, REML = FALSE)
 
-model_len_3 <- lmer(len ~ dd_mach_comp + 
-                          dd_narc_comp + 
-                          dd_psyc_comp + 
-                          sns +
-                          dd_mach_comp * sns + 
-                          dd_narc_comp * sns + 
-                          dd_psyc_comp * sns +
-                          (1 | id), data = data1)
+# fit model with gender x sns interaction
+model_freq_5 <- lmer(freq ~ gender + 
+                            dd_mach_comp + 
+                            dd_narc_comp +
+                            dd_psyc_comp + 
+                            sns +
+                            gender * dd_mach_comp + 
+                            gender * dd_narc_comp + 
+                            gender * dd_psyc_comp + 
+                            gender * sns +
+                            (1 | id), data = data1, REML = FALSE)
 
-summary(model_len_3)
-std_beta(model_len_3)
+# fit model with d3 x sns interaction
+model_freq_6 <- lmer(freq ~ gender + 
+                            dd_mach_comp + 
+                            dd_narc_comp +
+                            dd_psyc_comp + 
+                            sns +
+                            gender * dd_mach_comp + 
+                            gender * dd_narc_comp + 
+                            gender * dd_psyc_comp + 
+                            gender * sns +
+                            dd_mach_comp * sns + 
+                            dd_narc_comp * sns +
+                            dd_psyc_comp * sns + 
+                            (1 | id), data = data1, REML = FALSE)
+
+# compare models
+freq_model_comp <- anova(model_freq_0,
+                         model_freq_1,
+                         model_freq_3,
+                         model_freq_4,
+                         model_freq_5,
+                         model_freq_6)
+
+# respecify model (drop gender x d3 interactions)
+model_freq_final <- lmer(freq ~ gender + 
+                                dd_mach_comp + 
+                                dd_narc_comp +
+                                dd_psyc_comp + 
+                                sns +
+                                gender * sns +
+                                (1 | id), data = data1, REML = FALSE)
+
+# summarize final model
+model_freq_final_sum <- summary(model_freq_final)
+
 ```
+
+```{r data1_lmer_len, include = FALSE}
+# fit unconditional model
+model_len_0 <- lmer(len ~ (1 | id), data = data1, REML = FALSE)
+
+# calculate ICCs
+len_icc <- icc(model_len_0)
+
+# fit gender model
+model_len_1 <- lmer(len ~ gender + 
+                            (1 | id), data = data1, REML = FALSE)
+
+# fit model with the dark triad traits
+model_len_2 <- lmer(len ~ gender + 
+                            dd_mach_comp + 
+                            dd_narc_comp +
+                            dd_psyc_comp + 
+                            (1 | id), data = data1, REML = FALSE)
+
+# fit model with sns
+model_len_3 <- lmer(len ~ gender + 
+                            dd_mach_comp + 
+                            dd_narc_comp +
+                            dd_psyc_comp + 
+                            sns +
+                            (1 | id), data = data1, REML = FALSE)
+
+# fit model with gender X d3 interaciton
+model_len_4 <- lmer(len ~ gender + 
+                            dd_mach_comp + 
+                            dd_narc_comp +
+                            dd_psyc_comp + 
+                            sns +
+                            gender * dd_mach_comp + 
+                            gender * dd_narc_comp + 
+                            gender * dd_psyc_comp + 
+                            (1 | id), data = data1, REML = FALSE)
+
+# fit model with gender x sns interaction
+model_len_5 <- lmer(len ~ gender + 
+                            dd_mach_comp + 
+                            dd_narc_comp +
+                            dd_psyc_comp + 
+                            sns +
+                            gender * dd_mach_comp + 
+                            gender * dd_narc_comp + 
+                            gender * dd_psyc_comp + 
+                            gender * sns +
+                            (1 | id), data = data1, REML = FALSE)
+
+# fit model with d3 x sns interaction
+model_len_6 <- lmer(len ~ gender + 
+                            dd_mach_comp + 
+                            dd_narc_comp +
+                            dd_psyc_comp + 
+                            sns +
+                            gender * dd_mach_comp + 
+                            gender * dd_narc_comp + 
+                            gender * dd_psyc_comp + 
+                            gender * sns +
+                            dd_mach_comp * sns + 
+                            dd_narc_comp * sns +
+                            dd_psyc_comp * sns + 
+                            (1 | id), data = data1, REML = FALSE)
+
+# compare models
+len_model_comp <- anova(model_len_0,
+                         model_len_1,
+                         model_len_3,
+                         model_len_4,
+                         model_len_5,
+                         model_len_6)
+
+# respecify model (drop gender x d3 interactions)
+model_len_final <- lmer(len ~ gender + 
+                                dd_mach_comp + 
+                                dd_narc_comp +
+                                dd_psyc_comp + 
+                                sns +
+                                gender * sns +
+                                (1 | id), data = data1, REML = FALSE)
+
+# summarize final model
+model_len_final_sum <- summary(model_len_final)
+
+```
+
+In terms of random effects, we allowed random intercepts accross subjects. It would have been defensible to run the model as a two-level cross-classified, nesting observations within both subjects and social media sites. However, we were interested in the effects of social media site and thus included them as fixed effects in our model. In the present case, grouping by subject explaiend `r spround(freq_icc * 100)`% of the variation in frequency of social media use an `r spround(len_icc * 100)`% of the variation in the length of social media use.
+
+We added fixed effects to our model in the following order: (1) gender, (2) the Dark Triad traits, (3) the specific social media site, (4) the interaction between gender and the Dark Triad traits, (5) the interaction between gender and the social media sites, and (6) the interaction between the Dark Triad traits and the  social media sites. The full model for the two models were:
+
+$$L1: Y_{ij} = \beta_{0j} + \beta_{1j}SMS_{ij} + r_{ij}$$
+
+$$L2: \beta_{0j} = \gamma_{00} + \gamma_{01}G{j} + \gamma_{02}M{j} + \gamma_{03}N_{j} + \gamma_{04}P_{j} + \gamma_{05}G_{j}*M_{j} + \gamma_{06}G_{j}*N_{j} + \gamma_{07}G_{j}*P_{j}  + u_{0j}$$.
+
+$$L2: \beta_{1j} = \gamma_{10} + \gamma_{11}G{j} + \gamma_{12}M_{j} + \gamma_{13}N_{j} + \gamma_{14}P_{j}  + u_{1j}$$
+
+
+Results of the model comparisons can be see in Table `r (table_count <- table_count + 1)`.
+
+
+```{r data1_model_comps_tab, echo = FALSE, results = 'asis'}
+# format for outputting
+freq_model_comp %<>%
+  select(df = Df,
+         `$\\chi^2$ df` = `Chi Df`,
+         AIC:logLik,
+         `$\\chi^2$` = Chisq,
+         `$p$` = `Pr(>Chisq)`)
+
+len_model_comp %<>%
+  select(`AIC ` = AIC,
+         `BIC ` = BIC,
+         `logLik ` = logLik,
+         `$\\chi^2$ ` = Chisq,
+         `$p$ ` = `Pr(>Chisq)`)
+
+# combine tables
+model_comps_comb <- cbind(freq_model_comp, len_model_comp)
+
+# round tables to appropriat enumber of digits
+model_comps_comb <- map2_df(model_comps_comb, 
+                            c(0, 0, 2, 2, 2, 2, 3, 2, 2, 2, 2, 3), 
+                            ~spround(.x, .y))
+
+model_comps_comb$Model <- c("Null",
+                            "Gender (G)",
+                            "Dark Triad (D3)",
+                            "Social Media (SNS)",
+                            "G X SNS",
+                            "D3 X SNS")
+
+model_comps_comb %<>%
+  select(Model,
+         everything())
+
+
+# output table
+model_comps_comb %>%
+ apa_table(caption = "Log likelihood comparison of linear mixed-effects models predicting frequency of visiting social media sites and length of time spent on social media sites.",
+           escape = FALSE,
+           align = "lrrrrrrrrrrrr",
+           landscape = TRUE,
+           col_spanners = list("Frequency" = c(4, 8),
+                               "Length" = c(9, 13)),
+           note = "something something")
+
+
+
+```
+
 
 
 ```{r tidy_data}
