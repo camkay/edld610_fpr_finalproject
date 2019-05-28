@@ -70,7 +70,7 @@ library(psych) # for caculating cronbach's alpha
 library(glue) # for parallel iteration 
 library(sjstats) # for caalculating betas
 
-# set a table incrementer
+# set a table incrementer (the papaja table referencer is not working for me)
 table_count <- 0
 
 # source custom functions (the rmarkdown document is unwieldy otherwise)
@@ -97,6 +97,8 @@ source(here("functions", "perble.R"))        # CUSTOM FUNCTION 7: for creating a
                                              # a table with the percentages
 source(here("functions", "lenique.R"))       # CUSTOM FUNCTION 8: calculates the
                                              # length of unique values
+source(here("functions", "con_to_cat.R"))    # CUSTOM FUNCTION 8: quantile 
+                                             # splits a numeric column
 
 # create a vector of the custom functions
 custom_functions <- objects()
