@@ -97,8 +97,10 @@ source(here("functions", "perble.R"))        # CUSTOM FUNCTION 7: for creating a
                                              # a table with the percentages
 source(here("functions", "lenique.R"))       # CUSTOM FUNCTION 8: calculates the
                                              # length of unique values
-source(here("functions", "con_to_cat.R"))    # CUSTOM FUNCTION 8: quantile 
+source(here("functions", "con_to_cat.R"))    # CUSTOM FUNCTION 9: quantile 
                                              # splits a numeric column
+source(here("functions", "paste_msd.R"))     # CUSTOM FUNCTION 10: for combining
+                                             # a mean and sd for a table
 
 # create a vector of the custom functions
 custom_functions <- objects()
@@ -467,9 +469,9 @@ descript_comps %<>%
   
 # format composite descriptives for output
 descript_comps %<>%
-  mutate(Overall = paste0(spround(mean), "(", spround(sd), ")"),
-         Female  = paste0(spround(mean_fem), "(", spround(sd_fem), ")"),
-         Male    = paste0(spround(mean_mal), "(", spround(sd_mal), ")")) %>%
+  mutate(Overall = paste_msd(spround(mean), spround(sd)),
+         Female  = paste_msd(spround(mean_fem), spround(sd_fem)),
+         Male    = paste_msd(spround(mean_mal), spround(sd_mal))) %>%
   select(Trait = vars, Overall, Female, Male, t, d)
 
 # create meaningful trait names
@@ -567,28 +569,28 @@ descript_sns %<>%
          ast_len  = case_when(p_len  < .001 ~ "***",
                               p_len  < .01  ~  "**",
                               p_len  < .05  ~   "*",
-                              TRUE          ~   ""),
-         t_freq   = paste0(spround(t_freq), ast_freq),
-         t_len    = paste0(spround(t_len), ast_len))
+                              TRUE          ~   ""))
   
 # format composite descriptives for output
 descript_sns %<>%
-  mutate(`Overall`    = paste0(spround(freq_mean), "(", spround(freq_sd), ")"),
-         `Female`     = paste0(spround(freq_mean_fem), "(", spround(freq_sd_fem), ")"),
-         `Male`       = paste0(spround(freq_mean_mal), "(", spround(freq_sd_mal), ")"),
-         `Overall `   = paste0(spround(len_mean), "(", spround(len_sd), ")"),
-         `Female `    = paste0(spround(len_mean_fem), "(", spround(len_sd_fem), ")"),
-         `Male `      = paste0(spround(len_mean_mal), "(", spround(len_sd_mal), ")")) %>%
+  mutate(`Overall`    = paste_msd(spround(freq_mean),     spround(freq_sd)),
+         `Female`     = paste_msd(spround(freq_mean_fem), spround(freq_sd_fem)),
+         `Male`       = paste_msd(spround(freq_mean_mal), spround(freq_sd_mal)),
+         `Overall `   = paste_msd(spround(len_mean),      spround(len_sd)),
+         `Female `    = paste_msd(spround(len_mean_fem),  spround(len_sd_fem)),
+         `Male `      = paste_msd(spround(len_mean_mal),  spround(len_sd_mal))) %>%
   select(Site = sns, 
          Overall,
          Female,
          Male,
-         t = t_freq,
-         d = d_freq,
+         t   = t_freq,
+         ` ` = ast_freq,
+         d   = d_freq,
          `Overall `,
          `Female `,
          `Male `,
          `t ` = t_len,
+         `  ` = ast_len,
          `d ` = d_len) %>%
   mutate(Site = stringi::stri_trans_totitle(Site))
 
@@ -600,19 +602,19 @@ descript_sns_len <- descript_sns[c(1, 7:11)]
 
 ```{r data1_measure_sns_freq_tab, echo = FALSE, results = 'asis'}
 descript_sns_freq %>%
-  apa_table(caption      = "Descriptive statistics and sex differences for frequency of SNS use",
+  apa_table(caption      = "Descriptive statistics and sex differences for frequency of social media use.",
             col_spanners = list("Mean (SD)" = c(str_cols_find("l", descript_comps, return = "numbers"))),
             note         = "* \\textit{p} < .05, ** \\textit{p} < .01, *** \\textit{p} < .001.", 
-            align        = c("l", "r", "r", "r", "r", "r"),
+            align        = c("l", "r", "r", "r", "r", "l", "r"),
             escape       = FALSE)
 ```
 
 ```{r data1_measure_sns_len_tab, echo = FALSE, results = 'asis'}
 descript_sns_len %>%
-  apa_table(caption      = "Descriptive statistics and sex differences for average length of SNS use in minutes",
+  apa_table(caption      = "Descriptive statistics and sex differences for average length of social media use per day in minutes.",
             col_spanners = list("Mean (SD)" = c(str_cols_find("l", descript_comps, return = "numbers"))),
             note         = "* \\textit{p} < .05, ** \\textit{p} < .01, *** \\textit{p} < .001.", 
-            align        = c("l", "r", "r", "r", "r", "r"),
+            align        = c("l", "r", "r", "r", "r", "l", "r"),
             escape       = FALSE)
 ```
 
@@ -881,20 +883,20 @@ model_len_6 <- lmer(len ~ gender +
 
 # compare models
 len_model_comp <- anova(model_len_0,
-                         model_len_1,
-                         model_len_3,
-                         model_len_4,
-                         model_len_5,
-                         model_len_6)
+                        model_len_1,
+                        model_len_3,
+                        model_len_4,
+                        model_len_5,
+                        model_len_6)
 
 # respecify model (drop gender x d3 interactions)
 model_len_final <- lmer(len ~ gender + 
-                                dd_mach_comp + 
-                                dd_narc_comp +
-                                dd_psyc_comp + 
-                                sns +
-                                gender * sns +
-                                (1 | id), data = data1, REML = FALSE)
+                              dd_mach_comp + 
+                              dd_narc_comp +
+                              dd_psyc_comp + 
+                              sns +
+                              gender * sns +
+                              (1 | id), data = data1, REML = FALSE)
 
 # summarize final model
 model_len_final_sum <- summary(model_len_final)
