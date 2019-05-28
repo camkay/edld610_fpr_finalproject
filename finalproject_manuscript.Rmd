@@ -1,6 +1,6 @@
 ---
-title             : "Clickbait Title with SEO Keywords"
-shorttitle        : "Clickbait Title"
+title             : "The dark (and light) side of social media"
+shorttitle        : "The dark (and light) side of social media"
 
 author: 
   - name          : "Cameron S. Kay"
@@ -19,7 +19,7 @@ authornote: |
   Cameron Stuart Kay, Department of Psychology, University of Oregon; Ashley L. Miller, Department of Psychology, University of Oregon.
 
 abstract: |
- Abstract goes herey
+ Abstract goes here.
   
 keywords          : "keywords"
 wordcount         : "X"
@@ -473,6 +473,7 @@ descript_comps <- cbind(descript_comps,
                                      n2  = descript_comps$n_mal),
                                 tdp_from_pars))
 
+# round valuess and include asterisks
 descript_comps %<>%
   mutate(d   = spround(d),
          ast = p_to_ast(p),
@@ -515,6 +516,7 @@ descript_comps <- rbind(c("\\textit{Dark Triad}", rep("", ncol(descript_comps) -
 ```
 
 ```{r data1_measures_comps_tab, echo = FALSE, results = 'asis'}
+# output gender comparison scale table
 descript_comps %>%
   apa_table(caption      = "Descriptive statistics and sex differences for scales",
             col_spanners = list("Mean (SD)" = c(str_cols_find("l", descript_comps, return = "numbers"))),
@@ -543,7 +545,7 @@ low_use_sites <- n_gen_sns %>%
 data1 %<>%
   filter(!(sns %in% low_use_sites))
 
-# calculate descriptives
+# calculate descriptives for a table
 descript_sns <- data1 %>%
   group_by(sns) %>%
   summarise(freq_mean = mean(freq, na.rm = TRUE),
@@ -571,15 +573,31 @@ descript_sns <- data1 %>%
             n_mal         =    n()) %>%
   right_join(descript_sns, by = "sns")
 
-# calculate t, p, and d
+# calculate t, p, and d for frequency and length
+sns_freq_tdp <- pmap_df(list(m1  = descript_sns$freq_mean_fem,
+                             m2  = descript_sns$freq_mean_mal,
+                             sd1 = descript_sns$freq_sd_fem,
+                             sd2 = descript_sns$freq_sd_mal,
+                             n1  = descript_sns$n_fem,
+                             n2  = descript_sns$n_mal),
+                        tdp_from_pars)
+
+names(sns_freq_tdp) <- paste0(names(sns_freq_tdp), "_freq")
+
+sns_len_tdp <- pmap_df(list(m1  = descript_sns$len_mean_fem,
+                            m2  = descript_sns$len_mean_mal,
+                            sd1 = descript_sns$len_sd_fem,
+                            sd2 = descript_sns$len_sd_mal,
+                            n1  = descript_sns$n_fem,
+                            n2  = descript_sns$n_mal),
+                       tdp_from_pars)
+
+names(sns_len_tdp) <- paste0(names(sns_len_tdp), "_len")
+
+descript_sns <- cbind(descript_sns, sns_freq_tdp, sns_len_tdp)
+
 descript_sns %<>%
-  mutate(t_freq   = (freq_mean_fem - freq_mean_mal) / sqrt(((freq_sd_fem^2) / n_fem) + ((freq_sd_mal^2) / n_mal)),
-         t_len    = (len_mean_fem - len_mean_mal) / sqrt(((len_sd_fem^2) / n_fem) + ((len_sd_mal^2) / n_mal)),
-         d_freq   = spround(abs(t2d(t_freq, n = n, n1 = n_fem, n2 = n_mal))),
-         d_len    = spround(abs(t2d(t_len, n = n, n1 = n_fem, n2 = n_mal))),
-         p_freq   = 2 * pt(-abs(t_freq), (n_fem + n_mal - 2)),
-         p_len    = 2 * pt(-abs(t_len),  (n_fem + n_mal - 2)),
-         ast_freq = p_to_ast(p_freq),
+  mutate(ast_freq = p_to_ast(p_freq),
          ast_len  = p_to_ast(p_len))
   
 # format composite descriptives for output
@@ -613,21 +631,26 @@ descript_sns_len <- descript_sns[c(1, 8:13)]
 ```
 
 ```{r data1_measure_sns_freq_tab, echo = FALSE, results = 'asis'}
+# output frequency table
 descript_sns_freq %>%
   apa_table(caption      = "Descriptive statistics and sex differences for frequency of social media use.",
-            col_spanners = list("Mean (SD)" = c(str_cols_find("l", descript_comps, return = "numbers"))),
+            col_spanners = list("Mean (SD)" = c(str_cols_find("l", descript_sns_freq, return = "numbers"))),
             note         = "* \\textit{p} < .05, ** \\textit{p} < .01, *** \\textit{p} < .001.", 
             align        = c("l", "r", "r", "r", "r", "l", "r"),
             escape       = FALSE)
 ```
 
 ```{r data1_measure_sns_len_tab, echo = FALSE, results = 'asis'}
+# output length table
 descript_sns_len %>%
   apa_table(caption      = "Descriptive statistics and sex differences for average length of social media use per day in minutes.",
-            col_spanners = list("Mean (SD)" = c(str_cols_find("l", descript_comps, return = "numbers"))),
+            col_spanners = list("Mean (SD)" = c(str_cols_find("l", descript_sns_len, return = "numbers"))),
             note         = "* \\textit{p} < .05, ** \\textit{p} < .01, *** \\textit{p} < .001.", 
             align        = c("l", "r", "r", "r", "r", "l", "r"),
             escape       = FALSE)
+
+# drop unneeded variables
+rm(list = setdiff(ls(), c("data1", "alphas", "data1_distinct", "custom_functions", custom_functions)))
 ```
 
 Participants completed an online survey that included (1) a measure of the Dark Triad personality traits (i.e., Machiavellianism, narcissism, psychopathy), (2) questions assessing  participants' frequency of visiting eleven social media sites, (3) questions assessing the amount of time participants spend on those eleven social media sites, (4) a scale assessing the participants' addiction to social media, (5) a scale measuring participants' reasons for using the internet, and (6) two questions assessing participants' overall view of social media sites. The following analyses will focus on the measure of the Dark Triad and the questions assessing frequency of use and amount of time spent on social media sites.
@@ -712,7 +735,6 @@ rownames(zo) <- c("1. SNS Frequency",
                   "5. Psychopathy")
 
 zo[zo == "1.00**"] <- "-"
-
 ```
 
 ```{r data1_zeroorder_tab, echo = FALSE, results = 'asis'}
@@ -726,6 +748,9 @@ zo %>%
                          "). P-values were adjusted using the Holm-Bonferonni method and were adjusted seperately for the male and female subsamples."),
             align = "l",
             escape = FALSE)
+
+# drop unneeded variables
+rm(list = setdiff(ls(), c("data1", "custom_functions", custom_functions)))
 ```
 
 Table `r (table_count <- table_count + 1)` for zero-order correlations, which seems to suggest that at conventional significant levels there is no relationship between the Dark Triad and either the freuqency of social media use or the average length of social media use per day. However, the frequency and length measures inclduded in the matrix are collapsing accross social media sites. 
@@ -1064,7 +1089,6 @@ data1 %>%
 
 ```
 
-
 ```{r gender_parallel_iteration, warning = FALSE}
 
 # examining gender differences in minutes spent on social media each day
@@ -1147,6 +1171,8 @@ plot_data$plots[[9]]
 ```
 
 # Discussion
+
+Something something something
 
 \newpage
 
