@@ -463,7 +463,7 @@ descript_comps <- data1_distinct %>%
 
 descript_comps$vars <- str_cols_find("_comp", data1, return = "names")
 
-# calculate t, p, and d
+# calculate t, p, and d for the gender comparisons
 descript_comps <- cbind(descript_comps,
                         pmap_df(list(m1  = descript_comps$mean_fem,
                                      m2  = descript_comps$mean_mal,

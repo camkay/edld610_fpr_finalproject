@@ -3,6 +3,23 @@
 #################################################
 
 tdp_from_pars <- function(m1, m2, sd1, sd2, n1, n2, two.tailed = TRUE) {
+  
+  # check arguments
+  if (!is.numeric(m1)) {
+    stop("m1 must be of type numeric.")
+  } else if (!is.numeric(m2)) {
+    stop("m2 must be of type numeric.")
+  } else if (!is.numeric(sd1)) {
+    stop("sd1 must be of type numeric.")
+  } else if (!is.numeric(sd2)) {
+    stop("sd2 must be of type numeric.")
+  } else if (!is.numeric(n1)) {
+    stop("n1 must be of type numeric.")
+  } else if (!is.numeric(n2)) {
+    stop("n2 must be of type numeric.")
+  } else if (!is.logical(two.tailed)) {
+    stop("two.tailed must be of type logical.")
+  }
   # calculate standard errors
   se <- sqrt(((sd1^2) / n1) + ((sd2^2) / n2))
   
@@ -26,7 +43,4 @@ tdp_from_pars <- function(m1, m2, sd1, sd2, n1, n2, two.tailed = TRUE) {
   # return all as list
   data.frame(t, df, d, p)
 }
-
-
-
 
