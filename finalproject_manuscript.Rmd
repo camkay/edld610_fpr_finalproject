@@ -464,7 +464,7 @@ descript_comps$vars <- str_cols_find("_comp", data1, return = "names")
 descript_comps %<>%
   mutate(t   = (mean_fem - mean_mal) / sqrt(((sd_fem^2) / n_fem) + ((sd_mal^2) / n_mal)),
          d   = spround(abs(t2d(t, n = n, n1 = n_fem, n2 = n_mal))),
-         p   = pt(t, (n_fem + n_mal - 2)),
+         p   = 2 * pt(-abs(t), (n_fem + n_mal - 2)),
          ast = p_to_ast(p),
          t   = spround(t))
   
@@ -567,8 +567,8 @@ descript_sns %<>%
          t_len    = (len_mean_fem - len_mean_mal) / sqrt(((len_sd_fem^2) / n_fem) + ((len_sd_mal^2) / n_mal)),
          d_freq   = spround(abs(t2d(t_freq, n = n, n1 = n_fem, n2 = n_mal))),
          d_len    = spround(abs(t2d(t_len, n = n, n1 = n_fem, n2 = n_mal))),
-         p_freq   = pt(t_freq, (n_fem + n_mal - 2)),
-         p_len    = pt(t_len, (n_fem + n_mal - 2)),
+         p_freq   = 2 * pt(-abs(t_freq), (n_fem + n_mal - 2)),
+         p_len    = 2 * pt(-abs(t_len),  (n_fem + n_mal - 2)),
          ast_freq = p_to_ast(p_freq),
          ast_len  = p_to_ast(p_len))
   
@@ -599,6 +599,7 @@ descript_sns %<>%
 descript_sns_freq <- descript_sns[1:7]
 
 descript_sns_len <- descript_sns[c(1, 8:13)]
+
 ```
 
 ```{r data1_measure_sns_freq_tab, echo = FALSE, results = 'asis'}
