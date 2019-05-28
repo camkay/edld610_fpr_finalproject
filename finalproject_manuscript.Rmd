@@ -932,9 +932,10 @@ len_model_comp %<>%
 model_comps_comb <- cbind(freq_model_comp, len_model_comp)
 
 # round tables to appropriat enumber of digits
-model_comps_comb <- map2_df(model_comps_comb, 
-                            c(0, 0, 2, 2, 2, 2, 3, 2, 2, 2, 2, 3), 
-                            ~spround(.x, .y))
+model_comps_comb <- pmap_df(list(model_comps_comb, 
+                                 c(0, 0, 2, 2, 2, 2, 3, 2, 2, 2, 2, 3), 
+                                 c(rep(TRUE, 2), rep(c(rep(TRUE, 4), FALSE), 2))),
+                            ~spround(x = ..1, digits = ..2, leading0 = ..3))
 
 model_comps_comb$Model <- c("Null",
                             "Gender (G)",
@@ -947,6 +948,11 @@ model_comps_comb %<>%
   select(Model,
          everything())
 
+gsub(".000", "<.000", model_comps_comb)
+
+model_comps_comb <- apply(model_comps_comb, MARGIN = c(1, 2), function(string) gsub(".000", "<.000", string))
+
+model_comps_comb <- apply(model_comps_comb, MARGIN = c(1, 2), function(string) gsub("NA", "", string))
 
 # output table
 model_comps_comb %>%
