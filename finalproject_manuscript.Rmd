@@ -466,14 +466,20 @@ descript_comps %<>%
          d   = spround(abs(t2d(t, n = n, n1 = n_fem, n2 = n_mal))),
          p   = pt(t, (n_fem + n_mal - 2)),
          ast = p_to_ast(p),
-         t   = paste0(spround(t), ast))
+         t   = spround(t))
   
 # format composite descriptives for output
 descript_comps %<>%
   mutate(Overall = paste_msd(spround(mean), spround(sd)),
          Female  = paste_msd(spround(mean_fem), spround(sd_fem)),
          Male    = paste_msd(spround(mean_mal), spround(sd_mal))) %>%
-  select(Trait = vars, Overall, Female, Male, t, d)
+  select(Trait = vars, 
+         Overall, 
+         Female, 
+         Male,
+         `$t$` = t, 
+         ` `   = ast,
+         `$d$` = d)
 
 # create meaningful trait names
 descript_comps$Trait <- c("Machiavellianism",
@@ -504,7 +510,7 @@ descript_comps %>%
             col_spanners = list("Mean (SD)" = c(str_cols_find("l", descript_comps, return = "numbers"))),
             stub_indents = list(which(descript_comps$Overall != "")),
             note         = "* \\textit{p} < .05, ** \\textit{p} < .01, *** \\textit{p} < .001.", 
-            align        = c("l", "r", "r", "r", "r", "r"),
+            align        = c("l", "r", "r", "r", "r", "l", "r"),
             escape       = FALSE)
 ```
 
@@ -578,15 +584,15 @@ descript_sns %<>%
          Overall,
          Female,
          Male,
-         t   = t_freq,
-         ` ` = ast_freq,
-         d   = d_freq,
+         `$t$` = t_freq,
+         ` `   = ast_freq,
+         `$d$` = d_freq,
          `Overall `,
          `Female `,
          `Male `,
-         `t ` = t_len,
-         `  ` = ast_len,
-         `d ` = d_len) %>%
+         `$t$ ` = t_len,
+         `  `   = ast_len,
+         `$d$ ` = d_len) %>%
   mutate(Site = stringi::stri_trans_totitle(Site))
 
 # split data into two
