@@ -335,10 +335,9 @@ rm(list = setdiff(ls(), c("data1", "alphas", "custom_functions", custom_function
 
 # Intro
 
-In 2005—one year before Facebook became publicly accessible—only 5% of American adults reported using at least one social media site [@Smith2018a]. Thirteen-years later, in 2018, that number had risen to include 69%, or roughly two-thirds, of American adults. It would be hard to argue there hasn’t been a profound increase in the number of Americans using social media, but this 69% figure does vary depending on age bracket. As one might expect, over twice as many 18-to-29 year-olds reported using social media when compared to those older than 65 (88% and 37%, respectively). The population variation was not restricted to age, however: Eight percent more women used social media than men and 16% more people from urban communities used social media than their non-urban counterparts. Recently, psychologists have turned to personality traits to explain some of the remaining variance in social media use. 
+In 2005—one year before Facebook went public—only 5% of American adults reported using at least one social media site [@Smith2018a]. Thirteen-years later, in 2018, that number had risen to include 69%, or roughly two-thirds, of American adults. It would be hard to argue there hasn’t been a profound increase in the number of Americans using social media, but this 69% figure does vary depending on age bracket. As one might expect, over twice as many 18-to-29 year-olds reported using social media when compared to those older than 65 (88% and 37%, respectively). The population variation was not restricted to age, however: Eight percent more women used social media than men and 16% more people from urban communities used social media than their non-urban counterparts. Recently, psychologists have turned to personality traits to explain some of the remaining variation in social media use. 
 
-With some notable exceptions, the research conducted in the overlapping region between personality and communications has focused primarily on ostensibly positive personality traits. Negative personality traits have been left largely unexplored. Given previous, albeit sparse, research, it does appear there may be a relationship between negative personality traits and social media use. The present study aims to address the paucity of research. To that end, we administered a survey assessing an individual’s levels of the Dark Triad personality traits (i.e., Machiavellianism, narcissism, and psychopathy), the amount of time he or she actively spends on social media sites, and the frequency with which he or she visits social media sites.
-Background
+With some notable exceptions, the research conducted in the overlapping region between personality and communications has focused primarily on ostensibly-positive personality traits. Negative personality traits have been left largely unexplored. The present study aims to address this paucity of research. To that end, we administered a survey assessing an individual’s levels of the Dark Triad personality traits (i.e., Machiavellianism, narcissism, and psychopathy), the amount of time they actively spend on social media sites and the frequency with which they visits social media sites.
 
 A common definition for a social media site is that it is an internet-based service allowing for the creation and broadcast of user-generated information [@Boyd2008; @Kaplan2010; @Obar2015]. @Obar2015 emphasize the user-generated aspect of this definition, arguing that this content is the lifeblood of social media. Although this is a substantial claim, it logically follows that if a site is created with the express purpose of providing user-generated content, it must have user-generated content to function as intended. By way of illustration, without videos created by users, YouTube, a social media site that allows its users to upload and share videos, would fail to serve its primary purpose. Netflix, a site that allows users to only stream videos, does not require user-generated content, as it does not serve user-generated content, and, by extension is not a social media site. Beyond the teleological aspects of social media sites, the user-generated focus also highlights the importance of individual differences in the user-service relationship, as users invariably have personalities that affect how they consume and generate content. One popular method for assessing personality in terms of social media use has been the Big Five [@John1999].
 
@@ -430,7 +429,7 @@ demo_age <- data1_distinct$age %>%
   unlist()
 ```
 
-A total of `r sample_start` participants were recruited from the human subject pool at the University of Oregon as part of a general survey. Data was collected over one academic quarter, and all participants were compensated with course credit necessary for meeting a course research requirement. The length of the survey was 10 minutes.  Participants completing the survey in under 90 seconds would have been excluded, but no participants failed to meet this treshold. We did, however, exclude a single participant for having a response standard deviation of zero, an indicator of straightlining. Since we were interested in the effects of gender on social media use and considering that the subsamples for the non-conventional genders were too small to be properly analyzed, we also excluded participants who reported being neither female nor male (*n* = `r exclusions_gender`). Our resulting sample comprised `r lenique(data1$id)` participants (`r spround(demo_gender["Percent", "Female"], 2)`% female; age range: `r demo_age["min"]` to `r demo_age["max"]` years; *M* age = `r demo_age["mean"]`, *SD* age = `r demo_age["sd"]`). With respect to cultural identity, `r spround(demo_culture["Percent", "Caucasian"], 2)`% reported being Caucasian, `r spround(demo_culture["Percent", "Asian"], 2)`% reported being Asian, `r spround(demo_culture["Percent", "Hispanic, Latinx, or Spanish Origin"], 2)`% reported being Hispanic, Latinx, or Spanish, `r spround(demo_culture["Percent", "Black or African American"], 2)`% reported being black or African American, and `r spround(100 - sum(sort(demo_culture["Percent", ], TRUE)[1:4]), 2)`% identified as being from some other culture or prefered not to answer. 
+A total of `r sample_start` participants were recruited from the human subject pool at the University of Oregon. Data was collected over one academic quarter, and all participants were compensated with course credit necessary for meeting a course research requirement. The length of the survey was 10 minutes.  Participants completing the survey in under 90 seconds would have been excluded from analysis, but no participants failed to meet this treshold. We did, however, exclude a single participant for having a response standard deviation of zero across all surveys, an indicator of straightlining. Since we were interested in the effects of gender on social media use and considering that the subsamples for the non-conventional genders were too small to be properly analyzed, we also excluded participants who reported being neither female nor male (*n* = `r exclusions_gender`). Our resulting sample comprised `r lenique(data1$id)` participants (`r spround(demo_gender["Percent", "Female"], 2)`% female; age range: `r demo_age["min"]` to `r demo_age["max"]` years; *M* age = `r demo_age["mean"]`, *SD* age = `r demo_age["sd"]`). With respect to cultural identity, `r spround(demo_culture["Percent", "Caucasian"], 2)`% reported being Caucasian, `r spround(demo_culture["Percent", "Asian"], 2)`% reported being Asian, `r spround(demo_culture["Percent", "Hispanic, Latinx, or Spanish Origin"], 2)`% reported being Hispanic, Latinx, or Spanish, `r spround(demo_culture["Percent", "Black or African American"], 2)`% reported being black or African American, and `r spround(100 - sum(sort(demo_culture["Percent", ], TRUE)[1:4]), 2)`% identified as being from some other culture, from multiple cultures, or prefered not to answer the question. 
 
 ## Procedures and Materials
 ```{r data1_measures_comps}
@@ -653,7 +652,9 @@ descript_sns_len %>%
 rm(list = setdiff(ls(), c("data1", "alphas", "data1_distinct", "custom_functions", custom_functions)))
 ```
 
-Participants completed an online survey that included (1) a measure of the Dark Triad personality traits (i.e., Machiavellianism, narcissism, psychopathy), (2) questions assessing  participants' frequency of visiting eleven social media sites, (3) questions assessing the amount of time participants spend on those eleven social media sites, (4) a scale assessing the participants' addiction to social media, (5) a scale measuring participants' reasons for using the internet, and (6) two questions assessing participants' overall view of social media sites. The following analyses will focus on the measure of the Dark Triad and the questions assessing frequency of use and amount of time spent on social media sites.
+Participants completed an online survey that included (1) a measure of the Dark Triad personality traits (i.e., Machiavellianism, narcissism, psychopathy), (2) questions assessing  participants' frequency of visiting eleven social media sites, (3) questions assessing the amount of time participants spend on those eleven social media sites, (4) a scale assessing the participants' addiction to social media, (5) a scale measuring participants' reasons for using the internet, and (6) two questions assessing participants' overall view of social media sites. Participants provided consent prior to beginning the survey and were debriefed upon completion of the survey. 
+
+For the purposes of the final project for Functional Programming in R, the following analyses will focus on the measures of the Dark Triad traits and the questions assessing frequency of use and amount of time spent on social media sites.
 
 The Dark Triad was assessed using the Dirty Dozen [@Jonason2010d], comprising four items each for Machiavellianism ($\alpha$ = `r alphas["dd_mach"]`), narcissism ($\alpha$ = `r alphas["dd_narc"]`), and psychopathy ($\alpha$ = `r alphas["dd_psyc"]`). Participants responded using a 5-pt Likert scale (1 = "Strongly disagree"; 5 = "Strongly agree"). Descriptive statistics and gender comparisons for the Dark Triad traits, as well as the other scale measures, can be seen in Table `r (table_count <- table_count + 1)`.
 
@@ -1010,7 +1011,13 @@ model_comps_comb %>%
 
 ```
 
-```{r data1_machxgender_plot}
+# Discussion
+
+Something something something
+
+\newpage
+
+```{r data1_machxgender_plot, echo = FALSE}
 # convert dark triad traits to categorical using con_to_cat
 data1$mach_group <- con_to_cat(data1$dd_mach_comp)
 data1$narc_group <- con_to_cat(data1$dd_narc_comp)
@@ -1039,6 +1046,8 @@ data1 %>%
          x = "Machiavellianism")
 ```
 
+*Figure 1.* Very cool plot. 
+
 ```{r data1_narcxgender_plot}
 #Examining whether social media use differ as a funciton of Narcissism (no gender)
 data1 %>%
@@ -1062,6 +1071,8 @@ data1 %>%
     labs(y = "Average length spent on Social \nMedia Sites per Day (minutes)",
          x = "Narcissism")
 ```
+
+*Figure 2.* Very cooler plot. 
 
 ```{r data1_psycxgender_plot}
 #Examining whether social media use differ as a funciton of Psychopathy (no gender)
@@ -1088,6 +1099,8 @@ data1 %>%
 
 
 ```
+
+*Figure 3.* Very coolest plot. 
 
 ```{r gender_parallel_iteration, warning = FALSE}
 
@@ -1169,10 +1182,6 @@ plot_data$plots[[7]]
 plot_data$plots[[8]]
 plot_data$plots[[9]]
 ```
-
-# Discussion
-
-Something something something
 
 \newpage
 
