@@ -67,7 +67,7 @@ library(magrittr) # for the compound assigiment pipe-operator
 library(lme4) # for conducting linear mixed-effects models
 library(lmerTest) # for calculating t-tests for linear mixed-effects models
 library(psych) # for caculating cronbach's alpha
-library(glue) # for parallel iteration 
+library(glue) # for gluing together strings during parallel iteration
 library(sjstats) # for caalculating betas
 
 # set a table incrementer (the papaja table referencer is not working for me)
@@ -101,6 +101,10 @@ source(here("functions", "con_to_cat.R"))    # CUSTOM FUNCTION 9: quantile
                                              # splits a numeric column
 source(here("functions", "paste_msd.R"))     # CUSTOM FUNCTION 10: for combining
                                              # a mean and sd for a table
+source(here("functions", "p_to_ast.R"))      # CUSTOM FUNCTION 11: for creating
+                                             # a vector of asterisks from a 
+                                             # vector of p-values
+
 
 # create a vector of the custom functions
 custom_functions <- objects()
@@ -461,10 +465,7 @@ descript_comps %<>%
   mutate(t   = (mean_fem - mean_mal) / sqrt(((sd_fem^2) / n_fem) + ((sd_mal^2) / n_mal)),
          d   = spround(abs(t2d(t, n = n, n1 = n_fem, n2 = n_mal))),
          p   = pt(t, (n_fem + n_mal - 2)),
-         ast = case_when(p < .001 ~ "***",
-                         p < .01  ~  "**",
-                         p < .05  ~   "*",
-                         TRUE     ~   ""),
+         ast = p_to_ast(p),
          t   = paste0(spround(t), ast))
   
 # format composite descriptives for output
@@ -562,14 +563,8 @@ descript_sns %<>%
          d_len    = spround(abs(t2d(t_len, n = n, n1 = n_fem, n2 = n_mal))),
          p_freq   = pt(t_freq, (n_fem + n_mal - 2)),
          p_len    = pt(t_len, (n_fem + n_mal - 2)),
-         ast_freq = case_when(p_freq < .001 ~ "***",
-                              p_freq < .01  ~  "**",
-                              p_freq < .05  ~   "*",
-                              TRUE          ~   ""),
-         ast_len  = case_when(p_len  < .001 ~ "***",
-                              p_len  < .01  ~  "**",
-                              p_len  < .05  ~   "*",
-                              TRUE          ~   ""))
+         ast_freq = p_to_ast(p_freq),
+         ast_len  = p_to_ast(p_len))
   
 # format composite descriptives for output
 descript_sns %<>%
@@ -595,9 +590,9 @@ descript_sns %<>%
   mutate(Site = stringi::stri_trans_totitle(Site))
 
 # split data into two
-descript_sns_freq <- descript_sns[1:6]
+descript_sns_freq <- descript_sns[1:7]
 
-descript_sns_len <- descript_sns[c(1, 7:11)]
+descript_sns_len <- descript_sns[c(1, 8:13)]
 ```
 
 ```{r data1_measure_sns_freq_tab, echo = FALSE, results = 'asis'}
@@ -711,7 +706,7 @@ zo %>%
                          median(zo_fem$n),
                          "); values below the diagonal are for men (\\textit{n} = ",
                          median(zo_mal$n),
-                         "). P-values were adjusted using the Holm-Bonferonni method (Holm, 1978) and were adjusted seperately for the male and female subsamples."),
+                         "). P-values were adjusted using the Holm-Bonferonni method and were adjusted seperately for the male and female subsamples."),
             align = "l",
             escape = FALSE)
 ```
