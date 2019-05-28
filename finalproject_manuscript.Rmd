@@ -902,15 +902,17 @@ In terms of random effects, we allowed random intercepts accross subjects. It wo
 
 We added fixed effects to our model in the following order: (1) gender, (2) the Dark Triad traits, (3) the specific social media site, (4) the interaction between gender and the Dark Triad traits, (5) the interaction between gender and the social media sites, and (6) the interaction between the Dark Triad traits and the  social media sites. The full model for the two models were:
 
-$$L1: Y_{ij} = \beta_{0j} + \beta_{1j}SMS_{ij} + r_{ij}$$
 
-$$L2: \beta_{0j} = \gamma_{00} + \gamma_{01}G{j} + \gamma_{02}M{j} + \gamma_{03}N_{j} + \gamma_{04}P_{j} + \gamma_{05}G_{j}*M_{j} + \gamma_{06}G_{j}*N_{j} + \gamma_{07}G_{j}*P_{j}  + u_{0j}$$.
+$L1: Y_{ij} = \beta_{0j} + \beta_{1j}SMS_{ij} + r_{ij}$
 
-$$L2: \beta_{1j} = \gamma_{10} + \gamma_{11}G{j} + \gamma_{12}M_{j} + \gamma_{13}N_{j} + \gamma_{14}P_{j}  + u_{1j}$$
+$L2: \beta_{0j} = \gamma_{00} + \gamma_{01}G{j} + \gamma_{02}M{j} + \gamma_{03}N_{j} + \gamma_{04}P_{j} + \gamma_{05}G_{j}*M_{j} + \gamma_{06}G_{j}*N_{j} + \gamma_{07}G_{j}*P_{j}  + u_{0j}$
+
+$\;\;\;\;\;\;\; \beta_{1j} = \gamma_{10} + \gamma_{11}G{j} + \gamma_{12}M_{j} + \gamma_{13}N_{j} + \gamma_{14}P_{j}  + u_{1j}$
 
 
 Results of the model comparisons can be see in Table `r (table_count <- table_count + 1)`.
 
+Interpretation of the results goes here. 
 
 ```{r data1_model_comps_tab, echo = FALSE, results = 'asis'}
 # format for outputting
@@ -948,8 +950,6 @@ model_comps_comb %<>%
   select(Model,
          everything())
 
-gsub(".000", "<.000", model_comps_comb)
-
 model_comps_comb <- apply(model_comps_comb, MARGIN = c(1, 2), function(string) gsub(".000", "<.000", string))
 
 model_comps_comb <- apply(model_comps_comb, MARGIN = c(1, 2), function(string) gsub("NA", "", string))
@@ -968,47 +968,15 @@ model_comps_comb %>%
 
 ```
 
-
-
-```{r tidy_data}
-#################################################
-#### Custom function 7 (at least 2 required) ####
-#################################################
-
-# create grouping variable function 
-con_to_cat <- function(column) {
-  cat_var <- case_when(column > quantile(column, .75, na.rm = TRUE) ~ "High",
-                       column < quantile(column, .25, na.rm = TRUE) ~ "Low",
-                       TRUE                                         ~ "Mid")
-  cat_var <- factor(cat_var, levels = c("Low", "Mid", "High"))
-  cat_var
-}
-
-# create variable specifying if an individual is..
-# high, mid, or low in Machiavellianism
+```{r data1_machxgender_plot}
+# convert dark triad traits to categorical using con_to_cat
 data1$mach_group <- con_to_cat(data1$dd_mach_comp)
-# create variable specifying if an individual is..
-# high, mid, or low in Narcissism
 data1$narc_group <- con_to_cat(data1$dd_narc_comp)
-# create variable specifying if an individual is..
-# high, mid, or low in Psychopathy
 data1$psyc_group <- con_to_cat(data1$dd_psyc_comp)
 
-
-
-```
-
-
-```{r machxgender_plots}
-
-#Examining whether social media use differ as a funciton of Machiavellianism
+#Examining whether social media use differ as a function of Machiavellianism
 data1 %>%
-  filter(mach_group != "Mid",
-         sns != "4chan" & 
-         sns != "linkedin" & 
-         sns != "pinterest" & 
-         sns != "tumblr" & 
-         sns != "whatsapp") %>% 
+  filter(mach_group != "Mid") %>% 
   group_by(sns, mach_group) %>%
   summarize(len_m  = mean(len, na.rm = TRUE),
             len_se = sundry::se(len)) %>%
@@ -1027,33 +995,12 @@ data1 %>%
           legend.title = element_text(face = "bold")) +
     labs(y = "Average length spent on Social \nMedia Sites per Day (minutes)",
          x = "Machiavellianism")
-
-#####################
-#### Mach Models ####
-#####################
-
-mach_models <- list(len ~ dd_mach_comp + (1 | id),
-                    len ~ dd_mach_comp*gender + (1 | id),
-                    len ~ dd_mach_comp*sns + (1 | id),
-                    len ~ dd_mach_comp*sns*gender + (1 | id))
-
-mach_model_fits <- map(mach_models, ~lmer(.x, data = data1)) 
-
-map(mach_model_fits, ~summary(.x))
-
-map(mach_model_fits, ~anova(.x)) #not quite doing what I want.. I want model comparisons????
-
 ```
 
-```{r narcxgender_plots}
+```{r data1_narcxgender_plot}
 #Examining whether social media use differ as a funciton of Narcissism (no gender)
 data1 %>%
-  filter(narc_group != "Mid",
-         sns != "4chan" & 
-         sns != "linkedin" & 
-         sns != "pinterest" & 
-         sns != "tumblr" & 
-         sns != "whatsapp") %>%
+  filter(narc_group != "Mid") %>%
   group_by(sns, narc_group) %>% 
   summarize(len_m  = mean(len, na.rm = TRUE),
             len_se = sundry::se(len)) %>%
@@ -1072,33 +1019,12 @@ data1 %>%
              legend.title = element_text(face = "bold")) +
     labs(y = "Average length spent on Social \nMedia Sites per Day (minutes)",
          x = "Narcissism")
-
-###########################
-#### Narcissism Models ####
-###########################
-
-narc_models <- list(len ~ dd_narc_comp + (1 | id),
-                    len ~ dd_narc_comp*gender + (1 | id),
-                    len ~ dd_narc_comp*sns + (1 | id),
-                    len ~ dd_narc_comp*sns*gender + (1 | id))
-
-narc_model_fits <- map(narc_models, ~lmer(.x, data = data1)) 
-
-map(narc_model_fits, ~summary(.x))
-
-map(narc_model_fits, ~anova(.x)) #not quite doing what I want.. I want model comparisons????
-
 ```
 
-```{r psycxgender_plots}
+```{r data1_psycxgender_plot}
 #Examining whether social media use differ as a funciton of Psychopathy (no gender)
 data1 %>%
-  filter(psyc_group != "Mid",
-         sns != "4chan" & 
-         sns != "linkedin" & 
-         sns != "pinterest" & 
-         sns != "tumblr" & 
-         sns != "whatsapp") %>%
+  filter(psyc_group != "Mid") %>%
   group_by(sns, psyc_group) %>% 
   summarize(len_m  = mean(len, na.rm = TRUE),
             len_se = sundry::se(len)) %>%
@@ -1118,25 +1044,11 @@ data1 %>%
     labs(y = "Average length spent on Social \nMedia Sites per Day (minutes)",
          x = "Psychopathy") 
 
-############################
-#### Psychopathy Models ####
-############################
-
-psyc_models <- list(len ~ dd_psyc_comp + (1 | id),
-                    len ~ dd_psyc_comp*gender + (1 | id),
-                    len ~ dd_psyc_comp*sns + (1 | id),
-                    len ~ dd_psyc_comp*sns*gender + (1 | id))
-
-psyc_model_fits <- map(psyc_models, ~lmer(.x, data = data1)) 
-
-map(psyc_model_fits, ~summary(.x))
-
-map(psyc_model_fits, ~anova(.x)) #not quite doing what I want.. I want model comparisons????
 
 ```
 
 
-```{r gender_parallel_iteration}
+```{r gender_parallel_iteration, warning = FALSE}
 
 # examining gender differences in minutes spent on social media each day
 # by social media site
@@ -1165,11 +1077,6 @@ data1 %>%
 # ...as a function of the dark triad traits
 
 plot_data <- data1 %>%
-  filter(sns != "4chan" & 
-         sns != "linkedin" & 
-         sns != "pinterest" & 
-         sns != "tumblr" & 
-         sns != "whatsapp") %>%
   gather(key = dd_trait, value = standing, mach_group:psyc_group) %>%
   mutate(dd_trait = recode(dd_trait,
                         "mach_group" = "Machiavellianism",
