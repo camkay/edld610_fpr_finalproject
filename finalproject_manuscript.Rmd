@@ -464,26 +464,17 @@ descript_comps <- data1_distinct %>%
 descript_comps$vars <- str_cols_find("_comp", data1, return = "names")
 
 # calculate t, p, and d
+descript_comps <- cbind(descript_comps,
+                        pmap_df(list(m1  = descript_comps$mean_fem,
+                                     m2  = descript_comps$mean_mal,
+                                     sd1 = descript_comps$sd_fem,
+                                     sd2 = descript_comps$sd_mal,
+                                     n1  = descript_comps$n_fem,
+                                     n2  = descript_comps$n_mal),
+                                tdp_from_pars))
+
 descript_comps %<>%
-  mutate(t   = tdp_from_pars(m1  = mean_fem, 
-                             m2  = mean_mal, 
-                             sd1 = sd_fem, 
-                             sd2 = sd_mal, 
-                             n1  = n_fem, 
-                             n2  = n_mal)$t,
-         d   = tdp_from_pars(m1  = mean_fem, 
-                             m2  = mean_mal, 
-                             sd1 = sd_fem, 
-                             sd2 = sd_mal, 
-                             n1  = n_fem, 
-                             n2  = n_mal)$d,
-         d   = spround(d),
-         p   = tdp_from_pars(m1  = mean_fem, 
-                             m2  = mean_mal, 
-                             sd1 = sd_fem, 
-                             sd2 = sd_mal, 
-                             n1  = n_fem, 
-                             n2  = n_mal)$p,
+  mutate(d   = spround(d),
          ast = p_to_ast(p),
          t   = spround(t))
   
