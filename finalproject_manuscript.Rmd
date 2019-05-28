@@ -70,10 +70,9 @@ library(psych) # for caculating cronbach's alpha
 library(glue) # for gluing together strings during parallel iteration
 library(sjstats) # for caalculating betas
 
-# set a table incrementer (the papaja table referencer is not working for me)
-table_count <- 0
-
-# source custom functions (the rmarkdown document is unwieldy otherwise)
+# source custom functions (the rmarkdown document is unwieldy otherwise);
+# we also considered adding them to a package, but we didn't want it to be too 
+# hard for reviewers to find the functions
 source(here("functions", "str_cols_find.R")) # CUSTOM FUNCTION 1: for extracting
                                              # columns from a dataframe using a 
                                              # string
@@ -100,7 +99,8 @@ source(here("functions", "lenique.R"))       # CUSTOM FUNCTION 8: calculates the
 source(here("functions", "con_to_cat.R"))    # CUSTOM FUNCTION 9: quantile 
                                              # splits a numeric column
 source(here("functions", "paste_msd.R"))     # CUSTOM FUNCTION 10: for combining
-                                             # a mean and sd for a table
+                                             # a mean and sd for a table; wraps
+                                             # sd in parantheses
 source(here("functions", "p_to_ast.R"))      # CUSTOM FUNCTION 11: for creating
                                              # a vector of asterisks from a 
                                              # vector of p-values
@@ -118,6 +118,9 @@ data1 <- rio::import(here::here("data", "data_1.xlsx"), setclass = "tibble") %>%
 
 # turn off scientific notation
 options(scipen = 999)
+
+# set a table incrementer (the papaja table referencer is not working for me)
+table_count <- 0
 ```
 
 ```{r data1_rename, include = FALSE}
