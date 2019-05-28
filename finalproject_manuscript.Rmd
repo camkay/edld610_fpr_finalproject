@@ -104,6 +104,9 @@ source(here("functions", "paste_msd.R"))     # CUSTOM FUNCTION 10: for combining
 source(here("functions", "p_to_ast.R"))      # CUSTOM FUNCTION 11: for creating
                                              # a vector of asterisks from a 
                                              # vector of p-values
+source(here("functions", "tdp_from_pars.R")) # CUSTOM FUNCTION 12: for 
+                                             # calculating t, d, and p from
+                                             # the calculated mean, sd, and n
 
 
 # create a vector of the custom functions
@@ -462,9 +465,25 @@ descript_comps$vars <- str_cols_find("_comp", data1, return = "names")
 
 # calculate t, p, and d
 descript_comps %<>%
-  mutate(t   = (mean_fem - mean_mal) / sqrt(((sd_fem^2) / n_fem) + ((sd_mal^2) / n_mal)),
-         d   = spround(abs(t2d(t, n = n, n1 = n_fem, n2 = n_mal))),
-         p   = 2 * pt(-abs(t), (n_fem + n_mal - 2)),
+  mutate(t   = tdp_from_pars(m1  = mean_fem, 
+                             m2  = mean_mal, 
+                             sd1 = sd_fem, 
+                             sd2 = sd_mal, 
+                             n1  = n_fem, 
+                             n2  = n_mal)$t,
+         d   = tdp_from_pars(m1  = mean_fem, 
+                             m2  = mean_mal, 
+                             sd1 = sd_fem, 
+                             sd2 = sd_mal, 
+                             n1  = n_fem, 
+                             n2  = n_mal)$d,
+         d   = spround(d),
+         p   = tdp_from_pars(m1  = mean_fem, 
+                             m2  = mean_mal, 
+                             sd1 = sd_fem, 
+                             sd2 = sd_mal, 
+                             n1  = n_fem, 
+                             n2  = n_mal)$p,
          ast = p_to_ast(p),
          t   = spround(t))
   
