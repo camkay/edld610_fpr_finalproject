@@ -46,10 +46,10 @@ output            : papaja::apa6_pdf
 ```{r setup, include = FALSE}
 
 # set knitr options
-knitr::opts_chunk$set(echo = FALSE,
-                      message = FALSE,
-                      warning = FALSE,
-                      fig.width = 7.5,
+knitr::opts_chunk$set(echo       = FALSE,
+                      message    = FALSE,
+                      warning    = FALSE,
+                      fig.width  = 7.5,
                       fig.height = 4.5)
 
 # install packages if you do not have them installed already
@@ -315,8 +315,8 @@ comp_names <- col_names[-2:-4]
 #### Variant of purr::map #2 (at least 2 required) ####
 #######################################################
 
-# drop item identifiers (e.g., "dd_7") to create the composite names; retain 
-# only unique names (e.g., "dd")
+# drop item identifiers (e.g.,  the "_7" in "dd_7") to create the composite 
+# names; retain only unique names (e.g., "dd")
 comp_names %<>%
   map(str_replace, "_\\d", "") %>%
   map(unique)
@@ -463,7 +463,7 @@ rm(list = setdiff(ls(), c("data1", "alphas", "data1_distinct", "table_count", "c
 data1 %<>%
   select(-matches("\\d"))
 
-# calculate descriptives for composite columns
+# calculate descriptives for the overall, female, and male composite columns
 descript_comps <- data1_distinct %>%
   select(ends_with("_comp")) %>%
   describe() %>%
@@ -483,6 +483,7 @@ descript_comps <- data1_distinct %>%
   select(vars, n_mal = n, mean_mal = mean, sd_mal = sd) %>%
   right_join(descript_comps, by = "vars")
 
+# create a column with the composite names
 descript_comps$vars <- str_cols_find("_comp", data1, return = "names")
 
 ########################################################
@@ -537,7 +538,7 @@ descript_comps <- rbind(c("\\textit{Dark Triad}", rep("", ncol(descript_comps) -
                         descript_comps[1:3, ],
                         c("\\textit{Motivation}", rep("", ncol(descript_comps) - 1)),
                         descript_comps[4:6, ],
-                        c("\\textit{Addiction}", rep("", ncol(descript_comps) - 1)),
+                        c("\\textit{Addiction}",  rep("", ncol(descript_comps) - 1)),
                         descript_comps[7:12, ])
 ```
 
@@ -571,7 +572,7 @@ low_use_sites <- n_gen_sns %>%
 data1 %<>%
   filter(!(sns %in% low_use_sites))
 
-# calculate descriptives for a table
+# calculate sns use descriptives for a table
 descript_sns <- data1 %>%
   group_by(sns) %>%
   summarise(freq_mean = mean(freq, na.rm = TRUE),
@@ -717,67 +718,68 @@ data1_corr %<>%
          gender,
          starts_with("dd")) 
 
-# corr. test
+# create a female correlation table
 zo_fem <- data1_corr %>%
   filter(gender == "Female") %>%
   select(-gender) %>%
   corr.test()
 
+# create a male correlaation table
 zo_mal <- data1_corr %>%
   filter(gender == "Male") %>%
   select(-gender) %>%
   corr.test()
   
+# create a zero-order correlation table to write over; has the additional 
+# benefit of preallocating the memory
 zo <- zo_fem$r
 
+# iterate over the rows of the correlation table
 for (i in 1:nrow(zo)) {
+  # iterate over the columns of the correlation table
   for (j in 1:ncol(zo)) {
+    # if we are in the bottom quadrant of the table, pull from the male table
     if (i / j > 1) {
+      # round the r to two decimal places
       r <- spround(zo_mal$r[i, j])
-      p <- zo_mal$p[j, i] # switched in order to get the "holm"-adjusted values
-      if (p < .01) {
-        p <- "**"
-      } else if (p < .05) {
-        p <- "*"
-      } else {
-        p <- ""
-      }
+      # pull the p from the upper quadrant of the male table to get holm 
+      # adjusted values and replace them with asterisks
+      p <- p_to_ast(zo_mal$p[j, i])
+      # paste the r and asterisks together and place in the correlation matrix
       zo[i, j] <- paste(r, p, sep = "")
+    # if we are in the upper quadrant of the table, pull from the female table
     } else {
+      # round the r to two decimal places
       r <- spround(zo_fem$r[i, j])
-      p <- zo_fem$p[i, j]
-      if (p < .01) {
-        p <- "**"
-      } else if (p < .05) {
-        p <- "*"
-      } else {
-        p <- ""
-      }
+      # pull the holm-adjusted ps from the table and replace with asterisks
+      p <- p_to_ast(zo_fem$p[i, j])
+      # paste the r and asterisks together and place in the correlation matrix
       zo[i, j] <- paste(r, p, sep = "")
     }
   }
 }
 
 # rename columns and headers
-colnames(zo) <- 1:ncol(zo)
+colnames(zo) <- seq_len(ncol(zo))
 rownames(zo) <- c("1. SNS Frequency",
                   "2. SNS Length",
                   "3. Machiavellianism",
                   "4. Narcissism",
                   "5. Psychopathy")
 
-zo[zo == "1.00**"] <- "-"
+# replace the diagonal correlations with hyphens
+zo[zo == "1.00***"] <- "-"
 ```
 
 ```{r data1_zeroorder_tab, echo = FALSE, results = 'asis'}
 # print table
 zo %>%
   apa_table(caption = "Zero-order correlations for frequency and length of social media use and the Dark Triad traits.",
-            note = paste0("* \\textit{p} < .05, ** \\textit{p} < .01. Values above the diagonal are for women (\\textit{n} = ",
-                         median(zo_fem$n),
-                         "); values below the diagonal are for men (\\textit{n} = ",
-                         median(zo_mal$n),
-                         "). P-values were adjusted using the Holm-Bonferonni method and were adjusted separately for the male and female sub-samples."),
+            note = paste0("* \\textit{p} < .05, ** \\textit{p} < .01, *** \\textit{p} < .001. Values above the diagonal are for women (\\textit{n} = ",
+                          median(zo_fem$n),
+                          "); values below the diagonal are for men (\\textit{n} = ",
+                          median(zo_mal$n),
+                          "). P-values were adjusted using the Holm-Bonferonni method and were adjusted separately for the male and female sub-samples."),
             align = "l",
             escape = FALSE)
 
@@ -788,7 +790,7 @@ rm(list = setdiff(ls(), c("data1", "table_count", "custom_functions", custom_fun
 Zero-order correlations among all variables are listed in Table `r (table_count <- table_count + 1)`, which seems to suggest that at conventional significant levels there is no relationship between the Dark Triad and either the frequency of social media use or the average length of social media use per day. However, the frequency and length measures included in the matrix are collapsing across social media sites. In order to leverage the multiple observations gathered for every participant, we opted to run two series of linear mixed-effects model. In terms of predictors, both models were identical. The models only differed by outcome variable:  The first model had frequency of social media use as an outcome variable. The second model had length of social media use per day (in minutes) as the outcome variable.
 
 ```{r data1_lmer_freq, include = FALSE}
-# filter data1 for nas
+# filter data1 for NAs
 data1 %<>%
   filter(!is.na(dd_mach_comp),
          !is.na(dd_narc_comp),
@@ -802,7 +804,7 @@ data1 %<>%
 # fit unconditional model
 model_freq_0 <- lmer(freq ~ (1 | id), data = data1, REML = FALSE)
 
-# calculate ICCs
+# calculate ICCs from unconditional model
 freq_icc <- icc(model_freq_0)
 
 # fit gender model
@@ -865,6 +867,7 @@ model_freq_6 <- lmer(freq ~ gender +
 # compare models
 freq_model_comp <- anova(model_freq_0,
                          model_freq_1,
+                         model_freq_2,
                          model_freq_3,
                          model_freq_4,
                          model_freq_5,
@@ -888,7 +891,7 @@ model_freq_final_sum <- summary(model_freq_final)
 # fit unconditional model
 model_len_0 <- lmer(len ~ (1 | id), data = data1, REML = FALSE)
 
-# calculate ICCs
+# calculate ICCs for unconditional model
 len_icc <- icc(model_len_0)
 
 # fit gender model
@@ -951,6 +954,7 @@ model_len_6 <- lmer(len ~ gender +
 # compare models
 len_model_comp <- anova(model_len_0,
                         model_len_1,
+                        model_len_2,
                         model_len_3,
                         model_len_4,
                         model_len_5,
@@ -983,7 +987,7 @@ Results of the model comparisons can be see in Table `r (table_count <- table_co
 **Interpretation of the results goes here.** 
 
 ```{r data1_model_comps_tab, echo = FALSE, results = 'asis'}
-# format for outputting
+# format column names for outputting
 freq_model_comp %<>%
   select(df = Df,
          `$\\chi^2$ df` = `Chi Df`,
@@ -1011,29 +1015,38 @@ model_comps_comb <- pmap_df(list(model_comps_comb,
                                  c(rep(TRUE, 2), rep(c(rep(TRUE, 4), FALSE), 2))),
                             ~spround(x = ..1, digits = ..2, leading0 = ..3))
 
+# add a new column with the predictors added in each subsequent models
 model_comps_comb$Model <- c("Null",
                             "Gender (G)",
                             "Dark Triad (D3)",
                             "Social Media (SNS)",
+                            "G X D3",
                             "G X SNS",
                             "D3 X SNS")
 
+# reorder the data frame so the predictors are first
 model_comps_comb %<>%
   select(Model,
          everything())
 
-model_comps_comb <- apply(model_comps_comb, MARGIN = c(1, 2), function(string) gsub(".000", "<.000", string))
+# iterate over entire table and replace .000s with <.000s
+model_comps_comb <- apply(model_comps_comb, 
+                          MARGIN = c(1, 2), 
+                          function(string) gsub(".000", "<.000", string))
 
-model_comps_comb <- apply(model_comps_comb, MARGIN = c(1, 2), function(string) gsub("NA", "", string))
+# iterate over entire table and replace NAs with nothing
+model_comps_comb <- apply(model_comps_comb, 
+                          MARGIN = c(1, 2), 
+                          function(string) gsub("NA", "", string))
 
-# output table
+# output the model comparison table
 model_comps_comb %>%
  apa_table(caption = "Log likelihood comparison of linear mixed-effects models predicting frequency of visiting social media sites and length of time spent on social media sites.",
            escape = FALSE,
            align = "lrrrrrrrrrrrr",
            landscape = TRUE,
            col_spanners = list("Frequency" = c(4, 8),
-                               "Length" = c(9, 13)),
+                               "Length"    = c(9, 13)),
            note = "something something")
 
 ```
@@ -1043,7 +1056,7 @@ model_comps_comb %>%
 **Something something something... TBD**
 
 ```{r fig.cap="Average length spent on social media per day (in minutes) as a function of Machiavellianism and social media site."}
-# convert dark triad traits to categorical using con_to_cat
+# convert dark triad traits to categorical using the con_to_cat function
 data1$mach_group <- con_to_cat(data1$dd_mach_comp)
 data1$narc_group <- con_to_cat(data1$dd_narc_comp)
 data1$psyc_group <- con_to_cat(data1$dd_psyc_comp)
@@ -1051,25 +1064,25 @@ data1$psyc_group <- con_to_cat(data1$dd_psyc_comp)
 # create academic inspired theme
 academic_theme <- theme(plot.subtitle = element_text(family = "Times"), 
                         plot.caption  = element_text(family = "Times", 
-                                                     size = 12,
-                                                     hjust = 0), 
+                                                     size   = 12,
+                                                     hjust  = 0), 
                         axis.title    = element_text(family = "Times", 
-                                                     face = "bold"), 
+                                                     face   = "bold"), 
                         axis.text     = element_text(family = "Times"), 
                         axis.text.x   = element_text(family = "Times"), 
                         axis.text.y   = element_text(family = "Times"), 
                         plot.title    = element_text(family = "Times", 
-                                                     face = "bold"), 
+                                                     face   = "bold"), 
                         legend.text   = element_text(family = "Times"), 
                         legend.title  = element_text(family = "Times"), 
                         strip.text    = element_text(family = "Times",
-                                                     face = "bold"))
+                                                     face   = "bold"))
 
-#making social media site title case
+# making social media site title case
 data1 %<>%
   mutate(sns = stringr::str_to_title(sns))
 
-#Examining whether social media use differ as a function of Machiavellianism
+# examining whether social media use differ as a function of Machiavellianism
 plot1_mach <- data1 %>%
   filter(mach_group != "Mid") %>% 
   group_by(sns, mach_group) %>%
@@ -1080,14 +1093,15 @@ plot1_mach <- data1 %>%
     geom_errorbar(aes(ymin = len_m - len_se, 
                       ymax = len_m + len_se),
                   position = "dodge",
-                  colour = "grey30") +
+                  colour   = "grey30") +
     scale_fill_manual(values = c("#4A235A", "#D2B4DE")) +
     facet_wrap(~sns) +
     theme_bw(base_size = 14) +
-    guides(fill=FALSE) +
+    guides(fill = FALSE) +
     labs(y = "Average length spent on Social \nMedia Sites per Day (minutes)",
          x = "Machiavellianism")
 
+# format the plot using the academic theme
 plot1_mach + academic_theme
 ```
 
@@ -1103,17 +1117,18 @@ plot1_narc <- data1 %>%
     geom_errorbar(aes(ymin = len_m - len_se, 
                       ymax = len_m + len_se),
                   position = "dodge",
-                  colour = "grey30") +
+                  colour   = "grey30") +
     scale_fill_manual(values = c("#17737B", "#5FCDD6")) +
     facet_wrap(~sns) +
-    guides(fill=FALSE) +
+    guides(fill = FALSE) +
     theme_bw(base_size = 14) +
-    theme(axis.title = element_text(face = "bold"),
-          strip.text = element_text(face = "bold", size = 14),
+    theme(axis.title   = element_text(face = "bold"),
+          strip.text   = element_text(face = "bold", size = 14),
           legend.title = element_text(face = "bold")) +
     labs(y = "Average length spent on Social \nMedia Sites per Day (minutes)",
          x = "Narcissism")
 
+# format the plot using the academic theme
 plot1_narc + academic_theme
 ```
 
@@ -1129,17 +1144,18 @@ plot1_psyc <- data1 %>%
     geom_errorbar(aes(ymin = len_m - len_se, 
                       ymax = len_m + len_se),
                   position = "dodge",
-                  colour = "grey30") +
+                  colour   = "grey30") +
     scale_fill_manual(values = c("#7B1740", "#D1769B")) +
     facet_wrap(~sns) +
-    guides(fill=FALSE) +
+    guides(fill = FALSE) +
     theme_bw(base_size = 14) +
-    theme(axis.title = element_text(face = "bold"),
-          strip.text = element_text(face = "bold", size = 14),
+    theme(axis.title   = element_text(face = "bold"),
+          strip.text   = element_text(face = "bold", size = 14),
           legend.title = element_text(face = "bold")) +
     labs(y = "Average length spent on Social \nMedia Sites per Day (minutes)",
          x = "Psychopathy") 
 
+# format the plot using the academic theme
 plot1_psyc + academic_theme
 ```
 
@@ -1162,6 +1178,7 @@ plot1_gender <- data1 %>%
     labs(y = "Average Length Spent on Social Media Sites per Day (minutes)",
          x = "Social Media Site")
 
+# format the plot using the academic theme
 plot1_gender + academic_theme
 ```
 
@@ -1180,9 +1197,9 @@ plot1_gender + academic_theme
 plot_data <- data1 %>%
   gather(key = dd_trait, value = standing, mach_group:psyc_group) %>%
   mutate(dd_trait = recode(dd_trait,
-                        "mach_group" = "Machiavellianism",
-                        "narc_group" = "Narcissism",
-                        "psyc_group" = "Psychopathy"))
+                           "mach_group" = "Machiavellianism",
+                           "narc_group" = "Narcissism",
+                           "psyc_group" = "Psychopathy"))
   
 plot_data$standing <- factor(plot_data$standing, levels = c("Low", "Mid", "High"))
 
@@ -1196,8 +1213,8 @@ final_plots <- plot_data %>%
   mutate(plots = pmap(
     # create list of plot resources
     list(data_for_plot = plot_data$data,
-         dd_trait = plot_data$dd_trait, 
-         standing = plot_data$standing),
+         dd_trait      = plot_data$dd_trait, 
+         standing      = plot_data$standing),
     # create plots
     function(data_for_plot, dd_trait, standing) {
       ggplot(data_for_plot, aes(x = gender, y = len, fill = gender)) +
@@ -1205,18 +1222,18 @@ final_plots <- plot_data %>%
         scale_fill_manual(values = c("#633974", "#2A99A2")) +
         # apply theme minimal
         theme_bw(base_size = 12) +
-        guides(fill=FALSE) +
+        guides(fill = FALSE) +
         facet_wrap(~sns) +
         #scale_color_manual(values = c("#17737B", "#5FCDD6")) +
-        theme(axis.title = element_text(face = "bold"),
-              legend.title = element_text(face = "bold"),
-              title = element_text(face = "bold"),
-              strip.text = element_text(face = "bold"),
+        theme(axis.title      = element_text(face = "bold"),
+              legend.title    = element_text(face = "bold"),
+              title           = element_text(face = "bold"),
+              strip.text      = element_text(face = "bold"),
               legend.position = "bottom") +
         # set labels
-        labs(title    = glue("Relation Between Time on Social Media and Gender for those {standing} in {dd_trait}"),
-             y        = "Total Time Spent on Social Media \nSites per Day (Minutes)",
-             x        = "Gender")
+        labs(title = glue("Relation Between Time on Social Media and Gender for those {standing} in {dd_trait}"),
+             y     = "Total Time Spent on Social Media \nSites per Day (Minutes)",
+             x     = "Gender")
 }))
 
 final_plots$plots[[1]]
