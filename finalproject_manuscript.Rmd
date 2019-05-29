@@ -65,6 +65,8 @@ knitr::opts_chunk$set(echo = FALSE,
 # install.packages("glue")
 # install.packages("sjstats")
 
+## Yufei: thanks for having all these installation codes for reviewers!!
+
 # load packages
 library(sundry) # for calculating standard errors
 library("papaja") # for creating the apa journal article
@@ -246,6 +248,8 @@ data1 %<>%
   # drop all text before "self" or "society
   mutate(sns_perc_context = gsub(".*_", "", sns_perc_context))
 
+
+## Yufei: (strength 1) the detailed comments really help me a lot in understanding the codes!
 ```
 
 ```{r data1_parse_length, include = FALSE}
@@ -258,6 +262,9 @@ data1 %<>%
 #######################################################
 #### Variant of purr::map #1 (at least 2 required) ####
 #######################################################
+
+## Yufei: (strength 2) I really like the way you separate the codes and highlight the title within comments
+## It's super clear to under the structure of the codes!
 
 # replace all range responses with the means of those ranges
 data1$len <- map_chr(data1$len, range_mean)
@@ -1250,6 +1257,10 @@ walk2(paths, final_plots$plots, ggsave,
       width  = 9.5, 
       height = 6.5,
       dpi    = 500)
+
+## Yufei: (one thing I learned) The whole apa format paper written with R is so impressive! By reading your codes I got a chance to see how this done by R. The coding style is so tidy and consistent and I will try to keep my codes in the same clean way. All in all, this work is an awesome sample for people to learn about tidying data/ploting/using papaja with detailed comments and explanation!
+
+## Yufei: (improvement) The codes are tidy and compact; the plots looks pretty and clear. If I really have to find something that needs improvement, I would ask if you could add a little brief description to your custom functions? I really want to adopt your awesome functions!
 
 ```
 
