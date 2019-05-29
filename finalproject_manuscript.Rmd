@@ -4,15 +4,15 @@ shorttitle        : "The dark (and light) side of social media"
 
 author: 
   - name          : "Cameron S. Kay"
-    affiliation   : "1"
+    affiliation   : ""
     corresponding : yes    # Define only one corresponding author
     address       : "Department of Psychology, 1227 University of Oregon, Eugene, OR 97403"
     email         : "ckay@uoregon.edu"
   - name          : "Ashley L. Miller"
-    affiliation   : "1"
+    affiliation   : ""
 
 affiliation:
-  - id            : "1"
+  - id            : ""
     institution   : "University of Oregon"
 
 authornote: |
@@ -44,6 +44,14 @@ output            : papaja::apa6_pdf
 ---
 
 ```{r setup, include = FALSE}
+
+# set knitr options
+knitr::opts_chunk$set(echo = FALSE,
+                      message = FALSE,
+                      warning = FALSE,
+                      fig.width = 7.5,
+                      fig.height = 4.5)
+
 # install packages if you do not have them installed already
 # devtools::install_github("datalorax/sundry")
 # install.packages("papaja")
@@ -69,6 +77,11 @@ library(lmerTest) # for calculating t-tests for linear mixed-effects models
 library(psych) # for caculating cronbach's alpha
 library(glue) # for gluing together strings during parallel iteration
 library(sjstats) # for caalculating betas
+
+######################################
+### Below are 12 custom functions ####
+########### only 2 required ########## 
+######################################
 
 # source custom functions (the rmarkdown document is unwieldy otherwise);
 # we also considered adding them to a package, but we didn't want it to be too 
@@ -188,6 +201,11 @@ data_rename <- tibble(
                       # the same length)
                       sub_lens    = list(4, 1, 1, 1, c(8, 7, 5), 3))
 
+
+########################################################
+### instance of parallel iteration # 1 (1 required) ####
+########################################################
+
 # iterate through the data_rename tibble and create a list of column names
 col_names <- pmap(list(data_rename$scale_names,
                        data_rename$sub_names,
@@ -200,7 +218,7 @@ col_names <- pmap(list(data_rename$scale_names,
 names(data1)[str_cols_find("q7", data1)] <- unlist(col_names)
 
 # remove uneeded variables
-rm(list = setdiff(ls(), c("data1", "col_names", "custom_functions", custom_functions)))
+rm(list = setdiff(ls(), c("data1", "col_names", "custom_functions", "table_count", custom_functions)))
 ```
 
 ```{r data1_convert_to_long, include = FALSE}
@@ -333,34 +351,32 @@ data1 <- data1 %>%
   cbind(data_comp)
 
 # clean up the environment
-rm(list = setdiff(ls(), c("data1", "alphas", "custom_functions", custom_functions)))
+rm(list = setdiff(ls(), c("data1", "alphas", "custom_functions", "table_count", custom_functions)))
 ```
 
 # Intro
 
-In 2005—one year before Facebook went public—only 5% of American adults reported using at least one social media site [@Smith2018a]. Thirteen-years later, in 2018, that number had risen to include 69%, or roughly two-thirds, of American adults. It would be hard to argue there hasn’t been a profound increase in the number of Americans using social media, but this 69% figure does vary depending on age bracket. As one might expect, over twice as many 18-to-29 year-olds reported using social media when compared to those older than 65 (88% and 37%, respectively). The population variation was not restricted to age, however: Eight percent more women used social media than men and 16% more people from urban communities used social media than their non-urban counterparts. Recently, psychologists have turned to personality traits to explain some of the remaining variation in social media use. 
+In 2005—one year before Facebook went public—only 5% of American adults reported using at least one social media site [@Smith2018a]. Thirteen-years later, in 2018, that number had risen to include 69%, or roughly two-thirds, of American adults. It would be hard to argue there hasn’t been a profound increase in the number of Americans using social media, but this 69% figure does vary depending on age bracket. As one might expect, over twice as many 18-to-29 year-olds reported using social media when compared to those older than 65 (88% and 37%, respectively). The population variation was not restricted to age, however: Eight percent more women used social media than men, and 16% more people from urban communities used social media than their non-urban counterparts. Recently, psychologists have turned to personality traits to explain some of the remaining variation in social media use. 
 
-With some notable exceptions, the research conducted in the overlapping region between personality and communications has focused primarily on ostensibly-positive personality traits. Negative personality traits have been left largely unexplored. The present study aims to address this paucity of research. To that end, we administered a survey assessing an individual’s levels of the Dark Triad personality traits (i.e., Machiavellianism, narcissism, and psychopathy), the amount of time they actively spend on social media sites and the frequency with which they visits social media sites.
+With some notable exceptions, the research conducted in the overlapping region between personality and communications has focused primarily on ostensibly-positive personality traits. Negative personality traits have been left largely unexplored. The present study aims to fill this void. To that end, we administered a survey assessing an individual’s levels of the Dark Triad personality traits (i.e., Machiavellianism, narcissism, and psychopathy), the amount of time they actively spend on social media sites, and the frequency with which they visit social media sites.
 
-A common definition for a social media site is that it is an internet-based service allowing for the creation and broadcast of user-generated information [@Boyd2008; @Kaplan2010; @Obar2015]. @Obar2015 emphasize the user-generated aspect of this definition, arguing that this content is the lifeblood of social media. Although this is a substantial claim, it logically follows that if a site is created with the express purpose of providing user-generated content, it must have user-generated content to function as intended. By way of illustration, without videos created by users, YouTube, a social media site that allows its users to upload and share videos, would fail to serve its primary purpose. Netflix, a site that allows users to only stream videos, does not require user-generated content, as it does not serve user-generated content, and, by extension is not a social media site. Beyond the teleological aspects of social media sites, the user-generated focus also highlights the importance of individual differences in the user-service relationship, as users invariably have personalities that affect how they consume and generate content. One popular method for assessing personality in terms of social media use has been the Big Five [@John1999].
+A common definition for a social media site is that it is an internet-based service allowing for the creation and broadcast of user-generated information [@Boyd2008; @Kaplan2010; @Obar2015]. @Obar2015 emphasize the user-generated aspect of this definition, arguing that this content is the lifeblood of social media. Although a substantial claim, it logically follows that if a site is created with the express purpose of providing user-generated content, the site must have user-generated content to function as intended. By way of illustration, without videos created by users, YouTube, a social media site that allows its users to upload and share videos, would fail to serve its primary purpose. Netflix, a site that allows users to only stream videos, does not require user-generated content, as it does not serve user-generated content, and, by extension is not a social media site. Beyond the teleological aspects of social media sites, the user-generated focus also highlights the importance of individual differences in the user-service relationship, as users invariably have personalities that affect how they consume and generate content. One popular method for assessing personality in terms of social media use has been the Big Five [@John1999].
 
-The Big Five is an overarching personality construct that distinguishes between five generally positive personality subconstructs: openness to experience, conscientiousness, extroversion, agreeableness, and emotional stability. Extroversion is typified by sociability and gregariousness; characteristics that seem intuitively linked with the performative and social aspects of social media. Perhaps unsurprisingly, extroversion has been the focus of the majority of research on whether an individual will use social media and how an individual will use social media. 
+The Big Five is an overarching personality construct that distinguishes between five generally positive personality sub-constructs: openness to experience, conscientiousness, extraversion, agreeableness, and emotional stability (i.e., neuroticism). Extroversion is typified by sociability and gregariousness--characteristics that seem intuitively linked with the performative and social aspects of social media. Perhaps unsurprisingly, extraversion has been the focus of the majority of research on whether an individual will use social media and how an individual will use social media. 
 
-With respect to whether an individual will use social media, extroversion has been found to be positively correlated with both general social media use [@Correa2010] and Facebook use in particular [@Harbaugh2010; @Jenkins-Guarnieri2012]. Regarding how individuals use social media, individuals high in extroversion are more likely to use Facebook and the internet to communicate with others than those low in extroversion [@Seidman2013; @Wolfradt2001]. Moreover, [@Moore2012] found that extroversion is positively correlated with the number of friends a person has on Facebook. Those with the lowest levels of extroversion in their sample had, on average, 484 fewer friends than those scoring in the top 10%. Similar to extroversion, those high in emotional stability tend to use more social media [@Correa2010]. Even prior to the introduction of most, if not all, social media sites, emotional stability was found to be positively correlated with using the internet for communication and entertainment [@Wolfradt2001]. Despite the apparent value in studying these personality traits, they ignore the distinctly darker aspects of personality. 
+With respect to whether an individual will use social media, prior work demonstrates that extraversion is positively correlated with both general social media use [@Correa2010], and Facebook use in particular [@Harbaugh2010; @Jenkins-Guarnieri2012]. Regarding how individuals use social media, individuals high in extraversion are more likely to use Facebook and the internet to communicate with others than those low in extraversion [@Seidman2013; @Wolfradt2001]. Moreover, [@Moore2012] found that extraversion is positively correlated with the number of friends a person has on Facebook. Those with the lowest levels of extraversion had, on average, 484 fewer friends than those scoring in the top 10%. Similar to extraversion, those high in emotional stability tend to use more social media [@Correa2010]. Even prior to the introduction of most, if not all, social media sites, emotional stability was found to be positively correlated with using the internet for communication and entertainment [@Wolfradt2001]. Despite the apparent value in studying these personality traits, research thus far has largely ignored the distinctly darker aspects of personality. 
 
-The Dark Triad, a construct comprising the intercorrelated, yet distinct, Machiavellianism, subclinical narcissism, and subclinical psychopathy, has garnered substantial interest since its introduction by @Paulhus2002. Machiavellianism originated with Niccolò Machiavelli’s essay, Il Principe [@NiccoloMachiavelli2006], which provided advice on how to properly rule one’s subjects. The advice is most succinctly summarized within the subscales of its most popular measure (i.e., the MACH-IV) [@Christie1970]: be tactical, distrust others, and use pragmatic morality.  
+The Dark Triad is a construct comprising the following inter-correlated, yet distinct traits: Machiavellianism, sub-clinical narcissism, and sub-clinical psychopathy. The Dark Triad has garnered substantial interest since its introduction by @Paulhus2002. Machiavellianism originated with Niccolò Machiavelli’s essay, Il Principe [@NiccoloMachiavelli2006], which provided advice on how to properly rule one’s subjects. The advice is most succinctly summarized within the sub-scales of its most popular measure (i.e., the MACH-IV) [@Christie1970]: be tactical, distrust others, and use pragmatic morality. Narcissism, on the other hand, originated with the Greek myth of Narcissus, who died after becoming fixated on his own reflection in a pool of water. Its present sub-clinical incarnation emerged with the creation of the 80-item Narcissistic Personality Inventory (NPI) [@Raskin1979] and has been further adapted into the widely-used NPI-40 [@Raskin1988] and the brief NPI-16 [@Ames2006]. A distillation of these inventories suggests that the current conceptualization of narcissism includes a combination of grandiosity, arrogance, entitlement, and vanity. 
 
-Narcissism originated with the Greek myth of Narcissus, who died after becoming fixated on his own reflection in a pool of water. Its present subclinical incarnation emerged with the creation of the 80-item Narcissistic Personality Inventory (NPI) [@Raskin1979] and has been further adapted into the widely-used NPI-40 [@Raskin1988] and the brief NPI-16 [@Ames2006]. A distillation of these inventories suggests that the current conceptualization of narcissism includes a combination of grandiosity, arrogance, entitlement, and vanity. 
+Finally, the etymologically ambiguous psychopathy (i.e., “mind” + “illness”) was historically used to refer to a constellation of deficiencies including emotional instability, criminal tendencies, inadequate personality, and pathological lying (United States, 1921, in Huddleson, 1926). Despite nearly 100 years of refinement, psychopathy includes many of the same elements as its original conceptualization. As captured within the fourth edition of the self-report psychopathy scale (SRP-IV) [@Paulhusa], psychopathy is currently operationalized as a combination of four separate facets: (1) interpersonal (e.g., use of manipulation in one’s relationships), (2) affective (e.g., little remorse or guilt), (3) lifestyle (e.g., impulsivity), and (4) antisocial (e.g., breaking laws).
 
-The etymologically ambiguous psychopathy (i.e., “mind” + “illness”) was historically used to refer to a constellation of deficiencies including emotional instability, criminal tendencies, inadequate personality, and pathological lying (United States, 1921, in Huddleson, 1926). Despite nearly 100 years of refinement, psychopathy includes many of the same elements as its original conceptualization. As captured within the fourth edition of the self-report psychopathy scale (SRP-IV) [@Paulhusa], psychopathy is currently operationalized as a combination of four separate facets: (1) interpersonal (e.g., use of manipulation in one’s relationships), (2) affective (e.g., little remorse or guilt), (3) lifestyle (e.g., impulsivity), and (4) antisocial (e.g., breaking laws).
+Previous research on the relationship between negative personality traits and social media has primarily focused on narcissism, seemingly because, as with extraversion, narcissism seems to be intuitively linked to performative behaviours. In fact, narcissistic individuals likely exhibit a fair amount of extraversion, as evidenced by the consistent positive correlations found between the two traits [@Muris2017]. Narcissism has been found to be related to posting selfies on social networking sites [@Fox2015; @McCain2016; @Moon2016; @Sorokowski2015; @Weiser2015], with a feedback loop appearing to exist between narcissism and the posting of selfies. That is, a narcissistic disposition seems to cause an individual to post more selfies, and posting selfies seems to cause a more narcissistic disposition [@Halpern2016]. Narcissism has also been found to be positively correlated with viewing and commenting on photos on Facebook [@Alloway2014], as well as posting on both Facebook and Twitter [@Panek2013].
 
-Previous research on the relationship between negative personality traits and social media has primarily focused on narcissism. Part of this may be due to the fact that, as with extroversion, narcissism seems to be intuitively linked to performative behaviours. In fact, it is likely that narcissistic individuals actually exhibit a fair amount of extraversion, as evidenced by the consistent positive correlations found between the two traits [@Muris2017]. Narcissism has been found to be related to posting selfies on social networking sites [@Fox2015; @McCain2016; @Moon2016; @Sorokowski2015; @Weiser2015], with a feedback loop appearing to exist between narcissism and the posting of selfies. A narcissistic disposition seems to cause an individual to post more selfies and posting selfies seems to cause a more narcissistic disposition [@Halpern2016]. Narcissism has also been found to be positively correlated with viewing and commenting on photos on Facebook [@Alloway2014], as well as posting on both Facebook and Twitter [@Panek2013].
+The other two Dark Triad traits (i.e., Machiavellianism and psychopathy) have been largely ignored when it comes to investigating their potential influence on social media. Presumably this is due to the absence of a strong theoretical link between the traits and social media use. Nevertheless, Machiavellianism has been found to be negatively correlated with the amount of time spent on Facebook [@Garcia2014] and is positively correlated with trolling on the internet [@Buckels2014]. Psychopathy, on the other hand, has been found to be associated with using Instagram to post selfies [@McCain2016]. Though, the potential, and likely, interrelation between psychopathy and narcissism was not controlled for. It is plausible that the more impulsive aspects of the psychopathic character may cause an individual to be less restrained when posting to social media, but it is equally plausible that psychopathic individuals tend to be higher in narcissism and, consequently, post more selfies. 
 
-The other two Dark Triad traits (i.e., Machiavellianism and psychopathy) have been largely ignored when it comes to investigating their potential influence on social media. Presumably this is due to the absence of a strong theoretical link between the traits and social media use. Nevertheless, Machiavellianism has been found to be negatively correlated with the amount of time spent on Facebook [@Garcia2014] and is positively correlated with trolling on the internet [@Buckels2014]. Psychopathy, on the other hand, has been found to be associated with using Instagram to post selfies [@McCain2016], but the potential, and likely, interrelation between psychopathy and narcissism was not controlled for. It is plausible that the more impulsive aspects of the psychopathic character may cause an individual to be less restrained when posting to social media, but it is equally plausible that psychopathic individuals tend to be higher in narcissism and, consequently, post more selfies. 
+The present study aims to further explore the relationship between a person’s levels of the Dark Triad traits and their use of social media. Instead of focusing on specific aspects of posting and commenting, we hope to address how the overall use of social media sites is related to personality. Additionally, we wish to explore whether certain sites are frequented by those high on the Dark Triad more than others. The sites investigated are the eight most popular social media sites in the United States as of 2018: Facebook, Pinterest, Instagram, LinkedIn, Twitter, Snapchat, YouTube, and WhatsApp [@Smith2018a], as well as Reddit, 4chan, and Tumblr.
 
-This study aims to further explore the relationship between a person’s levels of the Dark Triad traits and their use of social media. Instead of focusing on specific aspects of posting and commenting, we hope to address how the overall use of social media sites is related to personality. Additionally, we wish to explore whether certain sites are frequented by those high on the Dark Triad more than others. The sites investigated are the eight most popular social media sites in the United States as of 2018: Facebook, Pinterest, Instagram, LinkedIn, Twitter, Snapchat, YouTube, and WhatsApp [@Smith2018a], as well as Reddit, 4chan, and Tumblr.
-
-With respect to concrete hypotheses, we expect that (1) narcissism will be positively correlated with both the frequency of using social media and the amount of time spent on social media, independent of the other Dark Triad traits and irrespective of the exact social media site in question. We also expect that (2) psychopathy will be positively correlated with the frequency of general social media use and time spent on social media sites, even when controlling for the effect of narcissism and Machiavellianism and irrespective of the exact social media site in question. Finally, we expect that (3) Machiavellianism will be—independent of the other Dark Triad traits—negatively correlated with both frequency of social media use and time spent on social media sites, once again irrespective of the exact social media site in question. Differences in whether dark personalities use certain sites more than other sites and interactions with gender will be investigated in a purely exploratory fashion. 
+With respect to concrete hypotheses, we expected that (1) narcissism would positively correlate with both the frequency of using social media and the amount of time spent on social media, independent of the other Dark Triad traits and irrespective of the exact social media site in question. We also expected (2) psychopathy would positively correlate with the frequency of general social media use and time spent on social media sites, even when controlling for the effect of narcissism and Machiavellianism and irrespective of the exact social media site in question. Finally, we expected (3) Machiavellianism would be independent of the other Dark Triad traits—negatively correlated with both frequency of social media use and time spent on social media sites, once again irrespective of the exact social media site in question. Differences in whether dark personalities use certain sites more than other sites and interactions with gender will be investigated in a purely exploratory fashion. 
 
 # Method
 
@@ -385,6 +401,10 @@ data1_sd <- data1 %>%
   distinct(id, .keep_all = TRUE) %>%
   # create groups by id
   nest(-id)
+
+#######################################################
+#### Variant of purr::map #5 (at least 2 required) ####
+#######################################################
 
   # calculate a separate sd for each group (subject)
 data1_sd$resp_sd <- map_dbl(data1_sd$data, ~sd(unlist(.x), na.rm = TRUE))
@@ -432,12 +452,12 @@ demo_age <- data1_distinct$age %>%
   unlist()
 ```
 
-A total of `r sample_start` participants were recruited from the human subject pool at the University of Oregon. Data was collected over one academic quarter, and all participants were compensated with course credit necessary for meeting a course research requirement. The length of the survey was 10 minutes.  Participants completing the survey in under 90 seconds would have been excluded from analysis, but no participants failed to meet this treshold. We did, however, exclude a single participant for having a response standard deviation of zero across all surveys, an indicator of straightlining. Since we were interested in the effects of gender on social media use and considering that the subsamples for the non-conventional genders were too small to be properly analyzed, we also excluded participants who reported being neither female nor male (*n* = `r exclusions_gender`). Our resulting sample comprised `r lenique(data1$id)` participants (`r spround(demo_gender["Percent", "Female"], 2)`% female; age range: `r demo_age["min"]` to `r demo_age["max"]` years; *M* age = `r demo_age["mean"]`, *SD* age = `r demo_age["sd"]`). With respect to cultural identity, `r spround(demo_culture["Percent", "Caucasian"], 2)`% reported being Caucasian, `r spround(demo_culture["Percent", "Asian"], 2)`% reported being Asian, `r spround(demo_culture["Percent", "Hispanic, Latinx, or Spanish Origin"], 2)`% reported being Hispanic, Latinx, or Spanish, `r spround(demo_culture["Percent", "Black or African American"], 2)`% reported being black or African American, and `r spround(100 - sum(sort(demo_culture["Percent", ], TRUE)[1:4]), 2)`% identified as being from some other culture, from multiple cultures, or prefered not to answer the question. 
+A total of `r sample_start` participants were recruited from the human subject pool at the University of Oregon. Data was collected over one academic quarter, and all participants were compensated with course credit necessary for meeting a course research requirement. The length of the survey was 10 minutes.  Participants completing the survey in under 90 seconds would have been excluded from analysis, but no participants met this threshold. We did, however, exclude a single participant for having a response standard deviation of zero across all surveys, an indicator of straightlining. Since we were interested in the effects of gender on social media use and considering that the sub-samples for the non-conventional genders were too small to be properly analyzed, we also excluded participants who reported being neither female nor male (*n* = `r exclusions_gender`). Our resulting sample comprised `r lenique(data1$id)` participants (`r spround(demo_gender["Percent", "Female"], 2)`% female; age range: `r demo_age["min"]` to `r demo_age["max"]` years; *M* age = `r demo_age["mean"]`, *SD* age = `r demo_age["sd"]`). With respect to cultural identity, `r spround(demo_culture["Percent", "Caucasian"], 2)`% reported being Caucasian, `r spround(demo_culture["Percent", "Asian"], 2)`% reported being Asian, `r spround(demo_culture["Percent", "Hispanic, Latinx, or Spanish Origin"], 2)`% reported being Hispanic, Latinx, or Spanish, `r spround(demo_culture["Percent", "Black or African American"], 2)`% reported being black or African American, and `r spround(100 - sum(sort(demo_culture["Percent", ], TRUE)[1:4]), 2)`% identified as being from some other culture, from multiple cultures, or preferred not to answer the question. 
 
 ## Procedures and Materials
 ```{r data1_measures_comps}
 # drop unneeded variables from previous section
-rm(list = setdiff(ls(), c("data1", "alphas", "data1_distinct", "custom_functions", custom_functions)))
+rm(list = setdiff(ls(), c("data1", "alphas", "data1_distinct", "table_count", "custom_functions", custom_functions)))
 
 # drop individual item columns
 data1 %<>%
@@ -464,6 +484,10 @@ descript_comps <- data1_distinct %>%
   right_join(descript_comps, by = "vars")
 
 descript_comps$vars <- str_cols_find("_comp", data1, return = "names")
+
+########################################################
+### instance of parallel iteration # 2 (1 required) ####
+########################################################
 
 # calculate t, p, and d for the gender comparisons
 descript_comps <- cbind(descript_comps,
@@ -575,6 +599,10 @@ descript_sns <- data1 %>%
             n_mal         =    n()) %>%
   right_join(descript_sns, by = "sns")
 
+########################################################
+### instance of parallel iteration # 3 (1 required) ####
+########################################################
+
 # calculate t, p, and d for frequency and length
 sns_freq_tdp <- pmap_df(list(m1  = descript_sns$freq_mean_fem,
                              m2  = descript_sns$freq_mean_mal,
@@ -585,6 +613,10 @@ sns_freq_tdp <- pmap_df(list(m1  = descript_sns$freq_mean_fem,
                         tdp_from_pars)
 
 names(sns_freq_tdp) <- paste0(names(sns_freq_tdp), "_freq")
+
+########################################################
+### instance of parallel iteration # 4 (1 required) ####
+########################################################
 
 sns_len_tdp <- pmap_df(list(m1  = descript_sns$len_mean_fem,
                             m2  = descript_sns$len_mean_mal,
@@ -652,18 +684,14 @@ descript_sns_len %>%
             escape       = FALSE)
 
 # drop unneeded variables
-rm(list = setdiff(ls(), c("data1", "alphas", "data1_distinct", "custom_functions", custom_functions)))
+rm(list = setdiff(ls(), c("data1", "alphas", "data1_distinct", "table_count", "custom_functions", custom_functions)))
 ```
 
-Participants completed an online survey that included (1) a measure of the Dark Triad personality traits (i.e., Machiavellianism, narcissism, psychopathy), (2) questions assessing  participants' frequency of visiting eleven social media sites, (3) questions assessing the amount of time participants spend on those eleven social media sites, (4) a scale assessing the participants' addiction to social media, (5) a scale measuring participants' reasons for using the internet, and (6) two questions assessing participants' overall view of social media sites. Participants provided consent prior to beginning the survey and were debriefed upon completion of the survey. 
-
-For the purposes of the final project for Functional Programming in R, the following analyses will focus on the measures of the Dark Triad traits and the questions assessing frequency of use and amount of time spent on social media sites.
+Participants completed an online survey that included (1) a measure of the Dark Triad personality traits (i.e., Machiavellianism, narcissism, psychopathy), (2) questions assessing  participants' frequency of visiting eleven social media sites, (3) questions assessing the amount of time participants spend on those eleven social media sites, (4) a scale assessing the participants' addiction to social media, (5) a scale measuring participants' reasons for using the internet, and (6) two questions assessing participants' overall view of social media sites. Participants provided consent prior to beginning the survey and were debriefed upon completion of the survey. For the purposes of the final project for Functional Programming in R, the following analyses will focus on the measures of the Dark Triad traits and the questions assessing frequency of use and amount of time spent on social media sites.
 
 The Dark Triad was assessed using the Dirty Dozen [@Jonason2010d], comprising four items each for Machiavellianism ($\alpha$ = `r alphas["dd_mach"]`), narcissism ($\alpha$ = `r alphas["dd_narc"]`), and psychopathy ($\alpha$ = `r alphas["dd_psyc"]`). Participants responded using a 5-pt Likert scale (1 = "Strongly disagree"; 5 = "Strongly agree"). Descriptive statistics and gender comparisons for the Dark Triad traits, as well as the other scale measures, can be seen in Table `r (table_count <- table_count + 1)`.
 
-Participants were also asked how frequently they visited 11 social media sites on a 5-pt scale (1 = "less often than every few weeks"; 5 = "several times a day"). The list of sites included Facebook, Instagram, LinkedIn, Twitter, Snapchat, YouTube, WhatsApp, Reddit, 4chan, and Tumblr. However, certain sites were only used be women (i.e., Pinterest) or men (i.e., 4chan). Additional sites included did include users from both genders, but in an amount that would lead to misinterpretatiosn. We dropped sites with fewer than 20 participants reporting visiting the site at least every few weeks from the analysis from either gender. In the end, we retained frequency of use ratings for Facebook, Instagram, Reddit, Snapchat, Twitter, and YouTube. The descriptive statistics and gender comparisons for those sites can be seen in Table `r (table_count <- table_count + 1)`.
-
-We also asked participants the average number of minutes they spend on each site on an average day. Again, we only retained those sites that had more than 20 at-least-rare users of both genders. For the descriptive statistics and gender comparisons for the average length of time in minutes spent on those sites per day, see Table `r (table_count <- table_count + 1)`. 
+Participants were also asked how frequently they visited 11 social media sites on a 5-pt scale (1 = "less often than every few weeks"; 5 = "several times a day"). The list of sites included Facebook, Instagram, LinkedIn, Twitter, Snapchat, YouTube, WhatsApp, Reddit, 4chan, and Tumblr. However, certain sites were only used be women (e.g., Pinterest) or men (e.g., 4chan). Additional sites included users from both genders, but in an amount that would lead to misinterpretations. We dropped sites with fewer than 20 participants reporting visiting the site at least every few weeks from the analysis from either gender. In the end, we retained frequency of use ratings for Facebook, Instagram, Reddit, Snapchat, Twitter, and YouTube. The descriptive statistics and gender comparisons for those sites can be seen in Table `r (table_count <- table_count + 1)`. We also asked participants the average number of minutes they spend on each site on an average day. Again, we only retained those sites that had more than 20 at-least-rare users of both genders. For the descriptive statistics and gender comparisons for the average length of time in minutes spent on those sites per day, see Table `r (table_count <- table_count + 1)`. 
 
 # Results
 ```{r data1_zeroorder, include = FALSE}
@@ -745,21 +773,19 @@ zo[zo == "1.00**"] <- "-"
 # print table
 zo %>%
   apa_table(caption = "Zero-order correlations for frequency and length of social media use and the Dark Triad traits.",
-            note = paste0("* \\textit{p} < .05, ** \\textit{p} < .01. Values above the diagononal are for women (\\textit{n} = ",
+            note = paste0("* \\textit{p} < .05, ** \\textit{p} < .01. Values above the diagonal are for women (\\textit{n} = ",
                          median(zo_fem$n),
                          "); values below the diagonal are for men (\\textit{n} = ",
                          median(zo_mal$n),
-                         "). P-values were adjusted using the Holm-Bonferonni method and were adjusted seperately for the male and female subsamples."),
+                         "). P-values were adjusted using the Holm-Bonferonni method and were adjusted separately for the male and female sub-samples."),
             align = "l",
             escape = FALSE)
 
 # drop unneeded variables
-rm(list = setdiff(ls(), c("data1", "custom_functions", custom_functions)))
+rm(list = setdiff(ls(), c("data1", "table_count", "custom_functions", custom_functions)))
 ```
 
-Table `r (table_count <- table_count + 1)` for zero-order correlations, which seems to suggest that at conventional significant levels there is no relationship between the Dark Triad and either the freuqency of social media use or the average length of social media use per day. However, the frequency and length measures inclduded in the matrix are collapsing accross social media sites. 
-
-In order to leverage the multiple observations gathered for every participant, we opted to run two series of linear mixed-effects model. In terms of predictors, both models were identical. They differed by outcome variable:  The first model had frequency of social media use as an outcome variable. The second model had length of social media use per day as the outcome variable.
+Zero-order correlations among all variables are listed in Table `r (table_count <- table_count + 1)`, which seems to suggest that at conventional significant levels there is no relationship between the Dark Triad and either the frequency of social media use or the average length of social media use per day. However, the frequency and length measures included in the matrix are collapsing across social media sites. In order to leverage the multiple observations gathered for every participant, we opted to run two series of linear mixed-effects model. In terms of predictors, both models were identical. The models only differed by outcome variable:  The first model had frequency of social media use as an outcome variable. The second model had length of social media use per day (in minutes) as the outcome variable.
 
 ```{r data1_lmer_freq, include = FALSE}
 # filter data1 for nas
@@ -944,10 +970,7 @@ model_len_final_sum <- summary(model_len_final)
 
 ```
 
-In terms of random effects, we allowed random intercepts accross subjects. It would have been defensible to run the model as a two-level cross-classified, nesting observations within both subjects and social media sites. However, we were interested in the effects of social media site and thus included them as fixed effects in our model. In the present case, grouping by subject explaiend `r spround(freq_icc * 100)`% of the variation in frequency of social media use an `r spround(len_icc * 100)`% of the variation in the length of social media use.
-
-We added fixed effects to our model in the following order: (1) gender, (2) the Dark Triad traits, (3) the specific social media site, (4) the interaction between gender and the Dark Triad traits, (5) the interaction between gender and the social media sites, and (6) the interaction between the Dark Triad traits and the  social media sites. The full model for the two models were:
-
+In terms of random effects, we allowed random intercepts across subjects. It would have been defensible to run the model as a two-level cross-classified model, nesting observations within both subjects and social media sites. However, we were interested in the effects of social media site and thus included them as fixed effects in our model. In the present case, grouping by subject explained `r spround(freq_icc * 100)`% of the variation in frequency of social media use and `r spround(len_icc * 100)`% of the variation in the length of social media use. We added fixed effects to our model in the following order: (1) gender, (2) the Dark Triad traits, (3) the specific social media site, (4) the interaction between gender and the Dark Triad traits, (5) the interaction between gender and the social media sites, and (6) the interaction between the Dark Triad traits and the  social media sites. The full model for the two models was:
 
 $L1: Y_{ij} = \beta_{0j} + \beta_{1j}SMS_{ij} + r_{ij}$
 
@@ -955,10 +978,9 @@ $L2: \beta_{0j} = \gamma_{00} + \gamma_{01}G{j} + \gamma_{02}M{j} + \gamma_{03}N
 
 $\;\;\;\;\;\;\; \beta_{1j} = \gamma_{10} + \gamma_{11}G{j} + \gamma_{12}M_{j} + \gamma_{13}N_{j} + \gamma_{14}P_{j}  + u_{1j}$
 
-
 Results of the model comparisons can be see in Table `r (table_count <- table_count + 1)`.
 
-Interpretation of the results goes here. 
+**Interpretation of the results goes here.** 
 
 ```{r data1_model_comps_tab, echo = FALSE, results = 'asis'}
 # format for outputting
@@ -979,7 +1001,11 @@ len_model_comp %<>%
 # combine tables
 model_comps_comb <- cbind(freq_model_comp, len_model_comp)
 
-# round tables to appropriat enumber of digits
+########################################################
+### instance of parallel iteration # 4 (1 required) ####
+########################################################
+
+# round tables to appropriate number of digits
 model_comps_comb <- pmap_df(list(model_comps_comb, 
                                  c(0, 0, 2, 2, 2, 2, 3, 2, 2, 2, 2, 3), 
                                  c(rep(TRUE, 2), rep(c(rep(TRUE, 4), FALSE), 2))),
@@ -1010,30 +1036,47 @@ model_comps_comb %>%
                                "Length" = c(9, 13)),
            note = "something something")
 
-
-
 ```
 
 # Discussion
 
-Something something something
+**Something something something... TBD**
 
-\newpage
-
-```{r data1_machxgender_plot, echo = FALSE}
+```{r fig.cap="Average length spent on social media per day (in minutes) as a function of Machiavellianism and social media site."}
 # convert dark triad traits to categorical using con_to_cat
 data1$mach_group <- con_to_cat(data1$dd_mach_comp)
 data1$narc_group <- con_to_cat(data1$dd_narc_comp)
 data1$psyc_group <- con_to_cat(data1$dd_psyc_comp)
 
+# create academic inspired theme
+academic_theme <- theme(plot.subtitle = element_text(family = "Times"), 
+                        plot.caption  = element_text(family = "Times", 
+                                                     size = 12,
+                                                     hjust = 0), 
+                        axis.title    = element_text(family = "Times", 
+                                                     face = "bold"), 
+                        axis.text     = element_text(family = "Times"), 
+                        axis.text.x   = element_text(family = "Times"), 
+                        axis.text.y   = element_text(family = "Times"), 
+                        plot.title    = element_text(family = "Times", 
+                                                     face = "bold"), 
+                        legend.text   = element_text(family = "Times"), 
+                        legend.title  = element_text(family = "Times"), 
+                        strip.text    = element_text(family = "Times",
+                                                     face = "bold"))
+
+#making social media site title case
+data1 %<>%
+  mutate(sns = stringr::str_to_title(sns))
+
 #Examining whether social media use differ as a function of Machiavellianism
-data1 %>%
+plot1_mach <- data1 %>%
   filter(mach_group != "Mid") %>% 
   group_by(sns, mach_group) %>%
   summarize(len_m  = mean(len, na.rm = TRUE),
             len_se = sundry::se(len)) %>%
   ggplot(aes(x = mach_group, y = len_m, fill = mach_group)) +
-    geom_col(position = "dodge", alpha = 0.8) +
+    geom_col(position = "dodge", alpha = 0.75) +
     geom_errorbar(aes(ymin = len_m - len_se, 
                       ymax = len_m + len_se),
                   position = "dodge",
@@ -1042,24 +1085,21 @@ data1 %>%
     facet_wrap(~sns) +
     theme_bw(base_size = 14) +
     guides(fill=FALSE) +
-    theme(axis.title = element_text(face = "bold"),
-          strip.text = element_text(face = "bold", size = 14),
-          legend.title = element_text(face = "bold")) +
     labs(y = "Average length spent on Social \nMedia Sites per Day (minutes)",
          x = "Machiavellianism")
+
+plot1_mach + academic_theme
 ```
 
-*Figure 1.* Very cool plot. 
-
-```{r data1_narcxgender_plot}
+```{r fig.cap="Average length spent on social media per day (in minutes) as a function of Narcissism and social media site."}
 #Examining whether social media use differ as a funciton of Narcissism (no gender)
-data1 %>%
+plot1_narc <- data1 %>%
   filter(narc_group != "Mid") %>%
   group_by(sns, narc_group) %>% 
   summarize(len_m  = mean(len, na.rm = TRUE),
             len_se = sundry::se(len)) %>%
     ggplot(aes(x = narc_group, y = len_m, fill = narc_group)) +
-    geom_col(position = "dodge", alpha = 0.8) +
+    geom_col(position = "dodge", alpha = 0.75) +
     geom_errorbar(aes(ymin = len_m - len_se, 
                       ymax = len_m + len_se),
                   position = "dodge",
@@ -1069,23 +1109,23 @@ data1 %>%
     guides(fill=FALSE) +
     theme_bw(base_size = 14) +
     theme(axis.title = element_text(face = "bold"),
-             strip.text = element_text(face = "bold", size = 14),
-             legend.title = element_text(face = "bold")) +
+          strip.text = element_text(face = "bold", size = 14),
+          legend.title = element_text(face = "bold")) +
     labs(y = "Average length spent on Social \nMedia Sites per Day (minutes)",
          x = "Narcissism")
+
+plot1_narc + academic_theme
 ```
 
-*Figure 2.* Very cooler plot. 
-
-```{r data1_psycxgender_plot}
+```{r fig.cap="Average length spent on social media per day (in minutes) as a function of Psychopathy and social media site."}
 #Examining whether social media use differ as a funciton of Psychopathy (no gender)
-data1 %>%
+plot1_psyc <- data1 %>%
   filter(psyc_group != "Mid") %>%
   group_by(sns, psyc_group) %>% 
   summarize(len_m  = mean(len, na.rm = TRUE),
             len_se = sundry::se(len)) %>%
   ggplot(aes(x = psyc_group, y = len_m, fill = psyc_group)) +
-    geom_col(position = "dodge", alpha = 0.8) +
+    geom_col(position = "dodge", alpha = 0.75) +
     geom_errorbar(aes(ymin = len_m - len_se, 
                       ymax = len_m + len_se),
                   position = "dodge",
@@ -1095,26 +1135,23 @@ data1 %>%
     guides(fill=FALSE) +
     theme_bw(base_size = 14) +
     theme(axis.title = element_text(face = "bold"),
-             strip.text = element_text(face = "bold", size = 14),
-             legend.title = element_text(face = "bold")) +
+          strip.text = element_text(face = "bold", size = 14),
+          legend.title = element_text(face = "bold")) +
     labs(y = "Average length spent on Social \nMedia Sites per Day (minutes)",
          x = "Psychopathy") 
 
-
+plot1_psyc + academic_theme
 ```
 
-*Figure 3.* Very coolest plot. 
-
-```{r gender_parallel_iteration, warning = FALSE}
-
-# examining gender differences in minutes spent on social media each day
-# by social media site
-data1 %>%
+```{r fig.cap="Average length spent on social media per day (in minutes) as a function of gender and social media site."}
+# examining gender differences in minutes spent on social media each day 
+# as a function of social media site
+plot1_gender <- data1 %>%
   group_by(gender, sns) %>%
   summarise(len_m = mean(len, na.rm = TRUE),
             len_se = se(len, na.rm = TRUE)) %>%
   ggplot(aes(x = sns, y = len_m, fill = gender)) + 
-    geom_col(position = "dodge", alpha = 0.9) +
+    geom_col(position = "dodge", alpha = 0.75) +
     scale_fill_manual(values = c("#633974", "#2A99A2"),
                       name = "Gender") +
     theme_bw(base_size = 14) +
@@ -1125,13 +1162,20 @@ data1 %>%
     labs(y = "Average Length Spent on Social Media Sites per Day (minutes)",
          x = "Social Media Site")
 
+plot1_gender + academic_theme
+```
+
+```{r gender_parallel_iteration, warning = FALSE, include = FALSE}
+
 ########################################################
-### instance of parallel iteration # 1 (1 required) ####
+### instance of parallel iteration # 5 (1 required) ####
 ## instance of purr::nest%>%mutate() # 1 (1 required) ##
 ########################################################
 
-# lets examine potential gender effects on social media use..
-# ...as a function of the dark triad traits
+# for those who are curious: 
+#let's examine whether gender effects on sns use vary as a function of the dark triad traits
+#these figures will not appear in the manuscript
+#instead, the figures will be saved in a folder called "plots"
 
 plot_data <- data1 %>%
   gather(key = dd_trait, value = standing, mach_group:psyc_group) %>%
@@ -1143,12 +1187,12 @@ plot_data <- data1 %>%
 plot_data$standing <- factor(plot_data$standing, levels = c("Low", "Mid", "High"))
 
 plot_data %<>%
-  #filter(standing != "Mid") %>%
+  filter(standing != "Mid") %>%
   spread(sns_perc_context, sns_perc_rating) %>%
   group_by(dd_trait, standing) %>%
   nest()
 
-plot_data <- plot_data %>%
+final_plots <- plot_data %>%
   mutate(plots = pmap(
     # create list of plot resources
     list(data_for_plot = plot_data$data,
@@ -1175,15 +1219,38 @@ plot_data <- plot_data %>%
              x        = "Gender")
 }))
 
-plot_data$plots[[1]]
-plot_data$plots[[2]]
-plot_data$plots[[3]]
-plot_data$plots[[4]]
-plot_data$plots[[5]]
-plot_data$plots[[6]]
-plot_data$plots[[7]]
-plot_data$plots[[8]]
-plot_data$plots[[9]]
+final_plots$plots[[1]]
+final_plots$plots[[2]]
+final_plots$plots[[3]]
+final_plots$plots[[4]]
+final_plots$plots[[5]]
+final_plots$plots[[6]]
+
+# create a name for the plot files
+final_plots %<>%
+  mutate(file_name = paste(dd_trait, standing, sep = "_"),
+         file_name = gsub(" ", "_", file_name),
+         file_name = tolower(file_name),
+         file_name = glue("{file_name}.png"))
+
+# create a plots directory
+fs::dir_create(here::here("plots"))
+
+# create file paths
+paths <- here::here("plots", final_plots$file_name)
+
+#######################################################################
+#{purrr} function outside the basic map family (walk_*) # 1[10 points]#
+# One Required                                                        #
+#######################################################################
+
+# walk the plots and save using the paths
+walk2(paths, final_plots$plots, ggsave,
+      # specify image dimensions and resolution
+      width  = 9.5, 
+      height = 6.5,
+      dpi    = 500)
+
 ```
 
 \newpage
