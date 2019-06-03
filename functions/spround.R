@@ -2,6 +2,11 @@
 #### Custom function 6 (at least 2 required) ####
 #################################################
 
+# Much like lenique, spround rounds and formats a number for knitting (using 
+# sprintf) in one step. By default, it rounds to two decimal  places and 
+# leading zeros are retained. 
+
+
 spround <- function(x, digits = 2, leading0 = TRUE) {
   
   # check x argument
