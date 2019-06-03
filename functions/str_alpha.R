@@ -2,6 +2,12 @@
 #### Custom function 4 (at least 2 required) ####
 #################################################
 
+# A function for calculating a Cronbach's Alpha using all columns of a dataframe
+# that match a given string. By default, str_alpha provided the full output from
+# the psych::alpha function. When `full = FALSE` only the raw alpha value is
+# extracted. 
+
+
 str_alpha <- function(pattern, data, full = TRUE, na.rm = TRUE) {
   
   # ensure the pattern is a character
