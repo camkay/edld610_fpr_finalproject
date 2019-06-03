@@ -224,11 +224,13 @@ names(data1)[str_cols_find("q7", data1)] <- unlist(col_names)
 rm(list = setdiff(ls(), c("data1", "col_names", "custom_functions", "table_count", custom_functions)))
 ```
 
+#TN: great work with the data, very clear and clean coding!! It was useful to learn how to add subscales 
+
 ```{r data1_convert_to_long, include = FALSE}
 # add an id column to the data
 data1 %<>%
   mutate(id = 1:n()) %>%
-  select(id, everything())
+  select(id, everything()) #TN: this is useful! I will use it on my own work 
 
 # transform the data to long format with respect the the frequency of sns use 
 # and the length of sns use
@@ -281,6 +283,8 @@ data1 %<>%
          # drop the unit column
          select(-len_unit)
 ```
+
+# TN: great use of map! 
 
 ```{r data1_format, include = FALSE}
 # factorize and label factors
@@ -356,6 +360,9 @@ data1 <- data1 %>%
 # clean up the environment
 rm(list = setdiff(ls(), c("data1", "alphas", "custom_functions", "table_count", custom_functions)))
 ```
+
+#TN: great use of map to replace names! looks useful 
+#TN: I like how you divided the code : all the code chunks preparing the data and functions are very well organized beofre the beginning of the main manuscript and the following chunks for the different sections of the paper are well organized and placed across the text, which makes the creation of an APA format pdf clear and straight forward. 
 
 # Intro
 
@@ -1272,6 +1279,8 @@ walk2(paths, final_plots$plots, ggsave,
       dpi    = 500)
 
 ```
+
+# TN great use of walk2 to save the plots!! 
 
 \newpage
 
