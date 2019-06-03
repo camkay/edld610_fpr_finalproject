@@ -2,11 +2,20 @@
 #### Custom function 5 (at least 2 required) ####
 #################################################
 
+# Creates a composite vector from names of columns in a dataframe that match a
+# user-provided string. By default, the composite is calculated by row-wise 
+# averaging, however the option is available to calculate the composite using
+# row-wise summation. Similar to str_alpha, the function also
+# messages the user, telling them the names of the columns that were
+# used to calculate the composite. If only four columns were used, all column
+# names are returned. If greater than four columns were used, the first three
+# columns are named, followed by "and * more."
+
 str_composite <- function(pattern, data, sum = FALSE) {
   
   # ensure the pattern is a character
   if (!is.character(pattern)) {
-    stop("pattern must be of type numeric.")
+    stop("pattern must be of type character.")
   # and data is a data frame
   } else if (!is.data.frame(data)) {
     stop("data must be of type data frame or tibble.")
