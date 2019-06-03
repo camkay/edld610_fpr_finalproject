@@ -1046,7 +1046,7 @@ model_len_final_sum
 
 Results revealed that compared to males, females tended to use social media sites more frequently, overall, *b* = 0.45, *SE* = .19, *t*(791.03) = 2.30, *p* = .022. However, males appeared to use Reddit [*b* = 1.23, *SE* = .23, *t*(1571.11) = 5.31, *p* < .001] and Youtube [*b* = 1.07, *SE* = .23, *t*(1571.11) = 4.62, *p* < .001] more frequently than females. 
 
-In terms of the Dark Triad traits, those higher in narcissism reported using Instagram [*b* = .79, *SE* = .31, *t*(1571.11) = 2.56, *p* = .011] and--marginally--Snapchat [*b* = .56, *SE* = .31, *t*(1571.11) = 1.81, *p* = .07] more frequently than Facebook. 
+In terms of the Dark Triad traits, those higher in narcissism reported using Instagram [*b* = .79, *SE* = .31, *t*(1571.11) = 2.56, *p* = .011] and--marginally--Snapchat [*b* = .56, *SE* = .31, *t*(1571.11) = 1.81, *p* = .07] more frequently than Facebook. Interestingly, it appears the effect of Narcissism on Instagram use interacted with gender, such that female narcissists used Instrgram less than male narcissists (INSERT STATS).
 
 
 
