@@ -2,6 +2,13 @@
 #### Custom function 1 (at least 2 required) ####
 #################################################
 
+# A function for finding columns of a dataframe that have names that match a 
+# string. By default, a logical vector is returned. Specifying "numbers" for the
+# `return` argument creates a numeric vector of the column numbers that match 
+# the string. Specifying "names" returns the column names that match the string. 
+# Finally, specifying "data" returns a dataframe with only the columns that 
+# match the string. 
+
 str_cols_find <- function(pattern, data, return = "logical") {
   
   # ensure pattern is a character and the data is a dataframe
