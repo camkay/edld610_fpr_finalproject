@@ -5,7 +5,10 @@
 # A function for calculating a Cronbach's Alpha using all columns of a dataframe
 # that match a given string. By default, str_alpha provided the full output from
 # the psych::alpha function. When `full = FALSE` only the raw alpha value is
-# extracted. 
+# extracted. Messages the user, telling them the names of the columns that were
+# used to calculate the alpha value. If only four columns were used, all column
+# names are returned. If greater than four columns were used, the first three
+# columns are named, followed by "and * more."
 
 
 str_alpha <- function(pattern, data, full = TRUE, na.rm = TRUE) {
