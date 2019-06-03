@@ -67,7 +67,7 @@ knitr::opts_chunk$set(echo       = FALSE,
 
 # load packages
 library(sundry) # for calculating standard errors
-library("papaja") # for creating the apa journal article
+#library("papaja") # for creating the apa journal article
 library(tidyverse) # for purrr, dplyr, and ggplot2 functions
 library(rio) # for easy imporrting of data
 library(here) # for reproducible paths
@@ -135,6 +135,9 @@ options(scipen = 999)
 # set a table incrementer (the papaja table referencer is not working for me)
 table_count <- 0
 ```
+
+# TN I love the idea of making an APA manuscript for this project, super useful and lots to learn from! I like the way you organized your functions, and it was easy to find them and it also makes the code cleaner 
+# I dont know if it is the goal in this project, but explaining the step by step of how to create at least one of the functions would have been useful and informative - thinking of future audiences of this project 
 
 ```{r data1_rename, include = FALSE}
 # drop the display order columns and the custom demographic columns
