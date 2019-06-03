@@ -2,6 +2,11 @@
 #### Custom function 9 (at least 2 required) ####
 #################################################
 
+# This function takes one required argument (i.e., a numeric column) and 
+# quartile splits it to create a new character vector (i.e., a vector consisting 
+# of three strings: low, mid, and high). By default, the result is converted to 
+# a factor and NAs are removed.
+
 con_to_cat <- function(column, na.rm = TRUE, as.a.factor = TRUE) {
   
   # argument check
