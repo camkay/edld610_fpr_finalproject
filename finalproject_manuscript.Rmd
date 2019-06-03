@@ -1050,6 +1050,7 @@ In regard to the Dark Triad traits, those higher in narcissism reported using In
 
 *Length of Social Media Use (in minutes)*
 
+Contrary to the model above, analyzing the total reported minutes on social media per day revealed males and females did not significantly differ from one another in overall social media use (*p* > .29). However, results were consistent in that males appeared to report spending more minutes per day on Reddit [*b* = 25.63, *SE* = 8.09, *t*(11552.29) = 3.17, *p* = .002] and Youtube [*b* = 37.96, *SE* = 8.09, *t*(11552.29) = 4.69, *p* < .001].
 
 
 ```{r data1_model_comps_tab, echo = FALSE, results = 'asis'}
