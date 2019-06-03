@@ -16,6 +16,9 @@ str_cols_find <- function(pattern, data, return = "logical") {
     x <- grepl(pattern, names(data))
   } else if (return == "numbers") {
     x <- grep(pattern, names(data))
+    
+# Why is it grep() here when it was grepl() in line 16? Does it matter?
+    
   } else if (return == "names" ) {
     x <- grep(pattern, names(data), value = TRUE)
   } else if (return == "data") {
