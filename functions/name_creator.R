@@ -2,6 +2,13 @@
 #### Custom function 2 (at least 2 required) ####
 #################################################
 
+# Takes a string specifying a scale's name, a string specifying he scale's
+# subscale names, the length of the scale, and the length of the subscale, and
+# creates a vector of item names. If no subscale length is provided, equal 
+# subscale lengths is assumed and subscale length is equivalent to the scale 
+# length divided by the number of subscales. 
+
+
 name_creator <- function(scale_name, sub_name, scale_len, sub_len) {
   
   # ensure arguments of correct types
