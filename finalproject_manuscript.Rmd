@@ -694,7 +694,7 @@ The Dark Triad was assessed using the Dirty Dozen [@Jonason2010d], comprising fo
 
 Participants were also asked how frequently they visited 11 social media sites on a 5-pt scale (1 = "less often than every few weeks"; 5 = "several times a day"). The list of sites included Facebook, Instagram, LinkedIn, Twitter, Snapchat, YouTube, WhatsApp, Reddit, 4chan, and Tumblr. However, certain sites were only used be women (e.g., Pinterest) or men (e.g., 4chan). Additional sites included users from both genders, but in an amount that would lead to misinterpretations. We dropped sites with fewer than 20 participants reporting visiting the site at least every few weeks from the analysis from either gender. In the end, we retained frequency of use ratings for Facebook, Instagram, Reddit, Snapchat, Twitter, and YouTube. The descriptive statistics and gender comparisons for those sites can be seen in Table `r (table_count <- table_count + 1)`. We also asked participants the average number of minutes they spend on each site on an average day. Again, we only retained those sites that had more than 20 at-least-rare users of both genders. For the descriptive statistics and gender comparisons for the average length of time in minutes spent on those sites per day, see Table `r (table_count <- table_count + 1)`. 
 
-# Results
+# Results and Discussion
 ```{r data1_zeroorder, include = FALSE}
 # set the data up for the correlation matrix
 data1_corr <- data1 %>%
@@ -864,6 +864,24 @@ model_freq_6 <- lmer(freq ~ gender +
                             dd_psyc_comp * sns + 
                             (1 | id), data = data1, REML = FALSE)
 
+# fit model with d3 x sns x gender interaction
+model_freq_7 <- lmer(freq ~ gender + 
+                            dd_mach_comp + 
+                            dd_narc_comp +
+                            dd_psyc_comp + 
+                            sns +
+                            gender * dd_mach_comp + 
+                            gender * dd_narc_comp + 
+                            gender * dd_psyc_comp + 
+                            gender * sns +
+                            dd_mach_comp * sns + 
+                            dd_narc_comp * sns +
+                            dd_psyc_comp * sns + 
+                            dd_mach_comp * sns * gender + 
+                            dd_narc_comp * sns * gender +
+                            dd_psyc_comp * sns * gender + 
+                            (1 | id), data = data1, REML = FALSE)
+
 # compare models
 freq_model_comp <- anova(model_freq_0,
                          model_freq_1,
@@ -871,7 +889,8 @@ freq_model_comp <- anova(model_freq_0,
                          model_freq_3,
                          model_freq_4,
                          model_freq_5,
-                         model_freq_6)
+                         model_freq_6,
+                         model_freq_7)
 
 # respecify model (drop gender x d3 interactions)
 model_freq_final <- lmer(freq ~ gender + 
@@ -880,6 +899,12 @@ model_freq_final <- lmer(freq ~ gender +
                                 dd_psyc_comp + 
                                 sns +
                                 gender * sns +
+                                dd_mach_comp * sns + 
+                                dd_narc_comp * sns +
+                                dd_psyc_comp * sns + 
+                                dd_mach_comp * sns * gender + 
+                                dd_narc_comp * sns * gender +
+                                dd_psyc_comp * sns * gender +
                                 (1 | id), data = data1, REML = FALSE)
 
 # summarize final model
@@ -951,6 +976,24 @@ model_len_6 <- lmer(len ~ gender +
                             dd_psyc_comp * sns + 
                             (1 | id), data = data1, REML = FALSE)
 
+# fit model with d3 x sns x gender interaction
+model_len_7 <- lmer(len ~ gender + 
+                            dd_mach_comp + 
+                            dd_narc_comp +
+                            dd_psyc_comp + 
+                            sns +
+                            gender * dd_mach_comp + 
+                            gender * dd_narc_comp + 
+                            gender * dd_psyc_comp + 
+                            gender * sns +
+                            dd_mach_comp * sns + 
+                            dd_narc_comp * sns +
+                            dd_psyc_comp * sns + 
+                            dd_mach_comp * sns * gender + 
+                            dd_narc_comp * sns * gender +
+                            dd_psyc_comp * sns * gender + 
+                            (1 | id), data = data1, REML = FALSE)
+
 # compare models
 len_model_comp <- anova(model_len_0,
                         model_len_1,
@@ -958,23 +1001,32 @@ len_model_comp <- anova(model_len_0,
                         model_len_3,
                         model_len_4,
                         model_len_5,
-                        model_len_6)
+                        model_len_6,
+                        model_len_7)
 
 # respecify model (drop gender x d3 interactions)
 model_len_final <- lmer(len ~ gender + 
-                              dd_mach_comp + 
-                              dd_narc_comp +
-                              dd_psyc_comp + 
-                              sns +
-                              gender * sns +
-                              (1 | id), data = data1, REML = FALSE)
+                            dd_mach_comp + 
+                            dd_narc_comp +
+                            dd_psyc_comp + 
+                            sns +
+                            gender * sns +
+                            dd_mach_comp * sns + 
+                            dd_narc_comp * sns +
+                            dd_psyc_comp * sns + 
+                            dd_mach_comp * sns * gender + 
+                            dd_narc_comp * sns * gender +
+                            dd_psyc_comp * sns * gender + 
+                            (1 | id), data = data1, REML = FALSE)
 
 # summarize final model
 model_len_final_sum <- summary(model_len_final)
 
+model_len_final_sum
+
 ```
 
-In terms of random effects, we allowed random intercepts across subjects. It would have been defensible to run the model as a two-level cross-classified model, nesting observations within both subjects and social media sites. However, we were interested in the effects of social media site and thus included them as fixed effects in our model. In the present case, grouping by subject explained `r spround(freq_icc * 100)`% of the variation in frequency of social media use and `r spround(len_icc * 100)`% of the variation in the length of social media use. We added fixed effects to our model in the following order: (1) gender, (2) the Dark Triad traits, (3) the specific social media site, (4) the interaction between gender and the Dark Triad traits, (5) the interaction between gender and the social media sites, and (6) the interaction between the Dark Triad traits and the  social media sites. The full model for the two models was:
+In terms of random effects, we allowed random intercepts across subjects. It would have been defensible to run the model as a two-level cross-classified model, nesting observations within both subjects and social media sites. However, we were interested in the effects of social media site and thus included them as fixed effects in our model. In the present case, grouping by subject explained `r spround(freq_icc * 100)`% of the variation in frequency of social media use and `r spround(len_icc * 100)`% of the variation in the length of social media use. We added fixed effects to our model in the following order: (1) gender, (2) the Dark Triad traits, (3) the specific social media site, (4) the interaction between gender and the Dark Triad traits, (5) the interaction between gender and the social media sites, (6) the interaction between the Dark Triad traits and the  social media sites, and, finally, (7) the three-way interaction between the Dark Triad traits, social media sites, and gender. The full model for the two models was:
 
 $L1: Y_{ij} = \beta_{0j} + \beta_{1j}SMS_{ij} + r_{ij}$
 
@@ -1051,9 +1103,6 @@ model_comps_comb %>%
 
 ```
 
-# Discussion
-
-**Something something something... TBD**
 
 ```{r fig.cap="Average length spent on social media per day (in minutes) as a function of Machiavellianism and social media site."}
 # convert dark triad traits to categorical using the con_to_cat function
