@@ -2,6 +2,10 @@
 #### Custom function 12 (at least 2 required) ###
 #################################################
 
+# A function for performing a t-test using a number of parameters: the mean of
+# both groups, the sd of both groups, and the number of participants in both 
+# groups. By default, the function performs a two-tailed test.
+
 tdp_from_pars <- function(m1, m2, sd1, sd2, n1, n2, two.tailed = TRUE) {
   
   # check arguments
