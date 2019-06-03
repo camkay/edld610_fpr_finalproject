@@ -1022,11 +1022,9 @@ model_len_final <- lmer(len ~ gender +
 # summarize final model
 model_len_final_sum <- summary(model_len_final)
 
-model_len_final_sum
-
 ```
 
-In terms of random effects, we allowed random intercepts across subjects. It would have been defensible to run the model as a two-level cross-classified model, nesting observations within both subjects and social media sites. However, we were interested in the effects of social media site and thus included them as fixed effects in our model. In the present case, grouping by subject explained `r spround(freq_icc * 100)`% of the variation in frequency of social media use and `r spround(len_icc * 100)`% of the variation in the length of social media use. We added fixed effects to our model in the following order: (1) gender, (2) the Dark Triad traits, (3) the specific social media site, (4) the interaction between gender and the Dark Triad traits, (5) the interaction between gender and the social media sites, (6) the interaction between the Dark Triad traits and the  social media sites, and, finally, (7) the three-way interaction between the Dark Triad traits, social media sites, and gender. The full model for the two models was:
+In terms of random effects, we allowed random intercepts across subjects. It would have been defensible to run the model as a two-level cross-classified model, nesting observations within both subjects and social media sites. However, we were interested in the effects of social media site and thus included them as fixed effects in our model. In the present case, grouping by subject explained `r spround(freq_icc * 100)`% of the variation in frequency of social media use and `r spround(len_icc * 100)`% of the variation in the length of social media use. We added fixed effects to our model in the following order: (1) gender, (2) the Dark Triad traits, (3) the specific social media site, (4) the interaction between gender and the Dark Triad traits, (5) the interaction between gender and the social media sites, (6) the interaction between the Dark Triad traits and the  social media sites, and, finally, (7) the three-way interaction between the Dark Triad traits, social media sites, and gender. Results of the model comparisons can be see in Table `r (table_count <- table_count + 1)`. Note the final model above included all of the previously mentioned fixed effects, except for the gender x Dark Triad interaction. Model comparisons revealed that the inclusion of this interaction term did not significantly improve model fit. The full model for the two models was:
 
 $L1: Y_{ij} = \beta_{0j} + \beta_{1j}SMS_{ij} + r_{ij}$
 
@@ -1034,9 +1032,23 @@ $L2: \beta_{0j} = \gamma_{00} + \gamma_{01}G{j} + \gamma_{02}M{j} + \gamma_{03}N
 
 $\;\;\;\;\;\;\; \beta_{1j} = \gamma_{10} + \gamma_{11}G{j} + \gamma_{12}M_{j} + \gamma_{13}N_{j} + \gamma_{14}P_{j}  + u_{1j}$
 
-Results of the model comparisons can be see in Table `r (table_count <- table_count + 1)`.
+**NEED TO UPDATE WITH THREE-WAY INTERACTION.** 
 
-**Interpretation of the results goes here.** 
+```{r model_interpretation, eval = FALSE, include = FALSE}
+model_freq_final_sum
+
+# First, an examiniation of social media sites revealed that relative to Facebook, participants in general reported using Instagram [*b* = .81, *SE* = .20, *t*(1571.11) = 4.10, *p* < .001], Snapchat [*b* = 1.01, *SE* = .20, *t*(1571.11) = 5.11, *p* < .001], and Youtube [*b* = 1.31, *SE* = .20, *t*(1571.11) = 6.64, *p* < .001] more. Reddit was used less frequently than Facebook [*b* = -1.23, *SE* = .23, *t*(1571.11) = -5.31, *p* < .001], and there were no significant differences between Facebook and Instagram (*p* > .35). 
+
+model_len_final_sum
+```
+
+*Frequency of Social Media Use*
+
+Results revealed that compared to males, females tended to use social media sites more frequently, overall, *b* = 0.45, *SE* = .19, *t*(791.03) = 2.30, *p* = .022. However, males appeared to use Reddit [*b* = 1.23, *SE* = .23, *t*(1571.11) = 5.31, *p* < .001] and Youtube [*b* = 1.07, *SE* = .23, *t*(1571.11) = 4.62, *p* < .001] more frequently than females. 
+
+In terms of the Dark Triad traits, those higher in narcissism reported using Instagram [*b* = .79, *SE* = .31, *t*(1571.11) = 2.56, *p* = .011] and--marginally--Snapchat [*b* = .56, *SE* = .31, *t*(1571.11) = 1.81, *p* = .07] more frequently than Facebook. 
+
+
 
 ```{r data1_model_comps_tab, echo = FALSE, results = 'asis'}
 # format column names for outputting
