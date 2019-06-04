@@ -144,9 +144,9 @@ data1 %<>%
 
 # manualy rename the demographic columns
 data1 %<>%
-  rename(age          = q1_1,
-         gender       = q1_2,
-         race         = q1_4)
+  rename(age    = q1_1,
+         gender = q1_2,
+         race   = q1_4)
 
 
 # create vectors of subscale names
@@ -356,7 +356,7 @@ rm(list = setdiff(ls(), c("data1", "alphas", "custom_functions", "table_count", 
 
 # Intro
 
-In 2005—one year before Facebook went public—only 5% of American adults reported using at least one social media site [@Smith2018a]. Thirteen-years later, in 2018, that number had risen to include 69%, or roughly two-thirds, of American adults. It would be hard to argue there hasn’t been a profound increase in the number of Americans using social media, but this 69% figure does vary depending on age bracket. As one might expect, over twice as many 18-to-29 year-olds reported using social media when compared to those older than 65 (88% and 37%, respectively). The population variation was not restricted to age, however: Eight percent more women used social media than men, and 16% more people from urban communities used social media than their non-urban counterparts. Recently, psychologists have turned to personality traits to explain some of the remaining variation in social media use. 
+In 2005—one year before Facebook went public—only 5% of American adults had reported using even one social media site [@Smith2018a]. Thirteen-years later, in 2018, that number had risen to include 69% of American adults. It would be hard to argue there hasn’t been a profound increase in the number of Americans using social media, but this 69% figure does vary depending on age bracket. Over twice as many 18-to-29 year-olds reported using social media when compared to those older than 65 (88% and 37%, respectively). This population variation was not restricted to age, however: Eight percent more women used social media than men, and 16% more people from urban communities used social media than their non-urban counterparts. Recently, psychologists have turned to personality traits to explain some of the remaining variation in social media use. 
 
 With some notable exceptions, the research conducted in the overlapping region between personality and communications has focused primarily on ostensibly-positive personality traits. Negative personality traits have been left largely unexplored. The present study aims to fill this void. To that end, we administered a survey assessing an individual’s levels of the Dark Triad personality traits (i.e., Machiavellianism, narcissism, and psychopathy), the amount of time they actively spend on social media sites, and the frequency with which they visit social media sites.
 
