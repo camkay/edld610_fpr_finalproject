@@ -1030,7 +1030,7 @@ $L1: Y_{ij} = \beta_{0j} + \beta_{1j}SMS_{ij} + r_{ij}$
 
 $L2: \beta_{0j} = \gamma_{00} + \gamma_{01}G{j} + \gamma_{02}M{j} + \gamma_{03}N_{j} + \gamma_{04}P_{j} + \gamma_{05}G_{j}*M_{j} + \gamma_{06}G_{j}*N_{j} + \gamma_{07}G_{j}*P_{j}  + u_{0j}$
 
-$\;\;\;\;\;\;\; \beta_{1j} = \gamma_{10} + \gamma_{11}G{j} + \gamma_{12}M_{j} + \gamma_{13}N_{j} + \gamma_{14}P_{j}  + u_{1j}$
+$\;\;\;\;\;\;\; \beta_{1j} = \gamma_{10} + \gamma_{11}G{j} + \gamma_{12}M_{j} + \gamma_{13}N_{j} + \gamma_{14}P_{j} + \gamma_{15}G_{j}*M_{j} + \gamma_{16}G_{j}*N_{j} + \gamma_{17}G_{j}*P_{j} + u_{1j}$
 
 **NEED TO UPDATE WITH THREE-WAY INTERACTION.** 
 
