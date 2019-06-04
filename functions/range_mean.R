@@ -33,4 +33,3 @@ range_mean <- function(x, as.character = TRUE) {
   }
 }
 
-range_mean("10-12", as.character = 20)
