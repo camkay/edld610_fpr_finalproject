@@ -1061,8 +1061,8 @@ Lastly, results suggested those high in psychopathy spent more minutes per day o
 ```{r data1_model_comps_tab, echo = FALSE, results = 'asis'}
 # format column names for outputting
 freq_model_comp %<>%
-  select(df = Df,
-         `$\\chi^2$ df` = `Chi Df`,
+  select(`$df$` = Df,
+         `$\\chi^2 df$` = `Chi Df`,
          AIC:logLik,
          `$\\chi^2$` = Chisq,
          `$p$` = `Pr(>Chisq)`)
@@ -1081,7 +1081,7 @@ model_comps_comb <- cbind(freq_model_comp, len_model_comp)
 ### instance of parallel iteration # 4 (1 required) ####
 ########################################################
 
-# round tables to appropriate number of digits
+# round table columns to appropriate number of digits
 model_comps_comb <- pmap_df(list(model_comps_comb, 
                                  c(0, 0, 2, 2, 2, 2, 3, 2, 2, 2, 2, 3), 
                                  c(rep(TRUE, 2), rep(c(rep(TRUE, 4), FALSE), 2))),
@@ -1094,7 +1094,8 @@ model_comps_comb$Model <- c("Null",
                             "Social Media (SNS)",
                             "G X D3",
                             "G X SNS",
-                            "D3 X SNS")
+                            "D3 X SNS",
+                            "G X D3 X SNS")
 
 # reorder the data frame so the predictors are first
 model_comps_comb %<>%
@@ -1104,7 +1105,7 @@ model_comps_comb %<>%
 # iterate over entire table and replace .000s with <.000s
 model_comps_comb <- apply(model_comps_comb, 
                           MARGIN = c(1, 2), 
-                          function(string) gsub(".000", "<.000", string))
+                          function(string) gsub(".000", "<.001", string))
 
 # iterate over entire table and replace NAs with nothing
 model_comps_comb <- apply(model_comps_comb, 
@@ -1119,7 +1120,7 @@ model_comps_comb %>%
            landscape = TRUE,
            col_spanners = list("Frequency" = c(4, 8),
                                "Length"    = c(9, 13)),
-           note = "something something")
+           note = "All models were fit using Full Maximal Likelihood estimation. Intercepts varied among participants. ")
 
 ```
 
