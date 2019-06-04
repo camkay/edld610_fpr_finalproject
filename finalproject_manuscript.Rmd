@@ -52,7 +52,7 @@ knitr::opts_chunk$set(echo       = FALSE,
                       fig.width  = 7.5,
                       fig.height = 4.5)
 
-# install packages if you do not have them installed already
+# install packages if you do not have them installed already #I'm glad you kept this!
 # devtools::install_github("datalorax/sundry")
 # install.packages("papaja")
 # install.packages("tidyverse")
@@ -65,7 +65,7 @@ knitr::opts_chunk$set(echo       = FALSE,
 # install.packages("glue")
 # install.packages("sjstats")
 
-# load packages
+# load packages #This is also very informative!
 library(sundry) # for calculating standard errors
 library("papaja") # for creating the apa journal article
 library(tidyverse) # for purrr, dplyr, and ggplot2 functions
@@ -1134,7 +1134,7 @@ data1$narc_group <- con_to_cat(data1$dd_narc_comp)
 data1$psyc_group <- con_to_cat(data1$dd_psyc_comp)
 
 # create academic inspired theme
-academic_theme <- theme(plot.subtitle = element_text(family = "Times"), 
+academic_theme <- theme(plot.subtitle = element_text(family = "Times"), #Well, this is pretty cool! 
                         plot.caption  = element_text(family = "Times", 
                                                      size   = 12,
                                                      hjust  = 0), 
@@ -1171,7 +1171,7 @@ plot1_mach <- data1 %>%
     theme_bw(base_size = 14) +
     guides(fill = FALSE) +
     labs(y = "Average length spent on Social \nMedia Sites per Day (minutes)",
-         x = "Machiavellianism")
+         x = "Machiavellianism")  #It's too bad that the reported data for 4chan is so low, I would imagine that Machiavellianism would be incredibly high!
 
 # format the plot using the academic theme
 plot1_mach + academic_theme
@@ -1355,3 +1355,17 @@ r_refs(file = "r-references.bib")
 
 <div id = "refs"></div>
 \endgroup
+
+
+#Overall comments
+
+Areas of strength
+1) Very well annotated step-by-step code that I was able to follow (you two are also the first that I've seen use the manuscript format).
+2) Clean, detailed plots that get the information across effectively (e.g., I like the plot grid to represent a variety of social media platforms)
+3) I just want to acknowledge that you two put in an incredible amount of work/dedication for this project, which is reflected by the amount of detail and length of the manuscript.
+ 
+What did I learn?
+1) Whenever I read your code, I feel like that I'm learning more than anything else! If I had to pick one thing out, I would say that I enjoyed learning about how to create a custom theme (line 1064) to make a more professional plot (I could easily see this on a poster at a conference).
+
+Area of improvement
+1) Very minor suggestion--I think your code could benefit from more consistent allignment at times. I think that this would make it easier to follow functions and data tidying at on a few occasions.
