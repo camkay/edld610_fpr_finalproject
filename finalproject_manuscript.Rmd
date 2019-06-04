@@ -56,7 +56,7 @@ knitr::opts_chunk$set(echo       = FALSE,
 
 # install packages if you do not have them installed already
 # devtools::install_github("datalorax/sundry")
-# install.packages("papaja")
+# devtools::install_github("crsh/papaja")
 # install.packages("tidyverse")
 # install.packages("rio")
 # install.packages("here")
@@ -69,7 +69,10 @@ knitr::opts_chunk$set(echo       = FALSE,
 
 # load packages
 library(sundry) # for calculating standard errors
-library("papaja") # for creating the apa journal article
+library(papaja) # for creating the apa journal article
+# I had to find this package on GitHub and install it. I also had to remove the quotes
+# from the package name in the library() call.
+
 library(tidyverse) # for purrr, dplyr, and ggplot2 functions
 library(rio) # for easy imporrting of data
 library(here) # for reproducible paths
