@@ -546,7 +546,7 @@ descript_comps <- rbind(c("\\textit{Dark Triad}", rep("", ncol(descript_comps) -
 # output gender comparison scale table
 descript_comps %>%
   apa_table(caption      = "Descriptive statistics and sex differences for scales",
-            col_spanners = list("Mean (SD)" = c(str_cols_find("l", descript_comps, return = "numbers"))),
+            col_spanners = list("\\textit{Mean} (\\textit{SD})" = c(2, 4)),
             stub_indents = list(which(descript_comps$Overall != "")),
             note         = "* \\textit{p} < .05, ** \\textit{p} < .01, *** \\textit{p} < .001.", 
             align        = c("l", "r", "r", "r", "r", "l", "r"),
@@ -669,7 +669,7 @@ descript_sns_len <- descript_sns[c(1, 8:13)]
 # output frequency table
 descript_sns_freq %>%
   apa_table(caption      = "Descriptive statistics and sex differences for frequency of social media use.",
-            col_spanners = list("Mean (SD)" = c(str_cols_find("l", descript_sns_freq, return = "numbers"))),
+            col_spanners = list("\\textit{Mean} (\\textit{SD})" = c(2, 4)),
             note         = "* \\textit{p} < .05, ** \\textit{p} < .01, *** \\textit{p} < .001.", 
             align        = c("l", "r", "r", "r", "r", "l", "r"),
             escape       = FALSE)
@@ -679,7 +679,7 @@ descript_sns_freq %>%
 # output length table
 descript_sns_len %>%
   apa_table(caption      = "Descriptive statistics and sex differences for average length of social media use per day in minutes.",
-            col_spanners = list("Mean (SD)" = c(str_cols_find("l", descript_sns_len, return = "numbers"))),
+            col_spanners = list("\\textit{Mean} (\\textit{SD})" = c(2, 4)),
             note         = "* \\textit{p} < .05, ** \\textit{p} < .01, *** \\textit{p} < .001.", 
             align        = c("l", "r", "r", "r", "r", "l", "r"),
             escape       = FALSE)
@@ -774,12 +774,12 @@ zo[zo == "1.00***"] <- "-"
 ```{r data1_zeroorder_tab, echo = FALSE, results = 'asis'}
 # print table
 zo %>%
-  apa_table(caption = "Zero-order correlations for frequency and length of social media use and the Dark Triad traits.",
+  apa_table(caption = "Zero-order correlations with frequency of social media use, length spent on social media per day, and the Dark Triad traits.",
             note = paste0("* \\textit{p} < .05, ** \\textit{p} < .01, *** \\textit{p} < .001. Values above the diagonal are for women (\\textit{n} = ",
                           median(zo_fem$n),
                           "); values below the diagonal are for men (\\textit{n} = ",
                           median(zo_mal$n),
-                          "). P-values were adjusted using the Holm-Bonferonni method and were adjusted separately for the male and female sub-samples."),
+                          "). P-values were adjusted using the Holm-Bonferonni method and were adjusted separately for the male and female sub-samples. Frequency of social media use and length spent on social media were collapsed accross all sites."),
             align = "l",
             escape = FALSE)
 
@@ -787,7 +787,7 @@ zo %>%
 rm(list = setdiff(ls(), c("data1", "table_count", "custom_functions", custom_functions)))
 ```
 
-Zero-order correlations among all variables are listed in Table `r (table_count <- table_count + 1)`, which seems to suggest that at conventional significant levels there is no relationship between the Dark Triad and either the frequency of social media use or the average length of social media use per day. However, the frequency and length measures included in the matrix are collapsing across social media sites. In order to leverage the multiple observations gathered for every participant, we opted to run two series of linear mixed-effects model. In terms of predictors, both models were identical. The models only differed by outcome variable:  The first model had frequency of social media use as an outcome variable. The second model had length of social media use per day (in minutes) as the outcome variable.
+Zero-order correlations among all variables are shown in Table `r (table_count <- table_count + 1)`. Collapsing across the social media sites, there appears to be no relationship between the Dark Triad traits and either the frequency of social media use or the average length of time spent on social media per day. In order to leverage the multiple observations gathered for every participant, we opted to run two series of linear mixed-effects models. The predictors and the sequence of adding those predictors to the models for each series was identical. The series only differed by outcome variable: The first model had frequency of social media use as an outcome variable, while the second model had length of social media use per day (in minutes) as the outcome variable.
 
 ```{r data1_lmer_freq, include = FALSE}
 # filter data1 for NAs
@@ -1024,7 +1024,9 @@ model_len_final_sum <- summary(model_len_final)
 
 ```
 
-In terms of random effects, we allowed random intercepts across subjects. It would have been defensible to run the model as a two-level cross-classified model, nesting observations within both subjects and social media sites. However, we were interested in the effects of social media site and thus included them as fixed effects in our model. In the present case, grouping by subject explained `r spround(freq_icc * 100)`% of the variation in frequency of social media use and `r spround(len_icc * 100)`% of the variation in the length of social media use. We added fixed effects to our model in the following order: (1) gender, (2) the Dark Triad traits, (3) the specific social media site, (4) the interaction between gender and the Dark Triad traits, (5) the interaction between gender and the social media sites, (6) the interaction between the Dark Triad traits and the  social media sites, and, finally, (7) the three-way interaction between the Dark Triad traits, social media sites, and gender. Results of the model comparisons can be see in Table `r (table_count <- table_count + 1)`. Note the final model above included all of the previously mentioned fixed effects, except for the gender x Dark Triad interaction. Model comparisons revealed that the inclusion of this interaction term did not significantly improve model fit. The full model for the two models was:
+In terms of random effects, we allowed intercepts to vary accross subjects. It would have also been defensible to run the model as a two-level cross-classified model, nesting observations within both subjects and social media sites. However, we were interested in the effects of specific social media sites and thus included them as fixed effects in our model. In the present case, grouping by subject explained `r spround(freq_icc * 100)`% of the variation in frequency of social media use and `r spround(len_icc * 100)`% of the variation in the length of social media use before addition of any fixed effect predictors. We added fixed effects to our model in the following order: (1) gender, (2) the Dark Triad traits, (3) the specific social media site, (4) the interaction between gender and the Dark Triad traits, (5) the interaction between gender and the social media sites, (6) the interaction between the Dark Triad traits and the  social media sites, and, finally, (7) the three-way interaction between the Dark Triad traits, social media sites, and gender. Results of the model comparisons can be see in Table `r (table_count <- table_count + 1)`. Since the three-way interaction significantly improved model fit for the length of social media use model, we retained all predictors. Although the three-way model for the frequency of social media use did not significantly improve model fit, we retained all predictors to allow for easy comparison accross both series of models.
+
+The final, interpreted model was
 
 $L1: Y_{ij} = \beta_{0j} + \beta_{1j}SMS_{ij} + r_{ij}$
 
@@ -1032,7 +1034,7 @@ $L2: \beta_{0j} = \gamma_{00} + \gamma_{01}G{j} + \gamma_{02}M{j} + \gamma_{03}N
 
 $\;\;\;\;\;\;\; \beta_{1j} = \gamma_{10} + \gamma_{11}G{j} + \gamma_{12}M_{j} + \gamma_{13}N_{j} + \gamma_{14}P_{j} + \gamma_{15}G_{j}*M_{j} + \gamma_{16}G_{j}*N_{j} + \gamma_{17}G_{j}*P_{j} + u_{1j}$
 
-**NEED TO UPDATE WITH THREE-WAY INTERACTION.** 
+with $Y_{ij}$ representing frequency of social media use and length spent on social media use for each respective series of model comparisons. 
 
 ```{r model_interpretation, eval = FALSE, include = FALSE}
 model_freq_final_sum
@@ -1042,13 +1044,13 @@ model_freq_final_sum
 model_len_final_sum
 ```
 
-*Frequency of Visting Social Media Sites*
+## Frequency of Visting Social Media Sites
 
 Results revealed that compared to males, females tended to visit social media sites more frequently, overall, *b* = 0.45, *SE* = .19, *t*(791.03) = 2.30, *p* = .022. However, males appeared to visit Reddit [*b* = 1.23, *SE* = .23, *t*(1571.11) = 5.31, *p* < .001] and Youtube [*b* = 1.07, *SE* = .23, *t*(1571.11) = 4.62, *p* < .001] more frequently than females. 
 
 In regard to the Dark Triad traits, those higher in narcissism reported visiting Instagram [*b* = .79, *SE* = .31, *t*(1571.11) = 2.56, *p* = .011] and Snapchat [albeit marginally; *b* = .56, *SE* = .31, *t*(1571.11) = 1.81, *p* = .07] more frequently than Facebook. Interestingly, it appears this effect of Narcissism on Instagram use interacted with gender, such that female narcissists visited Instagram less than male narcissists, *b* = -0.79, *SE* = .35, *t*(1571.11) = -2.27, *p* = .023. Those high in Machiavellianism, on the other hand, visited Reddit more than Facebook, *b* = .85, *SE* = .30, *t*(1571.11) = 2.84, *p* = .004. This effect again depended on gender. That is, females high in Machiavellianism  visited Reddit less than males high in Machiavellianism, *b* = -0.92, *SE* = .38, *t*(1571.11) = -2.39, *p* = .017. Finally, the only effect to arise concerning psychopathy was an interaction between psychopathy, gender, and social media site. Specifically, females scoring higher in psychopathy reported visiting Reddit more than Facebook, *b* = .84, *SE* = .42, *t*(1571.11) = 1.99, *p* = .047.
 
-*Length of Social Media Use (in minutes)*
+## Length of Social Media Use (in minutes)
 
 While females tended to visit social media sites more overall, analyzing the total time spend on social media per day (in minutes) revealed males and females did not significantly differ from one another in overall time spend on social media (*p* > .29). Results similarly indicated that males appeared to report spending more minutes per day on Reddit [*b* = 25.63, *SE* = 8.09, *t*(11552.29) = 3.17, *p* = .002] and Youtube [*b* = 37.96, *SE* = 8.09, *t*(11552.29) = 4.69, *p* < .001].
 
