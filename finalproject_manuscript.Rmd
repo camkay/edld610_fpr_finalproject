@@ -29,6 +29,7 @@ bibliography      : ["r-references.bib"]
 
 floatsintext      : no
 figurelist        : no
+figsintext        : no #Plots will be referenced at end
 tablelist         : no
 footnotelist      : no
 linenumbers       : no
@@ -37,10 +38,10 @@ draft             : no
 
 header-includes:
   - \raggedbottom
-  - \setlength{\parskip}{0pt}
+  - \setlength{\parskip}{0pt} #Equations are now left-aligned
 
 documentclass     : "apa6"
-classoption       : "man, fleqn, noextraspace"
+classoption       : "man, fleqn, noextraspace" #Odd spacing around paragraphs and headers is removed
 output            : papaja::apa6_pdf
 ---
 
