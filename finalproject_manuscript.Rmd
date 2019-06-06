@@ -789,7 +789,7 @@ zo %>%
 rm(list = setdiff(ls(), c("data1", "table_count", "custom_functions", custom_functions)))
 ```
 
-Zero-order correlations among all variables are shown in Table `r (table_count <- table_count + 1)`. Collapsing across the social media sites, there appears to be no relationship between the Dark Triad traits and either the frequency of social media use or the average length of time spent on social media per day. In order to leverage the multiple observations gathered for every participant, we opted to run two series of linear mixed-effects models. The predictors and the sequence of adding those predictors to the models for each series was identical. The series only differed by outcome variable: The first model had frequency of visiting social media as an outcome variable, while the second model had length of social media use per day (in minutes) as the outcome variable.
+Zero-order correlations among all variables are shown in Table `r (table_count <- table_count + 1)`. Collapsing across the social media sites, there appears to be no relationship between the Dark Triad traits and either the frequency visiting social media sites per day or the average length of time spent on social media per day. In order to leverage the multiple observations gathered for every participant, we opted to run two series of linear mixed-effects models. The predictors and the sequence of adding those predictors to the models for each series was identical. The series only differed by outcome variable: The first model had frequency of visiting social media as an outcome variable, while the second model had length of social media use per day (in minutes) as the outcome variable.
 
 ```{r data1_lmer_freq, include = FALSE}
 # filter data1 for NAs
