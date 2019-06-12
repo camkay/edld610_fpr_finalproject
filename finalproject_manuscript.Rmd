@@ -19,11 +19,11 @@ authornote: |
   Cameron Stuart Kay, Department of Psychology, University of Oregon; Ashley L. Miller, Department of Psychology, University of Oregon.
 
 abstract: | 
-  The current study examines potential sources of variation in frequency visiting social media sites and overall time spent on social media each day. In particular, the relations between the Dark Triad traits (i.e., Machiavellianism, psychopathy, and narcissism) and social media use are discussed. Furthermore, interactions between the Dark Triad and gender are explored, suggesting that these two factors interact in predicting social media use, depending on the social media site in question.  Overall, there are robust and important personality-related individual differences in social media use, and it is suggested that future research is needed to better clarify why certain social media platforms attract those with "darker" personalities.
+  The current study examined potential sources of variation in the frequency of visiting social media sites and the overall time spent on social media each day. In particular, the relations between the Dark Triad traits (i.e., Machiavellianism, psychopathy, and narcissism) and social media use are discussed. Furthermore, interactions between the Dark Triad and gender are explored, suggesting that these two factors interact in predicting social media use, depending on the social media site in question.  Overall, there are robust and important personality-related individual differences in social media use, and it is suggested that future research is needed to better clarify why certain social media platforms attract those with "darker" personalities.
   
 keywords          : "social media use, Dark Triad, gender"
 
-wordcount         : 107
+wordcount         : 110
 
 bibliography      : ["r-references.bib"]
 
